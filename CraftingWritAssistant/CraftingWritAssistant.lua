@@ -23,7 +23,8 @@ CraftingWritAssistant.CurrentCraftingWritSteps = {}
 CraftingWritAssistant.AutoSelectionInProgress = false
 CraftingWritAssistant.JournalQuestInformation = {}
 CraftingWritAssistant.ManualSelectedWritName = ""
- 
+CraftingWritAssistant.ManualSelectedWritType = 0
+
 -- using this to not rebind the window and show if they have closed it 
 -- during the session crafting station session
 CraftingWritAssistant.ClosedWindowInSession = false
@@ -142,9 +143,9 @@ function OnCraftingWritAssistSelect(_, selectedWrit, choice)
     
     if CraftingWritAssistant.AutoSelectionInProgress ~= true then
         local questSelected = CraftingWritAssistant.JournalQuestInformation[selectedWrit]
-        
+        --d("OnCraftingWritAssistSelect "..selectedWrit)
 		CraftingWritAssistant.ManualSelectedWritName = selectedWrit
-		
+		CraftingWritAssistant.ManualSelectedWritType = questSelected.craftingType
         local hasCraftQuests = CraftingWritAssistant.BindWindow(questSelected.craftingType, selectedWrit)
         if hasCraftQuests then      
             CraftingWritAssistant.ShowWindow()  
@@ -324,7 +325,7 @@ function CraftingWritAssistant.CreateOptionsWindow()
         type = "panel",
         name = "Crafting Writ Assistant",
         author = "@dovah-argus",
-        version = ".29b",
+        version = ".30b",
         slashCommand = "/cwasettings",
         registerForRefresh = true,
         website = "http://www.esoui.com/downloads/info1121-CraftingWritAssistant.html"
@@ -527,13 +528,13 @@ function BindProvisioningDetails(journalIndex)
                             local recipeNameStep = questDetails.questSteps[y]
                             --d(recipeNameStep)
 							local ingredList = {}
-                            if PlainStringFind(recipeNameStep, recipeName) then 
+							local nameClean = zo_strformat("<<C:1>>", recipeName)
+                            if PlainStringFind(recipeNameStep, nameClean) then 
                                             
                                     local listOfIngred = ""
                                     for z = 1, numIngredients do
                                         local ingredName = GetRecipeIngredientItemInfo(i,x,z)
-                                        table.insert(ingredList, ingredName)
-                                       
+                                        table.insert(ingredList, ingredName)                                       
                                     end          
 								
 								local sort_func = function( a,b ) return a < b end
@@ -849,14 +850,30 @@ function CraftingWritAssistant.BindWindow(craftingType, selectedWrit)
                 --d(details.craftingType)
 					--todo: CHECK CraftingWritAssistant.ManualSelectedWritName			
 				
-                    if craftingType == details.craftingType then                       
-                        local craftingWritDetails = { name = questName, steps = details.questSteps, stepComplete = details.questStepsComplete}                              
+                    if craftingType == details.craftingType then   
+						local questToSelect = questName
+						local detailsToSelect = details
+						
+						if CraftingWritAssistant.ManualSelectedWritName ~= "" and CraftingWritAssistant.ManualSelectedWritType == craftingType then
+							--auto select last manual selected quest
+							questToSelect = CraftingWritAssistant.ManualSelectedWritName
+							--search for manual selected quest details
+							for innerQuestName, innerQuestDetails in pairs(CraftingWritAssistant.JournalQuestInformation) do
+								if CraftingWritAssistant.ManualSelectedWritName == innerQuestName then
+									detailsToSelect = innerQuestDetails
+									break
+								end
+							end 
+						end
+						--d("questToSelect "..questToSelect)
+							
+                        local craftingWritDetails = { name = questToSelect, steps = detailsToSelect.questSteps, stepComplete = detailsToSelect.questStepsComplete}                              
                         CraftingWritAssistant.CurrentCraftingWritSteps[craftingType] = craftingWritDetails  
                         --d("match on type")    
-                        journalIndex = details.journalIndex
+                        journalIndex = detailsToSelect.journalIndex
                         
-                        SetSelectedItemWritDropdown(questName)
-                        isMasterQuest = CraftingWritAssistant.GetIsMasterActiveCraftingWritQuest(questName)
+                        SetSelectedItemWritDropdown(questToSelect)
+                        isMasterQuest = CraftingWritAssistant.GetIsMasterActiveCraftingWritQuest(questToSelect)
                         hasCraftingTypeActiveWrit = true
                         break
                     end 

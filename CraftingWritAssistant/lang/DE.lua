@@ -75,8 +75,8 @@ ZO_CreateStringId("SI_CWA_DISPLAY_AT_BANK_DESC", "This will display the writ win
 
 --MISC. TEXT
 ZO_CreateStringId("SI_CWA_TITLE", "Crafting Writ Assistant")
-ZO_CreateStringId("SI_CWA_UNKNOWN_RECIPE", "Unknown Recipe")
+ZO_CreateStringId("SI_CWA_UNKNOWN_RECIPE", "Rezept ist unbekannt")
 ZO_CreateStringId("SI_CWA_KEY_BINDING", "Öffnen des Crafting Writ Assistant fenster")
-ZO_CreateStringId("SI_CWA_NO_WRITS", "No Active Writs")
+ZO_CreateStringId("SI_CWA_NO_WRITS", "Keine schrieb")
 
 ZO_CreateStringId("SI_CWA_DELIVER", "Beliefert")

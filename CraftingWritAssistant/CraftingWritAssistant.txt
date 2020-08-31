@@ -1,7 +1,7 @@
 ## Title: Crafting Writ Assistant
 ## Author: @dovah_argus
-## Version: .29b
-## AddOnVersion: 29
+## Version: .30b
+## AddOnVersion: 30
 ## APIVersion: 100031 100032
 ## Description: This addon will display your crafting writs when you visit a crafting station, please mail me for suggestions and recommendations.
 ## SavedVariables: CraftingWritAssistantVars
