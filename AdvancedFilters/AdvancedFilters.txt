@@ -1,0 +1,30 @@
+## Title: Advanced Filters
+## Author: Randactyl & Baertram
+## Version: 1.5.4.7
+## AddOnVersion: 1547
+## APIVersion: 100032 100033
+## DependsOn: LibAddonMenu-2.0>=31 libCommonInventoryFilters>=140 LibCustomMenu>=682 LibFilters-3.0>=315 LibMotifCategories>=2
+## OptionalDependsOn: CraftBagExtended
+## SavedVariables: AdvancedFilters_Settings
+
+constants.lua
+util.lua
+
+strings/en.lua
+strings/$(language).lua
+
+libraries.lua
+
+main.lua
+
+textures.lua
+AF_FilterBar.xml
+AF_FilterBar.lua
+data.lua
+menu.lua
+
+extrafilters/LevelFilters.lua
+extrafilters/NewMotif.lua
+extrafilters/MotifKnowledge.lua
+extrafilters/EquipmentMotifCategories.lua
+extrafilters/BoPTradeableFilters.lua

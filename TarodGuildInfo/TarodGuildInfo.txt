@@ -1,0 +1,9 @@
+## Title: Tarod Guild Info
+## Author: Tarod
+## APIVersion: 100031 100032
+## Description: This addon displays guild info as system message on login.
+## Version: 0.1b
+## AddOnVersion: 0.1b
+## DependsOn: LibChatMessage
+
+TarodGuildInfo.lua
