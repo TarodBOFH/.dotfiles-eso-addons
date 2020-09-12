@@ -1,0 +1,677 @@
+<GuiXml>
+    <Controls>
+
+        <!-- Floating button -->
+        <Backdrop name="CPSlot_UI_ButtonBg" mouseEnabled="true" movable="true" clampedToScreen="true" edgeColor="80aaffff" centerColor="40aaffff" alpha="0">
+            <Anchor relativeTo="GuiRoot" relativePoint="TOPLEFT" point="TOPLEFT"/>
+            <Dimensions y="60" x="60"/>
+            <Edge edgeSize="1"/>
+            <OnInitialized>self:SetParent(ZO_MainMenu)</OnInitialized>
+            <OnMouseEnter>WINDOW_MANAGER:SetMouseCursor(MOUSE_CURSOR_PAN);self:SetAlpha(1)</OnMouseEnter>
+            <OnMouseExit>WINDOW_MANAGER:SetMouseCursor(MOUSE_CURSOR_DO_NOT_CARE);self:SetAlpha(0)</OnMouseExit>
+        </Backdrop>
+
+        <Button name="CPSlot_UI_Button" topmost="true">
+            <Anchor relativeTo="CPSlot_UI_ButtonBg" relativePoint="CENTER" point="CENTER"/>
+            <Dimensions y="40" x="40"/>
+            <OnInitialized>self:SetParent(ZO_MainMenu)</OnInitialized>
+            <Textures normal="ChampionPointsSlots/star.dds"
+                      mouseOver="ChampionPointsSlots/starOver.dds"
+                      disabled="ChampionPointsSlots/starHalf.dds"/>
+            <Controls>
+                <Label name="CPSlot_UI_ButtonLabel" font="ZoFontWinH4">
+                    <Anchor relativeTo="$(parent)" relativePoint="TOPRIGHT" point="TOPLEFT"/>
+                </Label>
+            </Controls>
+        </Button>
+
+    <!-- Virtuals {{{-->
+        <Button name="CPS_Check" inherits="ZO_CheckButton" virtual="true">
+            <Dimensions x="30" y="30" />
+            <Textures
+                pressed="ChampionPointsSlots/checked.dds"
+                pressedMouseOver="ChampionPointsSlots/hover.dds"
+
+                normal="ChampionPointsSlots/disabled.dds"
+                mouseOver="ChampionPointsSlots/hover.dds"
+                />
+        </Button>
+
+        <Backdrop name="CPS_Edit" edgeColor="00000000" centerColor="77777766" alpha="1.0" virtual="true">
+            <Edge edgeSize="1" />
+            <Dimensions y="21" x="40" />
+            <Controls>
+                <EditBox name="$(parent)Box" inherits="ZO_DefaultEditForBackdrop" maxInputCharacters="3" font="$(BOLD_FONT)|$(KB_15)" textType="3" color="INTERFACE_TEXT_COLOR_SELECTED:INTERFACE_TEXT_COLOR_NORMAL" >
+                </EditBox>
+            </Controls>
+        </Backdrop>
+
+        <Button name="CPS_Button" font="ZoFontGame" virtual="true">
+            <Dimensions x="200" y="40" />
+            <Textures normal="esoui/art/buttons/button_xlarge_mouseup.dds"
+                      mouseOver="esoui/art/buttons/button_xlarge_mouseover.dds" />
+        </Button>
+
+        <Button name="CPS_Special_Star" font="ZoFontGame" virtual="true">
+            <Dimensions x="20" y="20"/>
+            <Textures normal="ChampionPointsSlots/star.dds"
+                mouseOver="ChampionPointsSlots/starOver.dds"
+                disabled="ChampionPointsSlots/starHalf.dds"/>
+        </Button>
+
+        <Label name="CPS_Equip" font="ZoFontGame" virtual="true">
+            <Controls>
+                <Label name="$(parent)_Count" font="ZoFontWinH4">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPRIGHT" offsetX="15"/>
+                </Label>
+            </Controls>
+        </Label>
+
+        <Button name="CPS_Skill" font="ZoFontGame" virtual="true">
+            <Dimensions x="40" y="40"/>
+            <OnMouseEnter>
+                if self.slot == nil then return end
+
+                local actionSlotIndex = self.slot
+                local slotData = ACTION_BAR_ASSIGNMENT_MANAGER:GetCurrentHotbar():GetSlotData(actionSlotIndex)
+                if slotData then
+                    -- This is an ability, use the slotData tooltip
+                    if self.activeTooltip then
+                        ClearTooltip(self.activeTooltip)
+                        self.activeTooltip = nil
+                    end
+
+                    local tooltip = slotData:GetKeyboardTooltipControl()
+                    if tooltip then
+                        self.activeTooltip = tooltip
+                        InitializeTooltip(tooltip, self, BOTTOM, 0, -5, TOP)
+                        slotData:SetKeyboardTooltip(tooltip)
+                    end
+                end
+            </OnMouseEnter>
+
+            <OnMouseExit>
+                if self.activeTooltip then
+                    ClearTooltip(self.activeTooltip)
+                    self.activeTooltip = nil
+                end
+            </OnMouseExit>
+        </Button>
+
+        <Button name="CPS_Label" font="ZoFontGame" virtual="true" horizontalAlignment="0">
+            <Dimensions x="200" y="25"/>
+            <Textures normal="NULL"
+                      mouseOver="esoui/art/buttons/button_xlarge_mouseover.dds" />
+        </Button>
+
+        <Label name="CPS_Attribute" virtual="true" font="ZoFontWinH3"> </Label>
+        <Label name="CPS_Attribute_Avail" virtual="true" font="ZoFontWinH3"> </Label>
+
+        <Button name="CPS_Stat" virtual="true" font="ZoFontWinH3" horizontalAlignment="0">
+            <Dimensions x="200" y="40"/>
+            <Textures normal="NULL"
+                      mouseOver="NULL" />
+            <Controls>
+
+                <Button name="$(parent)_Text" font="ZoFontWinH3" inherits="CPS_Label">
+                    <Dimensions x="180" y="40"/>
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT" />
+                </Button>
+
+                <Button name="$(parent)_Amount" font="ZoFontWinH3" >
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_Text" relativePoint="TOPRIGHT" offsetX="5" />
+                </Button>
+
+            </Controls>
+        </Button>
+
+        <Button name="CPS_Star" virtual="true" font="ZoFontWinH3" horizontalAlignment="0">
+            <Dimensions x="200" y="40"/>
+            <Textures normal="NULL"
+                      mouseOver="esoui/art/buttons/button_xlarge_mouseover.dds" />
+            <Controls>
+                <Button name="$(parent)_1_Special" inherits="CPS_Special_Star">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPRIGHT" offsetX="-40" />
+                </Button>
+
+                <Button name="$(parent)_2_Special" inherits="CPS_Special_Star">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_1_Special" relativePoint="TOPRIGHT" offsetX="1" />
+                </Button>
+
+                <Button name="$(parent)_3_Special" inherits="CPS_Special_Star">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_2_Special" relativePoint="TOPRIGHT" offsetX="1" />
+                </Button>
+
+                <Button name="$(parent)_4_Special" inherits="CPS_Special_Star">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_3_Special" relativePoint="TOPRIGHT" offsetX="1" />
+                </Button>
+
+                <Button name="$(parent)Check" inherits="CPS_Check">
+                    <Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPLEFT" offsetX="0" offsetY="-10"/>
+                </Button>
+
+                <Button name="$(parent)_1_Text" font="ZoFontWinH3" >
+                    <Dimensions x="40" y="25"/>
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="BOTTOMLEFT" />
+                </Button>
+
+                <Button name="$(parent)_2_Text" font="ZoFontWinH3" >
+                    <Dimensions x="40" y="25"/>
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_1_Text" relativePoint="BOTTOMLEFT" />
+                </Button>
+
+                <Button name="$(parent)_3_Text" font="ZoFontWinH3" >
+                    <Dimensions x="40" y="25"/>
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_2_Text" relativePoint="BOTTOMLEFT" />
+                </Button>
+
+                <Button name="$(parent)_4_Text" font="ZoFontWinH3" >
+                    <Dimensions x="40" y="25"/>
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_3_Text" relativePoint="BOTTOMLEFT" />
+                </Button>
+
+
+                <Backdrop name="$(parent)_1_Edit" font="ZoFontWinH3" inherits="CPS_Edit" hidden="true">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="BOTTOMLEFT" offsetX="-45" />
+                </Backdrop>
+
+                <Backdrop name="$(parent)_2_Edit" font="ZoFontWinH3" inherits="CPS_Edit" hidden="true">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_1_Edit" relativePoint="BOTTOMLEFT" offsetY="5" />
+                </Backdrop>
+
+                <Backdrop name="$(parent)_3_Edit" font="ZoFontWinH3" inherits="CPS_Edit" hidden="true">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_2_Edit" relativePoint="BOTTOMLEFT" offsetY="5" />
+                </Backdrop>
+
+                <Backdrop name="$(parent)_4_Edit" font="ZoFontWinH3" inherits="CPS_Edit" hidden="true">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_3_Edit" relativePoint="BOTTOMLEFT" offsetY="5" />
+                </Backdrop>
+
+
+                <Button name="$(parent)_1" font="ZoFontWinH3" inherits="CPS_Label">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_1_Text" relativePoint="TOPLEFT" offsetX="45" />
+                </Button>
+
+                <Button name="$(parent)_2" font="ZoFontWinH3" inherits="CPS_Label">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_2_Text" relativePoint="TOPLEFT" offsetX="45" />
+                </Button>
+
+                <Button name="$(parent)_3" font="ZoFontWinH3" inherits="CPS_Label">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_3_Text" relativePoint="TOPLEFT" offsetX="45" />
+                </Button>
+
+                <Button name="$(parent)_4" font="ZoFontWinH3" inherits="CPS_Label">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)_4_Text" relativePoint="TOPLEFT" offsetX="45" />
+                </Button>
+
+            </Controls>
+        </Button>
+
+    <!-- End Virtuals }}}-->
+
+        <TopLevelControl name="ChampionPointsSlotsWindow" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true" >
+            <Dimensions x="930" y="650" />
+            <Anchor point="CENTER" />
+
+            <Controls>
+
+            <!-- Top {{{-->
+                <Backdrop name="$(parent)BG" inherits="ZO_DefaultBackdrop" />
+                <Button name="$(parent)CloseButton" inherits="ZO_ButtonBehaviorClickSound" >
+                    <Dimensions x="25" y="25" />
+                    <Textures normal="ESOUI/art/buttons/decline_up.dds"
+                        mouseOver="ESOUI/art/buttons/decline_over.dds" />
+                    <Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT" />
+                </Button>
+
+                <Label name="$(parent)Title" font="ZoFontWinH1" text="CP Slots" >
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT" offsetX="5" offsetY="1" />
+                </Label>
+
+                <Backdrop name="$(parent)Warning_BG" inherits="ZO_DefaultBackdrop" hidden="true">
+                    <Dimensions x="930" y="200" />
+                    <Anchor point="TOP" relativeTo="$(parent)" relativePoint="BOTTOM" />
+                    <Controls>
+                        <Label name="$(parent)Title" font="ZoFontWinH1" text="Help Messages" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT" offsetX="5" offsetY="1" />
+                        </Label>
+
+                        <Control name="$(parent)TopDivider" inherits="ZO_DynamicHorizontalDivider"  >
+                            <Dimensions x="850" />
+                            <Anchor point="TOP" relativeTo="$(parent)"/>
+                        </Control>
+
+                        <Label name="$(grandparent)WarningLabel" font="ZoFontWinH2" >
+                            <Dimensions x="930" y="200" />
+                            <Anchor point="TOP" relativeTo="$(parent)" relativePoint="CENTER" offsetX="5"/>
+                        </Label>
+
+                        <Label name="$(grandparent)HelpLabel" font="ZoFontWinH3" >
+                            <Dimensions x="930" y="200" />
+                            <Anchor point="TOP" relativeTo="$(parent)" relativePoint="CENTER" offsetX="5"/>
+                        </Label>
+                    </Controls>
+                </Backdrop>
+
+
+                <Control name="$(parent)Dropdown" inherits="ZO_ScrollableComboBox" >
+                    <Dimensions x="200" y="30" />
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOP" offsetX="-190" offsetY="10"/>
+                </Control>
+
+                <Control name="$(parent)Dropdown2" inherits="ZO_ScrollableComboBox" >
+                    <Dimensions x="200" y="30" />
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Dropdown" relativePoint="TOPRIGHT" offsetX="20" />
+                </Control>
+
+                <Label name="$(parent)CurrentSet" font="ZoFontWinH1" text="CP Slots" >
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Dropdown" relativePoint="TOPRIGHT" offsetX="10" offsetY="-13" />
+                </Label>
+
+                <Backdrop name="$(parent)RenameEditBoxBackdrop" edgeColor="00000000" centerColor="77777766" alpha="1.0" hidden="true">
+                    <Edge edgeSize="1" />
+                    <Dimensions x="200" y="30" />
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Dropdown2" relativePoint="BOTTOMLEFT" offsetX="-100" offsetY="5" />
+                    <Controls>
+                        <EditBox name="$(parent)EditBox" inherits="ZO_DefaultEditForBackdrop" >
+                        </EditBox>
+                    </Controls>
+                </Backdrop>
+
+
+                <Label name="$(parent)EditLabel" font="ZoFontWinH3" text="Edit " >
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Title" relativePoint="BOTTOMLEFT" offsetX="5" offsetY="10" />
+                </Label>
+
+                <Button name="$(parent)EditCheck" inherits="CPS_Check">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)EditLabel" relativePoint="TOPRIGHT" offsetX="10" offsetY="-3" />
+                </Button>
+
+                <Button name="$(parent)StatButton" font="ZoFontGame" inherits="CPS_Button" >
+                    <Anchor point="TOPRIGHT" relativeTo="$(parent)CloseButton" relativePoint="BOTTOMRIGHT" offsetX="5" offsetY="10" />
+                </Button>
+
+
+                <Control name="$(parent)TopDivider" inherits="ZO_DynamicHorizontalDivider"  >
+                    <Dimensions x="850" />
+                    <Anchor point="TOP" relativeTo="$(parent)"/>
+                </Control>
+
+                <Label name="$(parent)Thief" inherits="CPS_Attribute">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)TopDivider" relativePoint="TOPLEFT" offsetY="-60" offsetX="20" />
+                </Label>
+
+                <Label name="$(parent)Warrior" inherits="CPS_Attribute">
+                    <Anchor point="TOP" relativeTo="$(parent)TopDivider" relativePoint="TOP" offsetX="" offsetY="-60" />
+                </Label>
+
+                <Label name="$(parent)Mage" inherits="CPS_Attribute">
+                    <Anchor point="TOPRIGHT" relativeTo="$(parent)TopDivider" relativePoint="TOPRIGHT" offsetX="-25" offsetY="-60" />
+                </Label>
+
+                <Label name="$(parent)ThiefAvail" inherits="CPS_Attribute_Avail">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Thief" relativePoint="BOTTOMLEFT" offsetY="0"/>
+                </Label>
+
+                <Label name="$(parent)WarriorAvail" inherits="CPS_Attribute_Avail">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Warrior" relativePoint="BOTTOMLEFT" offsetY="0"/>
+                </Label>
+
+                <Label name="$(parent)MageAvail" inherits="CPS_Attribute_Avail">
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Mage" relativePoint="BOTTOMLEFT" offsetY="0"/>
+                </Label>
+
+            <!-- EndTop }}}-->
+
+            <!-- Green {{{-->
+
+                <Button name="$(parent)Shadow" inherits="CPS_Star" >
+                    <Anchor point="TOPRIGHT" relativeTo="$(parent)TopDivider" relativePoint="BOTTOMRIGHT" offsetY="10"/>
+                </Button>
+
+                <Button name="$(parent)Lover" inherits="CPS_Star" >
+                    <Anchor point="TOP" relativeTo="$(parent)TopDivider" relativePoint="BOTTOM" offsetX="-20" offsetY="10" />
+                </Button>
+
+                <Button name="$(parent)Tower" inherits="CPS_Star" >
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)TopDivider" relativePoint="BOTTOMLEFT" offsetX="15" offsetY="10" />
+                </Button>
+
+                <Control name="$(parent)DropdownGreen" inherits="ZO_ScrollableComboBox" >
+                    <Dimensions x="50" y="30" />
+                    <Anchor point="TOPRIGHT" relativeTo="$(parent)Tower_2_Text" relativePoint="LEFT"/>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$(parent)Tower_3_Text" relativePoint="LEFT"/>
+                </Control>
+
+            <!-- endGreen }}}-->
+
+            <!-- Red {{{-->
+
+                <Button name="$(parent)Lord" inherits="CPS_Star" >
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Shadow_4_Text" relativePoint="BOTTOMLEFT" offsetY="10" />
+                </Button>
+
+                <Button name="$(parent)Lady" inherits="CPS_Star" >
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Lover_4_Text" relativePoint="BOTTOMLEFT" offsetY="10" />
+                </Button>
+
+                <Button name="$(parent)Steed" inherits="CPS_Star" >
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Tower_4_Text" relativePoint="BOTTOMLEFT" offsetY="10" />
+                </Button>
+
+                <Control name="$(parent)DropdownRed" inherits="ZO_ScrollableComboBox" >
+                    <Dimensions x="50" y="30" />
+                    <Anchor point="TOPRIGHT" relativeTo="$(parent)Steed_2_Text" relativePoint="LEFT"/>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$(parent)Steed_3_Text" relativePoint="LEFT"/>
+                </Control>
+
+            <!-- endRed }}}-->
+
+            <!-- Blue {{{-->
+
+                <Button name="$(parent)Ritual" inherits="CPS_Star" >
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Lord_4_Text" relativePoint="BOTTOMLEFT" offsetY="10" />
+                </Button>
+
+                <Button name="$(parent)Atronach" inherits="CPS_Star" >
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Lady_4_Text" relativePoint="BOTTOMLEFT" offsetY="10" />
+                </Button>
+
+                <Button name="$(parent)Apprentice" inherits="CPS_Star" >
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Steed_4_Text" relativePoint="BOTTOMLEFT" offsetY="10" />
+                </Button>
+
+                <Control name="$(parent)DropdownBlue" inherits="ZO_ScrollableComboBox" >
+                    <Dimensions x="50" y="30" />
+                    <Anchor point="TOPRIGHT" relativeTo="$(parent)Apprentice_2_Text" relativePoint="LEFT"/>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$(parent)Apprentice_3_Text" relativePoint="LEFT"/>
+                </Control>
+
+            <!-- endBlue }}}-->
+
+            <!-- Bottom {{{-->
+
+                <Control name="$(parent)BottomDivider" inherits="ZO_DynamicHorizontalDivider" >
+                    <Dimensions x="850" />
+                    <Anchor point="BOTTOM" relativeTo="$(parent)"/>
+                </Control>
+
+
+                <Button name="$(parent)SaveButton" font="ZoFontGame" inherits="CPS_Button" >
+                    <Anchor point="TOP" relativeTo="$(parent)BottomDivider" relativePoint="BOTTOM" offsetX="-300" offsetY="15" />
+                </Button>
+
+                <Button name="$(parent)CloneButton" font="ZoFontGame" inherits="CPS_Button" >
+                    <Anchor point="TOP" relativeTo="$(parent)BottomDivider" relativePoint="BOTTOM" offsetX="-300" offsetY="60" />
+                </Button>
+
+                <Button name="$(parent)PreLoadButton" font="ZoFontGame" inherits="CPS_Button" >
+                    <Anchor point="TOP" relativeTo="$(parent)BottomDivider" relativePoint="BOTTOM" offsetX="0"   offsetY="15" />
+                </Button>
+
+                <Button name="$(parent)LoadButton" font="ZoFontGame" inherits="CPS_Button" >
+                    <Anchor point="TOP" relativeTo="$(parent)BottomDivider" relativePoint="BOTTOM" offsetX="300" offsetY="15" />
+                </Button>
+
+                <Button name="$(parent)DeleteButton" font="ZoFontGame" inherits="CPS_Button" >
+                    <Anchor point="TOP" relativeTo="$(parent)BottomDivider" relativePoint="BOTTOM" offsetX="0" offsetY="60" />
+                </Button>
+
+                <Button name="$(parent)ResetButton" font="ZoFontGame" inherits="CPS_Button" >
+                    <Anchor point="TOP" relativeTo="$(parent)BottomDivider" relativePoint="BOTTOM" offsetX="0" offsetY="60" />
+                </Button>
+
+                <Button name="$(parent)ImportButton" font="ZoFontGame" inherits="CPS_Button" >
+                    <Anchor point="TOP" relativeTo="$(parent)BottomDivider" relativePoint="BOTTOM" offsetX="300" offsetY="60" />
+                </Button>
+            <!-- Bottom }}} -->
+
+            <!-- Bg2 {{{ -->
+                <Backdrop name="$(parent)BG_2" inherits="ZO_DefaultBackdrop" hidden="true">
+                    <Dimensions x="525" y="650" />
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPRIGHT" offsetX="30"/>
+
+                    <Controls>
+                        <Button name="$(parent)CloseButton" inherits="ZO_ButtonBehaviorClickSound" >
+                            <Dimensions x="25" y="25" />
+                            <Textures normal="ESOUI/art/buttons/decline_up.dds"
+                                mouseOver="ESOUI/art/buttons/decline_over.dds" />
+                            <Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT" />
+                        </Button>
+
+                        <Backdrop name="$(grandparent)ImportBackdrop" inherits="ZO_MultiLineEditBackdrop_Keyboard" hidden="true" >
+                            <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" offsetX="5" offsetY="-10"/>
+                            <Dimensions x="500" y="240"/>
+                            <Controls>
+                                <EditBox name="$(parent)Text" inherits="ZO_DefaultEditMultiLineForBackdrop"  maxInputCharacters="10000"/>
+                            </Controls>
+                        </Backdrop>
+
+                        <Backdrop name="$(grandparent)ImportBackdropStaticThief" inherits="ZO_MultiLineEditBackdrop_Keyboard" >
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" offsetX="5" offsetY="15"/>
+                            <Dimensions x="500" y="120"/>
+                            <Controls>
+                                <EditBox name="$(parent)Text" inherits="ZO_DefaultEditMultiLineForBackdrop" editEnabled="false"  maxInputCharacters="10000"/>
+                            </Controls>
+                        </Backdrop>
+
+                        <Backdrop name="$(grandparent)ImportBackdropStaticWarrior" inherits="ZO_MultiLineEditBackdrop_Keyboard" >
+                            <Anchor point="TOPLEFT" relativeTo="$(grandparent)ImportBackdropStaticThief" relativePoint="BOTTOMLEFT" offsetY="5"/>
+                            <Dimensions x="500" y="120"/>
+                            <Controls>
+                                <EditBox name="$(parent)Text" inherits="ZO_DefaultEditMultiLineForBackdrop" editEnabled="false"  maxInputCharacters="10000"/>
+                            </Controls>
+                        </Backdrop>
+
+                        <Backdrop name="$(grandparent)ImportBackdropStaticMage" inherits="ZO_MultiLineEditBackdrop_Keyboard" >
+                            <Anchor point="TOPLEFT" relativeTo="$(grandparent)ImportBackdropStaticWarrior" relativePoint="BOTTOMLEFT" offsetY="5"/>
+                            <Dimensions x="500" y="120"/>
+                            <Controls>
+                                <EditBox name="$(parent)Text" inherits="ZO_DefaultEditMultiLineForBackdrop" editEnabled="false"  maxInputCharacters="10000"/>
+                            </Controls>
+                        </Backdrop>
+
+                        <Control name="$(parent)Divider" inherits="ZO_DynamicHorizontalDivider" >
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(grandparent)ImportBackdropStaticMage"/>
+                            <Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(grandparent)ImportBackdrop"/>
+                        </Control>
+
+                    </Controls>
+                </Backdrop>
+            <!-- Bg2 }}} -->
+
+            <!-- Bg3 {{{ -->
+                <Backdrop name="$(parent)BG_3" inherits="ZO_DefaultBackdrop" hidden="true">
+                    <Dimensions x="600" y="650" />
+                    <Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPLEFT" offsetX="-30"/>
+
+                    <Controls>
+                        <Label name="$(parent)Title" font="ZoFontWinH2" text="Current" >
+                            <Anchor point="TOP" relativeTo="$(parent)" relativePoint="TOP" offsetX="1" offsetY="10" />
+                        </Label>
+
+                        <Control name="$(parent)TopDivider" inherits="ZO_DynamicHorizontalDivider"  >
+                            <Dimensions x="525" />
+                            <Anchor point="TOP" relativeTo="$(parent)Title" relativePoint="BOTTOM"/>
+                        </Control>
+
+                        <Control name="$(parent)Attributes" inherits="ZO_StatsAttributesRow"  >
+                            <Anchor point="TOP" relativeTo="$(parent)TopDivider" relativePoint="TOP" offsetX="5" offsetY="10"/>
+                        </Control>
+
+                        <Button name="$(parent)CloseButton" inherits="ZO_ButtonBehaviorClickSound" >
+                            <Dimensions x="25" y="25" />
+                            <Textures normal="ESOUI/art/buttons/decline_up.dds"
+                                mouseOver="ESOUI/art/buttons/decline_over.dds" />
+                            <Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT" offsetX="-5" offsetY="5"/>
+                        </Button>
+
+                        <Label name="$(parent)MagickaLabel" font="ZoFontWinH3" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)AttributesMagickaBar" relativePoint="TOP" offsetX="-10" offsetY="20"/>
+                        </Label>
+
+                        <Label name="$(parent)HealthLabel" font="ZoFontWinH3" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)AttributesHealthBar" relativePoint="TOP" offsetX="-10" offsetY="20"/>
+                        </Label>
+
+                        <Label name="$(parent)StaminaLabel" font="ZoFontWinH3" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)AttributesStaminaBar" relativePoint="TOP" offsetX="-10" offsetY="20"/>
+                        </Label>
+
+                        <Label name="$(parent)AbilityBar0" font="ZoFontWinH2" text="1">
+                            <Dimensions y="40" x="40"/>
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)MagickaLabel" relativePoint="TOPLEFT" offsetX="-55" offsetY="35"/>
+                        </Label>
+
+                        <Button name="$(parent)Ability10" inherits="CPS_Skill" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)AbilityBar0" relativePoint="TOPLEFT" offsetX="15"/>
+                        </Button>
+                        <Button name="$(parent)Ability20" inherits="CPS_Skill" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Ability10" relativePoint="TOPLEFT" offsetX="40"/>
+                        </Button>
+                        <Button name="$(parent)Ability30" inherits="CPS_Skill" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Ability20" relativePoint="TOPLEFT" offsetX="40"/>
+                        </Button>
+                        <Button name="$(parent)Ability40" inherits="CPS_Skill" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Ability30" relativePoint="TOPLEFT" offsetX="40"/>
+                        </Button>
+                        <Button name="$(parent)Ability50" inherits="CPS_Skill" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Ability40" relativePoint="TOPLEFT" offsetX="40"/>
+                        </Button>
+                        <Button name="$(parent)Ability60" inherits="CPS_Skill" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Ability50" relativePoint="TOPLEFT" offsetX="40"/>
+                        </Button>
+
+                        <Label name="$(parent)AbilityBar1" font="ZoFontWinH2" text="2">
+                            <Dimensions y="40" x="40"/>
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Ability60" relativePoint="TOPLEFT" offsetX="60"/>
+                        </Label>
+
+                        <Button name="$(parent)Ability11" inherits="CPS_Skill" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)AbilityBar1" relativePoint="TOPLEFT" offsetX="15"/>
+                        </Button>
+                        <Button name="$(parent)Ability21" inherits="CPS_Skill" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Ability11" relativePoint="TOPLEFT" offsetX="40"/>
+                        </Button>
+                        <Button name="$(parent)Ability31" inherits="CPS_Skill" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Ability21" relativePoint="TOPLEFT" offsetX="40"/>
+                        </Button>
+                        <Button name="$(parent)Ability41" inherits="CPS_Skill" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Ability31" relativePoint="TOPLEFT" offsetX="40"/>
+                        </Button>
+                        <Button name="$(parent)Ability51" inherits="CPS_Skill" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Ability41" relativePoint="TOPLEFT" offsetX="40"/>
+                        </Button>
+                        <Button name="$(parent)Ability61" inherits="CPS_Skill" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Ability51" relativePoint="TOPLEFT" offsetX="40"/>
+                        </Button>
+
+                        <Label name="$(parent)SetInfo" inherits="CPS_Equip" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)AbilityBar0" relativePoint="BOTTOMLEFT" offsetY="10"/>
+                        </Label>
+
+<!--
+                        <Button name="$(parent)Equip4" inherits="CPS_Equip" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)AbilityBar0" relativePoint="BOTTOMLEFT" offsetX="0"/>
+                        </Button>
+                        <Button name="$(parent)Equip5" inherits="CPS_Equip" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Equip4" relativePoint="BOTTOMLEFT" offsetX="0"/>
+                        </Button>
+                        <Button name="$(parent)Equip20" inherits="CPS_Equip" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Equip5" relativePoint="BOTTOMLEFT" offsetX="0"/>
+                        </Button>
+                        <Button name="$(parent)Equip21" inherits="CPS_Equip" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Equip20" relativePoint="BOTTOMLEFT" offsetX="0"/>
+                        </Button>
+
+                        <Button name="$(parent)Equip0" inherits="CPS_Equip" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Equip21" relativePoint="BOTTOMLEFT" offsetX="0"/>
+                        </Button>
+
+                        <Button name="$(parent)Equip3" inherits="CPS_Equip" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Equip0" relativePoint="BOTTOMLEFT" offsetX="0"/>
+                        </Button>
+                        <Button name="$(parent)Equip16" inherits="CPS_Equip" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Equip3" relativePoint="BOTTOMLEFT" offsetX="0"/>
+                        </Button>
+                        <Button name="$(parent)Equip8" inherits="CPS_Equip" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Equip16" relativePoint="BOTTOMLEFT" offsetX="0"/>
+                        </Button>
+                        <Button name="$(parent)Equip2" inherits="CPS_Equip" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Equip8" relativePoint="BOTTOMLEFT" offsetX="0"/>
+                        </Button>
+                        <Button name="$(parent)Equip6" inherits="CPS_Equip" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Equip2" relativePoint="BOTTOMLEFT" offsetX="0"/>
+                        </Button>
+                        <Button name="$(parent)Equip9" inherits="CPS_Equip" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Equip6" relativePoint="BOTTOMLEFT" offsetX="0"/>
+                        </Button>
+-->
+
+                        <Button name="$(parent)Phys_Resist" inherits="CPS_Stat" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)SetInfo" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="0"/>
+                        </Button>
+                        <Button name="$(parent)Phys_Pene" inherits="CPS_Stat" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Phys_Resist_Text" relativePoint="TOPLEFT" offsetY="20"/>
+                        </Button>
+                        <Button name="$(parent)Phys_Crit" inherits="CPS_Stat" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Phys_Pene_Text" relativePoint="TOPLEFT" offsetY="20"/>
+                        </Button>
+                        <Button name="$(parent)Phys_Power" inherits="CPS_Stat" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Phys_Crit_Text" relativePoint="TOPLEFT" offsetY="20"/>
+                        </Button>
+                        <Button name="$(parent)Phys_Regen" inherits="CPS_Stat" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Phys_Power_Text" relativePoint="TOPLEFT" offsetY="20"/>
+                        </Button>
+
+                        <Button name="$(parent)Spell_Resist" inherits="CPS_Stat" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Phys_Resist_Amount" relativePoint="TOPRIGHT" offsetX="60"/>
+                        </Button>
+                        <Button name="$(parent)Spell_Pene" inherits="CPS_Stat" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Spell_Resist_Text" relativePoint="TOPLEFT" offsetY="20"/>
+                        </Button>
+                        <Button name="$(parent)Spell_Crit" inherits="CPS_Stat" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Spell_Pene_Text" relativePoint="TOPLEFT" offsetY="20"/>
+                        </Button>
+                        <Button name="$(parent)Spell_Power" inherits="CPS_Stat" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Spell_Crit_Text" relativePoint="TOPLEFT" offsetY="20"/>
+                        </Button>
+                        <Button name="$(parent)Spell_Regen" inherits="CPS_Stat" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Spell_Power_Text" relativePoint="TOPLEFT" offsetY="20"/>
+                        </Button>
+
+                        <Button name="$(parent)Crit_Resist" inherits="CPS_Stat" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Phys_Regen_Text" relativePoint="TOPLEFT" offsetY="30"/>
+                        </Button>
+                        <Button name="$(parent)Health_Regen" inherits="CPS_Stat" >
+                            <Anchor point="TOPLEFT" relativeTo="$(parent)Crit_Resist" relativePoint="TOPLEFT" offsetY="20"/>
+                        </Button>
+
+
+
+<!--
+                        <Label name="$(parent)BotTitle" font="ZoFontWinH2" text="Other" >
+                            <Anchor point="CENTER" relativeTo="$(parent)" relativePoint="CENTER" />
+                        </Label>
+
+
+                        <Control name="$(parent)BottomDivider" inherits="ZO_DynamicHorizontalDivider"  >
+                            <Dimensions x="525" />
+                            <Anchor point="TOP" relativeTo="$(parent)BotTitle" relativePoint="BOTTOM"/>
+                        </Control>
+
+                        <Control name="$(parent)Divider" inherits="ZO_DynamicHorizontalDivider" >
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(grandparent)ImportBackdropStaticMage"/>
+                            <Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(grandparent)ImportBackdrop"/>
+                        </Control>
+-->
+
+                    </Controls>
+                </Backdrop>
+            <!-- Bg3 }}} -->
+
+
+            </Controls>
+        </TopLevelControl>
+    </Controls>
+</GuiXml>
