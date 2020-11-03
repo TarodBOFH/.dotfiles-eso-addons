@@ -1,5 +1,5 @@
 --Library base values
-local MAJOR, MINOR = "LibSets", 0.21
+local MAJOR, MINOR = "LibSets", 0.23
 
 --Check if the library was loaded before already + chat output
 function IsLibSetsAlreadyLoaded(outputMsg)
@@ -51,7 +51,7 @@ APIVersions["live"] = GetAPIVersion()
 --of the game you are playing: live or PTS
 --> Several automatic routines like "scan the librray for new sets" is draised via this comparison function and LibSets' event
 --> EVENT_ADD_ON_LOADED -> function LoadSets()
-APIVersions["PTS"] = 100032 --Stonethorn
+APIVersions["PTS"] = 100033 --Markarth 2020-09-21
 --^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 --!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Update this if PTS increases to a new APIVersion !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 --^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -103,6 +103,7 @@ LIBSETS_TABLEKEY_DROPMECHANIC                   = "dropMechanic"
 LIBSETS_TABLEKEY_DROPMECHANIC_NAMES             = LIBSETS_TABLEKEY_DROPMECHANIC .. LIBSETS_TABLEKEY_NAMES
 LIBSETS_TABLEKEY_DROPMECHANIC_TOOLTIP_NAMES     = LIBSETS_TABLEKEY_DROPMECHANIC .. "Tooltip" .. LIBSETS_TABLEKEY_NAMES
 LIBSETS_TABLEKEY_MIXED_SETNAMES                 = "MixedSetNamesForDataAll"
+LIBSETS_TABLEKEY_SET_PROCS                      = "setProcs"
 ------------------------------------------------------------------------------------------------------------------------
 --Set types
 --> If you change these be sure to check the following tables below and add/change/remove entries as well:
@@ -541,3 +542,10 @@ setmetatable(dropMechanicTooltipNames["ru"], {__index = dropMechanicNamesEn})
 LIBSETS_SET_ITEMID_TABLE_VALUE_OK    = 1
 LIBSETS_SET_ITEMID_TABLE_VALUE_NOTOK = 2
 ------------------------------------------------------------------------------------------------------------------------
+--Set proc check types (e.g. event_effect_changed, event_combat_event)
+--SetprocCheckTypes
+LIBSETS_SETPROC_CHECKTYPE_ABILITY_EVENT_EFFECT_CHANGED  = 1     --Check abilityId via EVENT_EFFECT_CHANGED callback function
+LIBSETS_SETPROC_CHECKTYPE_ABILITY_EVENT_COMBAT_EVENT    = 2     --Check abilityId via EVENT_COMBAT_EVENT callback function
+LIBSETS_SETPROC_CHECKTYPE_EVENT_POWER_UPDATE	        = 4     --Check if a power updated at EVENT_POWER_UPDATE
+LIBSETS_SETPROC_CHECKTYPE_EVENT_BOSSES_CHANGED	        = 5     --Check if a boss changed with EVENT_BOSSES_CHANGED
+LIBSETS_SETPROC_CHECKTYPE_SPECIAL                       = 99    --Check with an own defined special callback function

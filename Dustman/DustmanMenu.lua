@@ -26,7 +26,7 @@ http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 
 if not Dustman then return end
 
-local ADDON_VERSION = "10.4"
+local ADDON_VERSION = "10.5"
 local ADDON_WEBSITE = "http://www.esoui.com/downloads/info97-Dustman.html"
 local ADDON_DONATIONS = "https://www.esoui.com/downloads/fileinfo.php?id=97#donate"
 
@@ -39,6 +39,15 @@ local function GetSettings()
 end
 Dustman.GetSettings = GetSettings
 
+local function getBoT(value)
+	if value==1 then 
+		return GetString(SI_DIALOG_NO)
+	elseif value==2 then 
+		return GetString(DUSTMAN_BOT_DD_ALL)
+	elseif value==3 then
+		return GetString(DUSTMAN_BOT_DD_ACTIVE)
+	end
+end
 
 --addon menu
 function Dustman.CreateSettingsMenu(defaults)
@@ -265,6 +274,134 @@ function Dustman.CreateSettingsMenu(defaults)
 		default = defaults.styleFullStack,
 	})
 	
+	local enchantingSubmenuControls = {}
+	table.insert(enchantingSubmenuControls, {
+		type = "checkbox",
+		name = GetString(DUSTMAN_GLYPHS),
+		tooltip = GetString(DUSTMAN_GLYPHS_DESC),
+		getFunc = function() return GetSettings().glyphs end,
+		setFunc = function(state) GetSettings().glyphs = state end,
+		default = defaults.glyphs,
+	})
+    table.insert(enchantingSubmenuControls, {
+		type = "dropdown",
+		name = GetString(DUSTMAN_QUALITY),
+		tooltip = GetString(DUSTMAN_QUALITY_DESC),
+		choices = qualityChoices,
+		getFunc = function() return qualityChoices[GetSettings().glyphsQuality] end,
+		setFunc = function(choice) GetSettings().glyphsQuality = reverseQualityChoices[choice] end,
+		disabled = function() return not GetSettings().glyphs end,
+		default = qualityChoices[defaults.glyphsQuality],
+	})
+	table.insert(enchantingSubmenuControls, {
+		type = "dropdown",
+		name = GetString(DUSTMAN_LEVELGLYPH),
+		tooltip = GetString(DUSTMAN_LEVELGLYPH_DESC),
+		choices = levelGlyphChoices,
+		getFunc = function() return levelGlyphChoices[valueLevelGlyphChoice[GetSettings().keepLevelGlyphs]] end,
+		setFunc = function(choice)
+			if reverseLevelGlyphChoices[choice] then
+				GetSettings().keepLevelGlyphs = reverseLevelGlyphChoices[choice]
+			else
+				GetSettings().keepLevelGlyphs = defaults.keepLevelGlyphs
+			end
+		end,
+		disabled = function() return not GetSettings().glyphs end,
+		default = levelGlyphChoices[defaults.keepLevelGlyphs],
+	})
+    table.insert(enchantingSubmenuControls, {
+		type = "divider",
+    })
+	table.insert(enchantingSubmenuControls, {
+		type = "checkbox",
+		name = GetString(DUSTMAN_ASPECT_RUNES),
+		tooltip = GetString(DUSTMAN_ASPECT_RUNES_DESC),
+		getFunc = function() return GetSettings().enchanting.enchantingAspect end,
+		setFunc = function(state) GetSettings().enchanting.enchantingAspect = state end,
+		default = defaults.enchanting.enchantingAspect,
+	})
+	table.insert(enchantingSubmenuControls, {
+		type = "dropdown",
+		name = GetString(DUSTMAN_QUALITY),
+		tooltip = GetString(DUSTMAN_QUALITY_DESC),
+		choices = qualityChoices,
+		getFunc = function() return qualityChoices[GetSettings().enchanting.aspectQuality] end,
+		setFunc = function(choice) GetSettings().enchanting.aspectQuality = reverseQualityChoices[choice] end,
+		disabled = function() return not GetSettings().enchanting.enchantingAspect end,
+		default = qualityChoices[defaults.enchanting.aspectQuality],
+	})
+	table.insert(enchantingSubmenuControls, {
+		type = "checkbox",
+		name = GetString(DUSTMAN_FULLSTACK), 
+		tooltip = GetString(DUSTMAN_FULLSTACK_DESC),
+		getFunc = function() return GetSettings().enchanting.aspectFullStack end,
+		setFunc = function(state) GetSettings().enchanting.aspectFullStack = state end,
+		disabled = function() return not GetSettings().enchanting.enchantingAspect end,
+		default = defaults.enchanting.aspectFullStack,
+	})
+	table.insert(enchantingSubmenuControls, {
+		type = "divider",
+    })
+	table.insert(enchantingSubmenuControls, {
+		type = "checkbox",
+		name = GetString(DUSTMAN_ESSENCE_RUNES), 
+		tooltip = GetString(DUSTMAN_ESSENCE_RUNES_DESC),
+		getFunc = function() return GetSettings().enchanting.enchantingEssence end,
+		setFunc = function(state) GetSettings().enchanting.enchantingEssence = state end,
+		default = defaults.enchanting.enchantingEssence,
+	})
+	for id=1, 19 do
+		table.insert(enchantingSubmenuControls, {
+			type = "checkbox",
+			name = Dustman.GetEssenceRuneName(id),
+			tooltip = Dustman.GetEssenceRuneName(id),
+			getFunc = function() return GetSettings().enchanting.essenceRunes[id][2] end,
+			setFunc = function(state) GetSettings().enchanting.essenceRunes[id][2] = state end,
+			default = defaults.enchanting.essenceRunes[id][2],
+			disabled = function() return not GetSettings().enchanting.enchantingEssence end,
+		})
+	end
+	table.insert(enchantingSubmenuControls, {
+		type = "checkbox",
+		name = GetString(DUSTMAN_FULLSTACK), 
+		tooltip = GetString(DUSTMAN_FULLSTACK_DESC),
+		getFunc = function() return GetSettings().enchanting.essenceFullStack end,
+		setFunc = function(state) GetSettings().enchanting.essenceFullStack = state end,
+		default = defaults.enchanting.essenceFullStack,
+		disabled = function() return not GetSettings().enchanting.enchantingEssence end,
+	})
+	table.insert(enchantingSubmenuControls, {
+		type = "divider",
+    })
+	table.insert(enchantingSubmenuControls, {
+		type = "checkbox",
+		name = GetString(DUSTMAN_POTENCY_RUNES), 
+		tooltip = GetString(DUSTMAN_POTENCY_RUNES_DESC),
+		getFunc = function() return GetSettings().enchanting.enchantingPotency end,
+		setFunc = function(state) GetSettings().enchanting.enchantingPotency = state end,
+		default = defaults.enchanting.enchantingPotency,
+	})
+	for id=1, 28 do
+		table.insert(enchantingSubmenuControls, {
+			type = "checkbox",
+			name = Dustman.GetPotencyRuneName(id),
+			tooltip = Dustman.GetPotencyRuneName(id),
+			getFunc = function() return GetSettings().enchanting.potencyRunes[id][2] end,
+			setFunc = function(state) GetSettings().enchanting.potencyRunes[id][2] = state end,
+			default = defaults.enchanting.potencyRunes[id][2],
+			disabled = function() return not GetSettings().enchanting.enchantingPotency end,
+		})
+	end
+	table.insert(enchantingSubmenuControls, {
+		type = "checkbox",
+		name = GetString(DUSTMAN_FULLSTACK), 
+		tooltip = GetString(DUSTMAN_FULLSTACK_DESC),
+		getFunc = function() return GetSettings().enchanting.potencyFullStack end,
+		setFunc = function(state) GetSettings().enchanting.potencyFullStack = state end,
+		default = defaults.enchanting.potencyFullStack,
+		disabled = function() return not GetSettings().enchanting.enchantingPotency end,
+	})
+	
 	local optionsData = {
 		{			
 			type = "submenu",
@@ -457,7 +594,7 @@ function Dustman.CreateSettingsMenu(defaults)
 					disabled = function() return not GetSettings().equipment.wa.enabled or GetSettings().equipment.wa.keepSetItems end,
 					default = defaults.equipment.wa.keepDungeon,
 				},
-								{
+				{
 					type = "checkbox",
 					name = GetString(DUSTMAN_SET_IC),
 					tooltip = GetString(DUSTMAN_SET_IC_DESC_WA),
@@ -475,7 +612,7 @@ function Dustman.CreateSettingsMenu(defaults)
 					disabled = function() return not GetSettings().equipment.wa.enabled or GetSettings().equipment.wa.keepSetItems end,
 					default = defaults.equipment.wa.keepOverland,
 				},
-								{
+				{
 					type = "checkbox",
 					name = GetString(DUSTMAN_SET_SPEC),
 					tooltip = GetString(DUSTMAN_SET_SPEC_DESC_WA),
@@ -982,74 +1119,8 @@ function Dustman.CreateSettingsMenu(defaults)
 		},
 		{
 			type = "submenu",
-			name = GetString(DUSTMAN_GL_AR), --Glyphs
-			controls = {
-				{
-					type = "checkbox",
-					name = GetString(DUSTMAN_GLYPHS),
-					tooltip = GetString(DUSTMAN_GLYPHS_DESC),
-					getFunc = function() return GetSettings().glyphs end,
-					setFunc = function(state) GetSettings().glyphs = state end,
-					default = defaults.glyphs,
-				},
-                
-				{
-					type = "dropdown",
-					name = GetString(DUSTMAN_QUALITY),
-					tooltip = GetString(DUSTMAN_QUALITY_DESC),
-					choices = qualityChoices,
-					getFunc = function() return qualityChoices[GetSettings().glyphsQuality] end,
-					setFunc = function(choice) GetSettings().glyphsQuality = reverseQualityChoices[choice] end,
-					disabled = function() return not GetSettings().glyphs end,
-					default = qualityChoices[defaults.glyphsQuality],
-				},
-				{
-					type = "dropdown",
-					name = GetString(DUSTMAN_LEVELGLYPH),
-					tooltip = GetString(DUSTMAN_LEVELGLYPH_DESC),
-					choices = levelGlyphChoices,
-					getFunc = function() return levelGlyphChoices[valueLevelGlyphChoice[GetSettings().keepLevelGlyphs]] end,
-					setFunc = function(choice)
-						if reverseLevelGlyphChoices[choice] then
-							GetSettings().keepLevelGlyphs = reverseLevelGlyphChoices[choice]
-						else
-							GetSettings().keepLevelGlyphs = defaults.keepLevelGlyphs
-						end
-					end,
-					disabled = function() return not GetSettings().glyphs end,
-					default = levelGlyphChoices[defaults.keepLevelGlyphs],
-				},
-                {
-                    type = "divider",
-                },
-				{
-					type = "checkbox",
-					name = GetString(DUSTMAN_ASPECT_RUNES),
-					tooltip = GetString(DUSTMAN_ASPECT_RUNES_DESC),
-					getFunc = function() return GetSettings().enchanting.enchantingAspect end,
-					setFunc = function(state) GetSettings().enchanting.enchantingAspect = state end,
-					default = defaults.enchanting.enchantingAspect,
-				},
-				{
-					type = "dropdown",
-					name = GetString(DUSTMAN_QUALITY),
-					tooltip = GetString(DUSTMAN_QUALITY_DESC),
-					choices = qualityChoices,
-					getFunc = function() return qualityChoices[GetSettings().enchanting.aspectQuality] end,
-					setFunc = function(choice) GetSettings().enchanting.aspectQuality = reverseQualityChoices[choice] end,
-					disabled = function() return not GetSettings().enchanting.enchantingAspect end,
-					default = qualityChoices[defaults.enchanting.aspectQuality],
-				},
-				{
-					type = "checkbox",
-					name = GetString(DUSTMAN_FULLSTACK), 
-					tooltip = GetString(DUSTMAN_FULLSTACK_DESC),
-					getFunc = function() return GetSettings().enchanting.aspectFullStack end,
-					setFunc = function(state) GetSettings().enchanting.aspectFullStack = state end,
-					disabled = function() return not GetSettings().enchanting.enchantingAspect end,
-					default = defaults.enchanting.aspectFullStack,
-				},
-			},
+			name = GetString(SI_CUSTOMERSERVICESUBMITFEEDBACKSUBCATEGORIES203), --Enchanting
+			controls = enchantingSubmenuControls,
 		},
 		{
 			type = "submenu",
@@ -1731,6 +1802,26 @@ function Dustman.CreateSettingsMenu(defaults)
 					default = defaults.automaticScan,
 				},
                 {
+                    type = "divider",
+                },
+				{
+					type = "dropdown",
+					name = GetString(DUSTMAN_BOT),
+					tooltip = GetString(DUSTMAN_BOT_DESC),
+					choices = {GetString(SI_DIALOG_NO),GetString(DUSTMAN_BOT_DD_ALL),GetString(DUSTMAN_BOT_DD_ACTIVE)},
+					getFunc = function() return getBoT(GetSettings().bot) end,
+					setFunc = function(choice) 
+						if choice == GetString(SI_DIALOG_NO) 
+							then GetSettings().bot = 1
+						elseif choice == GetString(DUSTMAN_BOT_DD_ALL) 
+							then GetSettings().bot = 2 
+						elseif choice == GetString(DUSTMAN_BOT_DD_ACTIVE)
+							then GetSettings().bot = 3 
+						end
+					end,
+					default = GetString(SI_DIALOG_NO)
+				},
+				{
                     type = "divider",
                 },
 				{

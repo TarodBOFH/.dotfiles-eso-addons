@@ -41,7 +41,7 @@ in the game which needs to be added to the excel (itemIds are only kept in the l
    LibSets_Data_All.lua (and not LibSets_Constants_All.lua!)
 3) Update the txt manifest file LibSets.txt and increase the ## Version, ## AddOnVersion tags, and change the ## APIVersion tag to support the new APIVersion
    e.g. change 100027 100028 to 100028 100029
-4) To scan the data of the new APIVersion ingame login to the PTS (or live if the new APIversion is already live!) and check teh file LibSets_Debug.lua for the
+4) To scan the data of the new APIVersion ingame login to the PTS (or live if the new APIversion is already live!) and check the file LibSets_Debug.lua for the
    functions to scan the data (multilanguage scans are not automatically supported so you need to change the client language in between manually!).
    The scanned data will be saved to the SavedVariables filename LibSets.lua in the SavedVariables folder.
    -> You should use the function LibSets.DebugResetSavedVariables() once before scanning all the new data so the SavedVariables are empty.
@@ -77,24 +77,6 @@ in the game which needs to be added to the excel (itemIds are only kept in the l
    ---------------------------------------------------------------------------------------------------------------------------------------------
     LibSets.DebugResetSavedVariables()          |   Reset ALL data in the SavedVariables. Should be run ONCE before new data is scanned!
 
-    LibSets.DebugGetAllZoneInfo()               |   Get all the zone info saved to the SavedVars key constant LIBSETS_TABLEKEY_ZONE_DATA
-
-    LibSets.DebugGetAllMapNames()               |   Get all the map names saved to the SavedVars key constant LIBSETS_TABLEKEY_MAPS
-                                                |   ->  Use /script SetCVar("language.2", "<lang>") (where <lang> is e.g. "de", "en", "fr") to change the client language
-                                                |       and then scan the names again with the new client language!
-
-    LibSets.DebugGetAllWayshrineInfo()          |   Get all the wayshrine info saved to the SavedVars key constant LIBSETS_TABLEKEY_WAYSHRINES
-
-    LibSets.DebugGetAllWayshrineNames()         |   Get all the wayshrine names saved to the SavedVars key constant LIBSETS_TABLEKEY_WAYSHRINE_NAMES
-                                                    |-> Use /script SetCVar("language.2", "<lang>") (where <lang> is e.g. "de", "en", "fr") to change the client language
-                                                |       and then scan the names again with the new client language!
-
-    LibSets.DebugGetDungeonFinderData()         |   Get all the dungeon ids and names saved to the SavedVars key constant LIBSETS_TABLEKEY_DUNGEONFINDER_DATA
-
-    LibSets.DebugGetAllCollectibleNames()       |   Get all the collectible ids and names saved to the SavedVars key constant LIBSETS_TABLEKEY_COLLECTIBLE_NAMES
-                                                |   ->  Use /script SetCVar("language.2", "<lang>") (where <lang> is e.g. "de", "en", "fr") to change the client language
-                                                |       and then scan the names again with the new client language!
-
     LibSets.DebugScanAllSetData()               |   Get all the set IDs and their item's itemIds saved to the SavedVars key constant LIBSETS_TABLEKEY_SETITEMIDS,
                                                 |   and then compress the itemIds from 1 itemId each to the table LIBSETS_TABLEKEY_SETITEMIDS_COMPRESSED, where itemIds
                                                 |   which are "in a range" (e.g. 200020, 200021, 200022, 200023) will be saved as 1 String entry with the starting itemId (e.g. 200020)
@@ -102,11 +84,46 @@ in the game which needs to be added to the excel (itemIds are only kept in the l
                                                 |   resulting in the real timeIds 200020, 200020+1=200021, 200020+2=200022 and 200020+3=200023.
                                                 |   The real itemIds are cached in the table LibSets.CachedSetItemIdsTable[setId], once the itemIds of a setId were asked for in a session.
 
+    LibSets.DebugGetAllZoneInfo()               |   Get all the zone info saved to the SavedVars key constant LIBSETS_TABLEKEY_ZONE_DATA
+
+    LibSets.DebugGetAllMapNames()               |   Get all the map names saved to the SavedVars key constant LIBSETS_TABLEKEY_MAPS
+                                                |   ->  Use /script SetCVar("language.2", "<lang>") (where <lang> is e.g. "de", "en", "fr") to change the client language
+                                                |       and then scan the names again with the new client language!
+
+    LibSets.DebugGetAllWayshrineInfo()          |   Get all the wayshrine info saved to the SavedVars key constant LIBSETS_TABLEKEY_WAYSHRINES
+                                                |   --> You need to open a map (zone map, no city or sub-zone maps!) in order to let the function work properly
+
+    LibSets.DebugGetAllWayshrineNames()         |   Get all the wayshrine names saved to the SavedVars key constant LIBSETS_TABLEKEY_WAYSHRINE_NAMES
+                                                    |-> Use /script SetCVar("language.2", "<lang>") (where <lang> is e.g. "de", "en", "fr") to change the client language
+                                                |       and then scan the names again with the new client language!
+
+    LibSets.DebugGetDungeonFinderData()         |   Get all the dungeon ids and names saved to the SavedVars key constant LIBSETS_TABLEKEY_DUNGEONFINDER_DATA
+                                                |   --->!!!Attention!!!You MUST open the dungeon finder->go to specific dungeon dropdown entry in order to build the dungeons list needed first!!!
+
+    LibSets.DebugGetAllCollectibleNames()       |   Get all the collectible ids and names saved to the SavedVars key constant LIBSETS_TABLEKEY_COLLECTIBLE_NAMES
+                                                |   ->  Use /script SetCVar("language.2", "<lang>") (where <lang> is e.g. "de", "en", "fr") to change the client language
+                                                |       and then scan the names again with the new client language!
+
     LibSets.DebugGetAllSetNames()               |   Get all the set names saved to the SavedVars key constant LIBSETS_TABLEKEY_SETNAMES
                                                 |   ->  You need to scan the setIds BEFORE (language independent!) to scan all setnames properly afterwards.
                                                 |       Use the script /script LibSets.DebugScanAllSetData() to do this.
                                                 |   ->  Use /script SetCVar("language.2", "<lang>") (where <lang> is e.g. "de", "en", "fr") to change the client language
                                                 |       and then scan the names again with the new client language!
+
+    LibSets.DebugGetAllNames()                  |   Run the following functions described above:
+                                                |   LibSets.DebugGetAllCollectibleNames()
+                                                |   LibSets.DebugGetAllMapNames()
+                                                |   LibSets.DebugGetAllSetNames()
+                                                |   LibSets.DebugGetAllWayshrineNames()
+                                                |   LibSets.DebugGetAllZoneInfo()
+
+    LibSets.debugBuildMixedSetNames()           |    MIXING NEW SET NAMES INTO THE PRELOADED DATA
+                                                |    Put other language setNames here in the variable called "otherLangSetNames" below a table key representing the language
+                                                |    you want to "mix" into the LibSets_Data_All.lua file's table "lib.setDataPreloaded[LIBSETS_TABLEKEY_SETNAMES]" (e.g. ["jp"]).
+                                                |    For further details please read the function's description and comments in file LibSets_Debug.lua
+
+    LibSets.DebugShowNewSetIds()                |    Output the new found (scanned and not inside base LibSets data yet, but only the Savedvariables) setIds to the chat.
+
 5) After scanning the data from the game client and updating the SavedVariables file LibSets.lua you got all the data in the following tables now:
 
 LIBSETS_TABLEKEY_SETITEMIDS                     = "setItemIds"
@@ -118,6 +135,8 @@ LIBSETS_TABLEKEY_WAYSHRINE_NAMES                = "wayshrine" .. LIBSETS_TABLEKE
 LIBSETS_TABLEKEY_ZONE_DATA                      = "zoneData"
 LIBSETS_TABLEKEY_DUNGEONFINDER_DATA             = "dungeonFinderData"
 LIBSETS_TABLEKEY_COLLECTIBLE_NAMES              = "collectible" .. LIBSETS_TABLEKEY_NAMES
+LIBSETS_TABLEKEY_WAYSHRINENODEID2ZONEID         = "wayshrineNodeId2zoneId"
+LIBSETS_TABLEKEY_MIXED_SETNAMES                 = "MixedSetNamesForDataAll"
 -> This is only a "suffix" used for the tablekeys: LIBSETS_TABLEKEY_NAMES= "Names"
 
 
@@ -217,6 +236,46 @@ After all info is updated you can look at the columns AX to BB which provide the
 --> Copy ALL lines of this excel map to the file "LibSets_Data_All.lua" into the table "lib.setInfo"!
 --> New sets which are not known on the live server will automatically be removed as the internal LibSets tables are build (using function "checkIfSetExists(setId)"
     from file LibSets.lua). So just keep them also in this table "lib.SetInfo"!
+
+
+7) -[ For the set procs ]-
+You need to find out the set procs and abilityIds of the procs and add them to the excel's tab "SetProcs" at the relevant setId.
+Each setId should have 1 row and in column D you need to add the procData table in this format, 1 new row for each different
+LIBSETS_SETPROC_CHECKTYPE_* (see file LibSets_ConstantsLibraryInternal.lua for the possible SetprocCheckTypes), and 1 new
+index if the SetprocCheckType is the same and only a different kind of abilityId or cooldown needs to be added.
+The cooldown table uses the same index as the abilityIds table, so the 1st cooldown is for abilityId1, the 2nd is for abilityId2, and so on.
+    [number setId] = {
+        [number LIBSETS_SETPROC_CHECKTYPE_ constant from LibSets_ConstantsLibraryInternal.lua] = {
+            [number index1toN] = {
+                ["abilityIds"] = {number abilityId1, number abilityId2, ...},
+                    --Only for LIBSETS_SETPROC_CHECKTYPE_ABILITY_EVENT_EFFECT_CHANGED
+                    ["unitTag"] = String unitTag e.g. "player", "playerpet", "group", "boss", etc.,
+
+                    --Only for LIBSETS_SETPROC_CHECKTYPE_ABILITY_EVENT_COMBAT_EVENT
+                    ["source"] = number combatUnitType e.g. COMBAT_UNIT_TYPE_PLAYER
+                    ["target"] = number combatUnitType e.g. COMBAT_UNIT_TYPE_PLAYER
+
+                    --Only for LIBSETS_SETPROC_CHECKTYPE_EVENT_POWER_UPDATE
+                    ["powerType"] = number powerType e.g. POWERTYPE_STAMINA
+
+                    --Only for LIBSETS_SETPROC_CHECKTYPE_EVENT_BOSSES_CHANGED
+                    ["unitTag"] = String unitTagOfBoss e.g. boss1, boss2, ...
+
+                    --Only for LIBSETS_SETPROC_CHECKTYPE_SPECIAL
+                    [number index1toN] = boolean specialFunctionIsGiven e.g. true/false (if true: the abilityId1's callback function should run a special                                             function as well, which will be registered for the
+
+                ["cooldown"] = {number cooldownForAbilityId1 e.g. 12000, number cooldownForAbilityId2, ...},
+                ["icon"] = String iconPathOfTheBuffIconToUse e.g. "/esoui/art/icons/ability_buff_minor_vitality.dds"
+            },
+        },
+        [number LIBSETS_SETPROC_CHECKTYPE_ constant from LibSets_ConstantsLibraryInternal.lua] = {
+        ...
+        },
+        ...
+        --String comment name of the set -> description of the proc EN / description of the proc DE
+After updating the columns D you are able to specify comments etc. in the columns E anf F and copy the columns G to the file
+LibSets_Data.All, table lib.setDataPreloaded, key LIBSETS_TABLEKEY_SET_PROCS
+-> Be sure to read and follow the comments at column G about the excel created duplicate "", "[, \ " etc. and how to remove them!
 ]]
 
 --Check if the library was loaded before already w/o chat output
@@ -1443,6 +1502,339 @@ function lib.GetSetTypeSetsData(setType)
 end
 
 ------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+-- 	Set PROC functions
+------------------------------------------------------------------------
+--Internal helper function to read the set's procData, if it exists
+local function getSetProcData(setId)
+    if setId == nil then return end
+    local setProcData = preloaded[LIBSETS_TABLEKEY_SET_PROCS] and preloaded[LIBSETS_TABLEKEY_SET_PROCS][setId]
+    return setProcData
+end
+
+--Internal helper function to loop over a table and add the "dataName" entries in the table "setProcDataOfSetProcCheckTypeTable"
+--to a table "dataReturnTable"
+local function getSetProcDataOfIndex(setProcDataOfSetProcCheckTypeTable, dataName, dataReturnTable)
+    for _, setProcDataOfIndex in ipairs(setProcDataOfSetProcCheckTypeTable) do
+        local setprocDataOfIndexData = setProcDataOfIndex[dataName]
+        if setprocDataOfIndexData then
+            for _, data in ipairs(setprocDataOfIndexData) do
+                table.insert(dataReturnTable, data)
+            end
+        end
+    end
+end
+
+
+--Returns true if the setId provided got a set proc
+--> Parameters: setId number: The set's setId
+--> Returns:    boolean isSetWithProc
+function lib.IsSetWithProc(setId)
+    if setId == nil then return end
+    if not lib.checkIfSetsAreLoadedProperly() then return end
+    local isSetWithProc = ( preloaded[LIBSETS_TABLEKEY_SET_PROCS] and preloaded[LIBSETS_TABLEKEY_SET_PROCS][setId] ) or false
+    return isSetWithProc
+end
+
+
+--Returns the procData of all the setIds
+--> Parameters: none
+--> Returns:    nilable:LibSetsAllSetProcData table
+function lib.GetAllSetProcData()
+    if not lib.checkIfSetsAreLoadedProperly() then return end
+    return preloaded[LIBSETS_TABLEKEY_SET_PROCS]
+end
+
+
+--Returns the procData of the setId as table, containing the abilityIds, unitTag, cooldown, icon, etc.
+--> Parameters: setId number: The set's setId
+--> Returns:    nilable:LibSetsSetProcData table
+--[[
+    [number setId] = {
+        [number LIBSETS_SETPROC_CHECKTYPE_ constant from LibSets_ConstantsLibraryInternal.lua] = {
+            [number index1toN] = {
+                ["abilityIds"] = {number abilityId1, number abilityId2, ...},
+                    --Only for LIBSETS_SETPROC_CHECKTYPE_ABILITY_EVENT_EFFECT_CHANGED
+                    ["unitTag"] = String unitTag e.g. "player", "playerpet", "group", "boss", etc.,
+
+                    --Only for LIBSETS_SETPROC_CHECKTYPE_ABILITY_EVENT_COMBAT_EVENT
+                    ["source"] = number combatUnitType e.g. COMBAT_UNIT_TYPE_PLAYER
+                    ["target"] = number combatUnitType e.g. COMBAT_UNIT_TYPE_PLAYER
+
+                    --Only for LIBSETS_SETPROC_CHECKTYPE_EVENT_POWER_UPDATE
+                    ["powerType"] = number powerType e.g. POWERTYPE_STAMINA
+
+                    --Only for LIBSETS_SETPROC_CHECKTYPE_EVENT_BOSSES_CHANGED
+                    ["unitTag"] = String unitTagOfBoss e.g. boss1, boss2, ...
+
+                    --Only for LIBSETS_SETPROC_CHECKTYPE_SPECIAL
+                    [number index1toN] = boolean specialFunctionIsGiven e.g. true/false (if true: the abilityId1's callback function should run a special                                             function as well, which will be registered for the
+
+                ["cooldown"] = {number cooldownForAbilityId1 e.g. 12000, number cooldownForAbilityId2, ...},
+                ["icon"] = String iconPathOfTheBuffIconToUse e.g. "/esoui/art/icons/ability_buff_minor_vitality.dds"
+            },
+        },
+        [number LIBSETS_SETPROC_CHECKTYPE_ constant from LibSets_ConstantsLibraryInternal.lua] = {
+        ...
+        },
+        ...
+        --String comment name of the set -> description of the proc EN / description of the proc DE
+    },
+]]
+function lib.GetSetProcData(setId)
+    if setId == nil then return end
+    if not lib.checkIfSetsAreLoadedProperly() then return end
+    return getSetProcData(setId)
+end
+
+--Returns the abilityIds of the setId's procData
+--> Parameters: setId number: The set's setId
+-->             nilable:setProcCheckType number: The setProcCheckType (See file LibSets_ConstantsLibryInternal.lua) to search
+-->             the abilityIds in. If left entry all setprocCheckTypes will be read adn the abilityIds taken from their indices.
+-->             nilable:procIndex number: The procIndex to get the abilityIds from. If left entry all abilityIds of all indices
+-->             of the setProcCheckType will be read
+--> Returns:    nilable:LibSetsSetProcDataAbilityIds table {[index1] = abilityId1, [index2] = abilityId2}
+function lib.GetSetProcAbilityIds(setId, setProcCheckType, procIndex)
+    if setId == nil then return end
+    if not lib.checkIfSetsAreLoadedProperly() then return end
+    local setProcData = getSetProcData(setId)
+    local setProcDataAbilityIds
+    if not setProcData then return end
+    local dataTableKey = "abilityIds"
+    if setProcCheckType and procIndex then
+        setProcDataAbilityIds = setProcData and setProcData[setProcCheckType]
+                and setProcData[setProcCheckType][procIndex]
+                and setProcData[setProcCheckType][procIndex][dataTableKey]
+    else
+        if setProcCheckType then
+            --No index given, so collect all of the setProcCheckType
+            local setProcDataOfSetProcCheckType = setProcData[setProcCheckType]
+            if not setProcDataOfSetProcCheckType then return end
+            setProcDataAbilityIds = {}
+            getSetProcDataOfIndex(setProcDataOfSetProcCheckType, dataTableKey, setProcDataAbilityIds)
+        else
+            --No setProcCheckType and no index given, so collect all setProcChecktypes and all indices of them
+            setProcDataAbilityIds = {}
+            for _, setProcDataOfSetProcCheckType in ipairs(setProcData) do
+                getSetProcDataOfIndex(setProcDataOfSetProcCheckType, dataTableKey, setProcDataAbilityIds)
+            end
+        end
+
+    end
+    return setProcDataAbilityIds
+end
+
+------------
+-- EVENTS --
+------------
+lib.eventListSetProcs = {}
+
+local function GetRegisteredSetProcEventDatatOfAbilityId(eventListTable, eventId, addOnEventNamespace, setId, abilityId, unregisterCheck)
+    --Find the eventId
+    unregisterCheck = unregisterCheck or false
+    local eventIdTableData = eventListTable[eventId]
+    if eventIdTableData then
+        if setId == nil and unregisterCheck == true then
+            return true
+        else
+            local eventIdAddonNamespaceTableData = eventIdTableData[addOnEventNamespace]
+            if eventIdAddonNamespaceTableData then
+                local eventIdAddonNamespaceSetIdTableData = eventIdAddonNamespaceTableData[setId]
+                if eventIdAddonNamespaceSetIdTableData then
+                    if abilityId == nil and unregisterCheck == true then
+                        return true
+                    else
+                        local eventIdAddonNamespaceSetIdAbilityIdTableData = eventIdAddonNamespaceSetIdTableData[abilityId]
+                        if eventIdAddonNamespaceSetIdAbilityIdTableData then
+                            return true
+                        end
+                    end
+                end
+            end
+        end
+    end
+	return false
+end
+
+local supportedSetprocEventIds = {
+    [EVENT_EFFECT_CHANGED]  = true,
+    [EVENT_COMBAT_EVENT]    = true,
+}
+
+local function buildUniqueEventFilterAddonNamespaceTag(addOnEventNamespace, abilityId)
+    local uniqueAddonNamespaceEventName = addOnEventNamespace
+    if abilityId ~= nil then
+        uniqueAddonNamespaceEventName = uniqueAddonNamespaceEventName .. "_" .. tostring(abilityId)
+    end
+    return uniqueAddonNamespaceEventName
+end
+
+-- Add a callback function to any of the possible events:
+--  EVENT_EFFECT_CHANGED
+--  EVENT_COMBAT_EVENT
+-- Specify the abilityIds of the set's proc which should be checked. Those abilityIds will be automatically filtered at
+-- the event to speed up the performance.
+-- You can define additional filterTypes at the ... parameters, where there are always 2 parameters for each additional
+-- filterTyp which you want to add. e.g. filterType1, filterParameter1, filterType2, filterParameter2, ...
+-- Possible additional filterTypes are:
+-- REGISTER_FILTER_UNIT_TAG, REGISTER_FILTER_UNIT_TAG_PREFIX or more https://wiki.esoui.com/AddFilterForEvent ,
+-- Attention: DO NOT USE the filterType REGISTER_FILTER_ABILITY_ID, because this is already handled by this function internally!
+-- Returns nilable:successfulRegister boolean
+--
+--Example call, will register EVENT_COMBAT_EVENT for the abilityId 135659 of th setId 487 (Winter), and call the function myCombatEventFunc
+--which's parameters must be the ones of the EVENT_COMBAT_EVENT (w/o the first eventId)->result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId, overflow
+--plus it will register a unitTag filter on "player"
+--LibSets.RegisterSetProcEventCallbackForAbilityIds(addOnEventNamespace, EVENT_COMBAT_EVENT, 487, {135659}, myCombatEventFunc, REGISTER_FILTER_UNIT_TAG, "player")
+function lib.RegisterSetProcEventCallbackForAbilityIds(addOnEventNamespace, eventId, setId, abilityIds, callbackFunc, ...)
+    if addOnEventNamespace == nil or addOnEventNamespace == "" or eventId == nil or abilityIds == nil or setId == nil
+            or callbackFunc == nil then return nil end
+    if not supportedSetprocEventIds[eventId] then return end
+
+    local typeNamespace = type(addOnEventNamespace) == "string"
+    local typeFunc = type(callbackFunc) == "function"
+    local typeAbilities = type(abilityIds) == "table"
+    if typeNamespace == true and typeFunc == true and typeAbilities == true then
+        --For each abilityId provided: Register the eventId and add a filter to the abilityId + add the additional filters
+        --provided
+        for _, abilityIdToRegister in ipairs(abilityIds) do
+            local alreadyRegistered = GetRegisteredSetProcEventDatatOfAbilityId(lib.eventListSetProcs, eventId, addOnEventNamespace, setId, abilityIdToRegister, false)
+            if not alreadyRegistered then
+                local uniqueEventFilterAddonNamespaceTag = buildUniqueEventFilterAddonNamespaceTag(addOnEventNamespace, abilityIdToRegister)
+                --Not registered for the eventId, setId and addOnEventNamespace yet? So register it now
+                EVENT_MANAGER:RegisterForEvent(uniqueEventFilterAddonNamespaceTag, eventId, function(_, ...)
+                    --Get the abilityId from the event's normal callback function
+                    local abilityId
+                    -- EVENT_EFFECT_CHANGED:
+                    -- Returns 16:  changeType, effectSlot, effectName, unitTag, beginTime, endTime, stackCount, iconName, buffType, effectType, abilityType, statusEffectType, unitName, unitId, abilityId, sourceType
+                    -- EVENT_COMBAT_EVENT:
+                    --Returns 17:   actionResultType, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId, overflow)
+                    if eventId == EVENT_EFFECT_CHANGED then
+                        abilityId = select(15, ...)
+                    elseif eventId == EVENT_COMBAT_EVENT then
+                        abilityId = select(16, ...)
+                    end
+                    callbackFunc(...)
+                end)
+                --Add the filter on the abilityId for the same uniqueEventName
+                EVENT_MANAGER:AddFilterForEvent(uniqueEventFilterAddonNamespaceTag, eventId, REGISTER_FILTER_ABILITY_ID, abilityIdToRegister)
+
+                -- Add additonal filters, e.g. on a unitTag
+                -- Multiple filters are handled here:
+                -- ... is a table like { filterType1, filterParameter1, filterType2, filterParameter2, filterType3, filterParameter3, ... }
+                -- You can only have one filterParameter for each filterType.
+                local filterParams = { ... }
+                if next(filterParams) then
+                    for i = 1, select("#", filterParams), 2 do
+                        local filterType = select(i, filterParams)
+                        local filterParameter = select(i + 1, filterParams)
+                        EVENT_MANAGER:AddFilterForEvent(uniqueEventFilterAddonNamespaceTag, eventId, filterType, filterParameter)
+                    end
+                end
+
+                --Keep track of the registered eventIds, setId, addonNameSpaces + abilityIds
+                lib.eventListSetProcs[eventId] = lib.eventListSetProcs[eventId] or {}
+                lib.eventListSetProcs[eventId][addOnEventNamespace] = lib.eventListSetProcs[eventId][addOnEventNamespace] or {}
+                lib.eventListSetProcs[eventId][addOnEventNamespace][setId] = lib.eventListSetProcs[eventId][addOnEventNamespace][setId] or {}
+                lib.eventListSetProcs[eventId][addOnEventNamespace][setId][abilityIdToRegister] = {
+                        eventId = eventId,
+                        setId = setId,
+                        addOnEventNamespace = addOnEventNamespace,
+                        abilityIds = abilityIds,
+                        abilityIdFiltered = abilityIdToRegister,
+                        callbackFunc = callbackFunc,
+                        filterParams = filterParams
+                }
+                return true
+            end
+        end
+    end
+    return nil
+end
+
+--Local helper fucntion to unregister an eventId (clear all filters on it) and clear up internal tables
+local function unregisterSetProcEventAndDeleteEventList(eventId, addOnEventNamespace, setId, abilityId)
+    local alreadyRegistered = GetRegisteredSetProcEventDatatOfAbilityId(lib.eventListSetProcs, eventId, addOnEventNamespace, setId, abilityId, true)
+    if alreadyRegistered == true then
+        local uniqueAddonNamespaceEventName = buildUniqueEventFilterAddonNamespaceTag(addOnEventNamespace, abilityId)
+        EVENT_MANAGER:UnregisterForEvent(uniqueAddonNamespaceEventName, eventId)
+        if setId ~= nil then
+            if abilityId ~= nil then
+                lib.eventListSetProcs[eventId][addOnEventNamespace][setId][abilityId] = nil
+            else
+                lib.eventListSetProcs[eventId][addOnEventNamespace][setId] = nil
+            end
+        else
+            lib.eventListSetProcs[eventId][addOnEventNamespace] = nil
+        end
+        return true
+    end
+    return false
+end
+
+-- Unregister the registered callback functions for the Set procs eventId at the addOnEventNamespace
+-- Returns nilable:succesfulUnregister boolean
+function lib.UnRegisterSetProcEventCallbackForEventId(addOnEventNamespace, eventId)
+    if not addOnEventNamespace or addOnEventNamespace == "" then return end
+    if eventId ~= nil then
+        return unregisterSetProcEventAndDeleteEventList(eventId, addOnEventNamespace, nil, nil)
+    else
+        local retVar
+        for eventIdInTable, _ in pairs(lib.eventListSetProcs) do
+            local wasUnregistered = unregisterSetProcEventAndDeleteEventList(eventIdInTable, addOnEventNamespace, nil, nil)
+            if wasUnregistered == true then
+                retVar = true
+            end
+        end
+        return retVar
+    end
+    return nil
+end
+
+-- Unregister the registered callback functions for the Set procs eventId at the addOnEventNamespace, setId and abilityId
+-- Returns nilable:succesfulUnregister boolean
+function lib.UnRegisterSetProcEventCallbackForAbilityId(addOnEventNamespace, eventId, setId, abilityId)
+    if not addOnEventNamespace or addOnEventNamespace == "" or not setId or not abilityId then return end
+    if eventId ~= nil then
+        return unregisterSetProcEventAndDeleteEventList(eventId, addOnEventNamespace, setId, abilityId)
+    else
+        local retVar
+        for eventIdInTable, _ in pairs(lib.eventListSetProcs) do
+            local wasUnregistered = unregisterSetProcEventAndDeleteEventList(eventIdInTable, addOnEventNamespace, setId, abilityId)
+            if wasUnregistered == true then
+                retVar = true
+            end
+        end
+        return retVar
+    end
+    return nil
+end
+
+-- Unregister the registered callback functions for the Set procs eventId at the addOnEventNamespace and setId
+-- Returns nilable:succesfulUnregister boolean
+function lib.UnRegisterSetProcEventCallbackForSetId(addOnEventNamespace, eventId, setId)
+    if not addOnEventNamespace or addOnEventNamespace == "" or not setId then return end
+    if eventId ~= nil then
+        return unregisterSetProcEventAndDeleteEventList(eventId, addOnEventNamespace, setId, nil)
+    else
+        local retVar
+        for eventIdInTable, _ in pairs(lib.eventListSetProcs) do
+            local wasUnregistered = unregisterSetProcEventAndDeleteEventList(eventIdInTable, addOnEventNamespace, setId, nil)
+            if wasUnregistered == true then
+                retVar = true
+            end
+        end
+        return retVar
+    end
+    return nil
+end
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- 	Global library check functions
 ------------------------------------------------------------------------
 --Returns a boolean value, true if the sets of the game were already loaded/ false if not
@@ -1489,7 +1881,7 @@ local function OnLibraryLoaded(event, name)
     lib.APIVersions["live"] = lib.APIVersions["live"] or GetAPIVersion()
     lib.currentAPIVersion = lib.APIVersions["live"]
 
-    --Remove future APIverison setsData (ids, itemIds, names, wayshrines, zones, ..) from the PreLoaded data
+    --Remove future APIversion setsData (ids, itemIds, names, wayshrines, zones, ..) from the PreLoaded data
     lib.removeFutureSetData()
     --...and then remove this function from the library
     lib.removeFutureSetData = nil
@@ -1504,5 +1896,4 @@ local function OnLibraryLoaded(event, name)
 end
 
 --Load the addon now
-EVENT_MANAGER:UnregisterForEvent(MAJOR, EVENT_ADD_ON_LOADED)
 EVENT_MANAGER:RegisterForEvent(MAJOR, EVENT_ADD_ON_LOADED, OnLibraryLoaded)

@@ -112,14 +112,17 @@ local strings = {
 	DUSTMAN_MUNDRUNE = "Mundane Rune",
 	DUSTMAN_OCHRE = "Ochre",
 	DUSTMAN_REGULUS = "Regulus",
-	--glyphs & runes submenu
-	DUSTMAN_GL_AR = "Glyphs & runestones",
+	--enchanting submenu
 	DUSTMAN_GLYPHS = "Mark non crafted glyphs",
 	DUSTMAN_GLYPHS_DESC = "Enable/Disable marking of glyphs",
 	DUSTMAN_LEVELGLYPH = "Exclude glyphs of level >=",
 	DUSTMAN_LEVELGLYPH_DESC = "If enabled, addon will never mark looted glyphs with a level (or Champion Rank) equal or superior to this value",
 	DUSTMAN_ASPECT_RUNES = "Mark aspect runes",
 	DUSTMAN_ASPECT_RUNES_DESC = "Enable/disable marking of aspect runes as junk.",
+	DUSTMAN_ESSENCE_RUNES = "Mark essence runes",
+	DUSTMAN_ESSENCE_RUNES_DESC = "Enable/disable marking of essence runes as junk.",
+	DUSTMAN_POTENCY_RUNES = "Mark potency runes",
+	DUSTMAN_POTENCY_RUNES_DESC = "Enable/disable marking of potency runes as junk.",
 	--consumables submenu
 	DUSTMAN_FOOD_ALL = "Mark all food and drinks",
 	DUSTMAN_FOOD_ALL_DESC = "Enable/disable marking of all food and drinks as junk.",
@@ -264,7 +267,26 @@ local strings = {
 	DUSTMAN_FORMATL_GOLD = "Dustman laundered <<2>>x <<t:1>> for <<3>>|t16:16:EsoUI/Art/currency/currency_gold.dds|t.",
 	DUSTMAN_FORMATL_NOTSOLD = "Dustman couldn't launder <<t:1>>.",
 	DUSTMAN_FORMATL_TOTAL = "Dustman laundered <<1>> <<1[item/items]>> for <<2>>|t16:16:EsoUI/Art/currency/currency_gold.dds|t.",
-	DUSTMAN_ZOS_RESTRICTIONS = "Due to ZOS restrictions, Dustman processed only 50 transactions. Please wait 10 seconds, and interact again with npc."
+	DUSTMAN_ZOS_RESTRICTIONS = "Due to ZOS restrictions, Dustman processed only 50 transactions. Please wait 10 seconds, and interact again with npc.",
+	--bursar of tributes
+	DUSTMAN_BOT_QUEST_NAME_1 = "A Matter of Tributes",
+	DUSTMAN_BOT_QUEST_NAME_2 = "A Matter of Respect",
+	DUSTMAN_BOT_QUEST_NAME_3 = "A Matter of Leisure",
+	DUSTMAN_BOT_QUEST_NAME_4 = "Glitter and Gleam",
+	DUSTMAN_BOT_QUEST_NAME_5 = "Morsels and Pecks",
+	DUSTMAN_BOT_QUEST_NAME_6 = "Nibbles and Bits",
+	DUSTMAN_BOT_COSMETIC = "Cosmetic",
+	DUSTMAN_BOT_GROOMING_ITEMS = "Grooming Items",
+	DUSTMAN_BOT_UTENSILS = "Utensils",
+	DUSTMAN_BOT_DAC = "Dishes and Cookware",
+	DUSTMAN_BOT_DRINKWARE = "Drinkware",
+	DUSTMAN_BOT_CT = "Children's Toys",
+	DUSTMAN_BOT_DOLLS = "Dolls",
+	DUSTMAN_BOT_GAMES = "Games",
+	DUSTMAN_BOT = "Save Bursar of Tributes quest items",
+	DUSTMAN_BOT_DESC = "Save items for Bursar of Tributes quests. Since there are six possible quests given by the raven npc, you can choose to save all items required for all the possible quests or to save only the items required for the active quest.",
+	DUSTMAN_BOT_DD_ALL = "All items required for all the quests",
+	DUSTMAN_BOT_DD_ACTIVE = "Items required for active quest only"
 }
 
 for stringId, stringValue in pairs(strings) do

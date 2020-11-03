@@ -175,6 +175,64 @@ local defaults = {
 		enchantingAspect = false,
 		aspectQuality = ITEM_QUALITY_NORMAL,
 		aspectFullStack = false,
+		enchantingEssence = false,
+		essenceFullStack = false,
+		essenceRunes = {
+			[1] = {"45839", false}, --Dekeipa
+			[2] = {"45833", false}, --Deni
+			[3] = {"45836", false}, --Denima
+			[4] = {"45842", false}, --Deteri
+			[5] = {"68342", false}, --Hakeijo
+			[6] = {"45841", false}, --Haoko
+			[7] = {"166045", false}, --Indeko
+			[8] = {"45849", false}, --Kaderi
+			[9] = {"45837", false}, --Kuoko
+			[10] = {"45848", false}, --Makderi
+			[11] = {"45832", false}, --Makko
+			[12] = {"45835", false}, --Makkoma
+			[13] = {"45840", false}, --Meip
+			[14] = {"45831", false}, --Oko
+			[15] = {"45834", false}, --Okoma
+			[16] = {"45843", false}, --Okori
+			[17] = {"45846", false}, --Oru
+			[18] = {"45838", false}, --Rakeipa
+			[19] = {"45847", false}, --Taderi
+		},
+		enchantingPotency = false,
+		potencyFullStack = false,
+		potencyRunes = {
+			[1] = {"45812", false}, --Dekeipa
+			[2] = {"45814", false}, --Derado
+			[3] = {"45822", false}, --Edode
+			[4] = {"45809", false}, --Edora
+			[5] = {"45825", false}, --Hade
+			[6] = {"45826", false}, --Idode
+			[7] = {"68340", false}, --Itade
+			[8] = {"45810", false}, --Jaera
+			[9] = {"45821", false}, --Jayde
+			[10] = {"64508", false}, --Jehade
+			[11] = {"45806", false}, --Jejora
+			[12] = {"45857", false}, --Jera
+			[13] = {"45855", false}, --Jora
+			[14] = {"45828", false}, --Kedeko
+			[15] = {"45830", false}, --Kude
+			[16] = {"45816", false}, --Kura
+			[17] = {"45818", false}, --Notade
+			[18] = {"45819", false}, --Ode
+			[19] = {"45807", false}, --Odra
+			[20] = {"45827", false}, --Pode
+			[21] = {"45823", false}, --Pojode
+			[22] = {"45508", false}, --Pojora
+			[23] = {"45811", false}, --Pora
+			[24] = {"45856", false}, --Porade
+			[25] = {"45829", false}, --Rede
+			[26] = {"64509", false}, --Rejera
+			[27] = {"45824", false}, --Rekude
+			[28] = {"45815", false}, --Rekura
+			[29] = {"68341", false}, --Repora
+			[30] = {"45813", false}, --Rera
+			[31] = {"45820", false}, --Tade
+		}
 	},
 	--potions
 	potions = false,
@@ -328,6 +386,8 @@ local defaults = {
 	destroyKeybind = false,
 	--continuos scan mode
 	automaticScan = true,
+	--bursar of tributes quest giver cwcs
+	bot = 1,
 }
 
 -- Local functions ------------------------------------------------------------
@@ -341,6 +401,18 @@ local function CanGemifyItem(bagId, slotIndex)
       return gemsAwarded > 0 and itemsRequired > 0
    end
    return false
+end
+
+local function GetEssenceRule(itemId)
+   for i, k in ipairs(Dustman.GetSettings().enchanting.essenceRunes) do 
+      if k[1]==itemId then return k[2] end 
+   end
+end
+
+local function GetPotencyRule(itemId)
+   for i, k in ipairs(Dustman.GetSettings().enchanting.potencyRunes) do 
+      if k[1]==itemId then return k[2] end 
+   end
 end
 
 local function BuildUsableIngredientsList()
@@ -634,6 +706,113 @@ local function HandleJunk(bagId, slotId, itemLink, sellPrice, forceDestroy, rule
 	
 end
 
+
+local function saveBotItemsForQuest(id,itemLink,bagId,slotId)
+	if id==0 then 
+		return false
+	elseif id==1 then --"A Matter of Tributes" quest
+		--5 Cosmetics and Grooming Items
+		--d("5 Cosmetics and Grooming Items")
+		local count = GetItemLinkNumItemTags(itemLink)
+		for i = 1, count do
+			local text, cat = GetItemLinkItemTagInfo(itemLink, i)
+			--d("text: "..text)
+			if cat == TAG_CATEGORY_TREASURE_TYPE then
+				if text == GetString(DUSTMAN_BOT_COSMETIC) or text == GetString(DUSTMAN_BOT_GROOMING_ITEMS) then 
+					--d("ret true")
+					return true
+				end
+			end
+		end
+	elseif id==2 then --"A Matter of Respect" quest
+		--5 utensils, drinkware, dishes or cookware
+		--d("5 utensils, drinkware, dishes or cookware")
+		local count = GetItemLinkNumItemTags(itemLink)
+		for i = 1, count do
+			local text, cat = GetItemLinkItemTagInfo(itemLink, i)
+			--d("text: "..text)
+			if cat == TAG_CATEGORY_TREASURE_TYPE then
+				if text == GetString(DUSTMAN_BOT_UTENSILS) or text == GetString(DUSTMAN_BOT_DAC) or text == GetString(DUSTMAN_BOT_DRINKWARE) then 
+					--d("ret true")
+					return true
+				end
+			end
+		end
+	elseif id==3 then --"A Matter of Leisure" quest
+		--5 toys, dolls or games
+		--d("5 toys, dolls or games")
+		local count = GetItemLinkNumItemTags(itemLink)
+		for i = 1, count do
+			local text, cat = GetItemLinkItemTagInfo(itemLink, i)
+			--d("text: "..text)
+			if cat == TAG_CATEGORY_TREASURE_TYPE then
+				if text == GetString(DUSTMAN_BOT_CT) or text == GetString(DUSTMAN_BOT_DOLLS) or text == GetString(DUSTMAN_BOT_GAMES) then 
+					--d("ret true")
+					return true
+				end
+			end
+		end
+	elseif id==4 then --"Glitter and Gleam" quest
+		--3 pieces of armor with the ornate trait		
+		--d("3 pieces of armor with the ornate trait")
+		itemType, _ = GetItemLinkItemType(itemLink)
+		if itemType == ITEMTYPE_ARMOR then
+			if GetItemTrait(bagId, slotId) == ITEM_TRAIT_TYPE_ARMOR_ORNATE then 
+				--d("ret true")
+				return true
+			end
+		end
+	elseif id==5 then --"Morsels and Pecks" quest
+		--2 Elemental Essence, 3 Supple Roots, 3 Ectoplasm
+		--d("2 Elemental Essence, 3 Supple Roots, 3 Ectoplasm")
+		itemId = select(4, ZO_LinkHandler_ParseLink(itemLink))
+		if itemId=="54385" or itemId=="54388" or itemId=="54384" then
+			--d("ret true")
+			return true
+		end
+	elseif id==6 then --"Nibbles and Bits" quest
+		--4 Carapaces, 3 Foul Hide, 5 Daedra Husks
+		--d("4 Carapaces, 3 Foul Hide, 5 Daedra Husks")
+		if itemId=="54382" or itemId=="54381" or itemId=="54383" then
+			--d("ret true")
+			return true
+		end
+	end
+	--d("ret false")
+	return false
+end
+
+local function saveAllBotItems(itemLink,bagId,slotId)
+	res = false
+	for i=1,6 do 
+		res = res or saveBotItemsForQuest(i,itemLink,bagId,slotId)	
+	end
+	return res
+end
+
+local function botItems(itemLink, bagId, slotId)
+	
+	--d("BOT: "..tostring(Dustman.GetSettings().bot))
+	if Dustman.GetSettings().bot == 1 then return false end
+	
+	if Dustman.GetSettings().bot == 2 then		
+		return saveAllBotItems(itemLink,bagId,slotId)	
+	else
+		local id = 0
+		for questIndex = 1, MAX_JOURNAL_QUESTS do
+			questName = GetJournalQuestName(questIndex)
+			if questName == GetString(DUSTMAN_BOT_QUEST_NAME_1) then id=1
+				elseif questName == GetString(DUSTMAN_BOT_QUEST_NAME_2) then id=2
+				elseif questName == GetString(DUSTMAN_BOT_QUEST_NAME_3) then id=3
+				elseif questName == GetString(DUSTMAN_BOT_QUEST_NAME_4) then id=4
+				elseif questName == GetString(DUSTMAN_BOT_QUEST_NAME_5) then id=5
+				elseif questName == GetString(DUSTMAN_BOT_QUEST_NAME_6) then id=6
+			end
+		end
+		return saveBotItemsForQuest(id,itemLink,bagId,slotId)
+	end
+end
+
 -- Event handlers -------------------------------------------------------------
 local function OnInventorySingleSlotUpdate(_, bagId, slotId, isNewItem)
 	
@@ -654,14 +833,14 @@ local function OnInventorySingleSlotUpdate(_, bagId, slotId, isNewItem)
 	if BankManagerRevived_inProgress and BankManagerRevived_inProgress() then return end --support for BankManagerRevived
 	
 	local _, stackCount, sellPrice, _, _, equipType, itemStyle, quality = GetItemInfo(bagId, slotId)
-	
 	if stackCount < 1 then return end -- empty slot	
 	local itemLink = GetItemLink(bagId, slotId)
 	local itemType, specializedItemType = GetItemLinkItemType(itemLink)
 	local itemId = select(4, ZO_LinkHandler_ParseLink(itemLink))
 	local level = GetItemLevel(bagId, slotId)
-
-
+	
+	--priority 0: items from bursar of tributes cwc quest giver
+	if botItems(itemLink, bagId, slotId) then return end
 	
 	local dontLaunder
 	-- Stolen item to do not launder, not in the main block because it must be re-evaluated.
@@ -764,9 +943,9 @@ local function OnInventorySingleSlotUpdate(_, bagId, slotId, isNewItem)
             return
         end
 	end
-    
+	
     if quality == ITEM_QUALITY_LEGENDARY then return end
-    
+   
 	-- stolen clothes
 	if Dustman.GetSettings().excludeStolenClothes and itemType == ITEMTYPE_ARMOR and GetItemLinkArmorType(itemLink) == ARMORTYPE_NONE and
 	equipType ~= EQUIP_TYPE_NECK and equipType ~= EQUIP_TYPE_RING and equipType ~= EQUIP_TYPE_COSTUME and equipType ~= EQUIP_TYPE_INVALID then
@@ -1224,6 +1403,16 @@ local function OnInventorySingleSlotUpdate(_, bagId, slotId, isNewItem)
 			HandleJunk(bagId, slotId, itemLink, sellPrice, false, "ASPECT RUNE")
 			return
 		end
+	elseif itemType == ITEMTYPE_ENCHANTING_RUNE_ESSENCE and GetEssenceRule(itemId) then 
+		if Dustman.GetSettings().enchanting.enchantingEssence and (not Dustman.GetSettings().enchanting.essenceFullStack or (Dustman.GetSettings().enchanting.essenceFullStack and IsFullStackInBag(slotId, BAG_BANK, itemLink))) then
+			HandleJunk(bagId, slotId, itemLink, sellPrice, false, "ESSENCE RUNE")
+			return
+		end
+	elseif itemType == ITEMTYPE_ENCHANTING_RUNE_POTENCY and GetPotencyRule(itemId) then 
+		if Dustman.GetSettings().enchanting.enchantingPotency and (not Dustman.GetSettings().enchanting.potencyFullStack or (Dustman.GetSettings().enchanting.potencyFullStack and IsFullStackInBag(slotId, BAG_BANK, itemLink))) then
+			HandleJunk(bagId, slotId, itemLink, sellPrice, false, "POTENCY RUNE")
+			return
+		end
 	elseif itemType == ITEMTYPE_SOUL_GEM and quality == ITEM_QUALITY_NORMAL and Dustman.GetSettings().emptyGems then 
 		HandleJunk(bagId, slotId, itemLink, sellPrice, false, "SOULGEM")
 		return
@@ -1503,14 +1692,27 @@ function Dustman_DestroyHoveredItem()
 end
 
 function Dustman_ExcludeSetItems()
-	Dustman.GetSettings().equipment.keepSetItems = not Dustman.GetSettings().equipment.keepSetItems
-	local to_show
-	if Dustman.GetSettings().equipment.keepSetItems then
+	Dustman.GetSettings().equipment.wa.keepSetItems = not Dustman.GetSettings().equipment.wa.keepSetItems
+	if Dustman.GetSettings().equipment.wa.keepSetItems then
 		d(GetString(DUSTMAN_SET_DISABLED))
 	else
 		d(GetString(DUSTMAN_SET_ENABLED))
 	end
 	Dustman.Sweep()
+end
+
+local function OnRemoveQuest(eventCode, isCompleted, journalIndex, questName, zoneIndex, poiIndex, questID)
+
+	if Dustman == nil or Dustman.AbandonQuestEventName == nil then return false end
+	
+	--d("DUSTMAN: [OnRemoveQuest] isCompleted: " .. tostring(isCompleted) .. ", journalIndex: " .. tostring(journalIndex) .. ", questName: " .. tostring(questName) .. ", questID: " .. tostring(questID))
+    
+	if Dustman.GetSettings().bot==2 or Dustman.GetSettings().bot==3 then 
+		if questName==GetString(DUSTMAN_BOT_QUEST_NAME_1) or questName==GetString(DUSTMAN_BOT_QUEST_NAME_2) or questName==GetString(DUSTMAN_BOT_QUEST_NAME_3) or questName==GetString(DUSTMAN_BOT_QUEST_NAME_4) or questName==GetString(DUSTMAN_BOT_QUEST_NAME_5) or questName==GetString(DUSTMAN_BOT_QUEST_NAME_6) then
+			--d("DUSTMAN: Rescan triggered by onremovequest "..tostring(questName))
+			Dustman.Sweep()
+		end
+	end
 end
 
 local function OnLoad(eventCode, name)
@@ -1529,6 +1731,10 @@ local function OnLoad(eventCode, name)
 			markedAsJunk = Dustman_Junk_SavedVariables.Default[displayName][id]
 		end
 		
+		--rescan inv when bot quests are completed/removed
+		Dustman.AbandonQuestEventName = "AbandonBOTQuests"	
+		EVENT_MANAGER:RegisterForEvent(Dustman.AbandonQuestEventName, EVENT_QUEST_REMOVED, OnRemoveQuest)
+
 		--hook SetItemIsJunk to watch item marked as junk
 		local original_SetItemIsJunk = SetItemIsJunk
 		SetItemIsJunk = function(bagId, slotId, junk, ...)

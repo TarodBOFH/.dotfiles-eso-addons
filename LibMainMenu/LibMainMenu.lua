@@ -1,8 +1,8 @@
 
 --[[
-Author: Ayantir
+Author: Ayantir, Baertram
 Filename: LibMainMenu.lua
-Version: 8
+Version: 9
 ]]--
 
 --[[
@@ -27,62 +27,64 @@ Please read full licence at :
 http://creativecommons.org/licenses/by-nc-sa/3.0/legalcode
 
 ]]--
---Register LAM with LibStub
-local MAJOR, MINOR = "LibMainMenu", 8
-local libMainMenu, oldminor
-if LibStub then
-    libMainMenu, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
+--Register LibMainMenu -> LibStub is NOT used any longer! Please use the global variable LibMainMenu
+local MAJOR, MINOR = "LibMainMenu", 9
+local libMainMenu
+--Check if LibMainMenu was already loaded before properly
+if LibMainMenu ~= nil and LibMainMenu.AddCategory ~= nil
+    and LibMainMenu.wasLoadedProperly == true and LibMainMenu.wasInitializedProperly == true
+    and LIBMAINMENU ~= nil then
+    --Library was loaded properly already before, so do not load it again
+    return
 else
-    --Check if LibMainMenu was already loaded before properly
-    if LibMainMenu ~= nil and LibMainMenu.AddCategory ~= nil and LibMainMenu.wasLoadedProperly == true and LIBMAINMENU ~= nil then
-        --Library was loaded properly already
-        return
-    else
-        --Create new library instance via the global variable
-        libMainMenu = {}
-        libMainMenu.wasLoadedProperly = false
-    end
+    --Create new library instance via the global variable
+    libMainMenu = ZO_Object:Subclass()
+    libMainMenu.wasLoadedProperly = false
 end
 if not libMainMenu then return end
+libMainMenu.name    = MAJOR
+libMainMenu.version = MINOR
 
 LIBMAINMENU_LAYOUT_INFO = {}
 local Initialized = false
-libMainMenu.wasInitializedProperly = false
+libMainMenu.wasInitializedProperly = Initialized
 
 local function InitializeLMM()
-	local LMMXML = CreateTopLevelWindow("LMMXML")
-	LMMXML:SetAnchor(CENTER, GuiRoot, nil, 0, 28)
-	local categoryBar = CreateControlFromVirtual("$(parent)CategoryBar", LMMXML, "ZO_MenuBarTemplate")
-	categoryBar:SetAnchor(TOP)
-	local sceneGroupBar = CreateControlFromVirtual("$(parent)SceneGroupBar", LMMXML, "ZO_LabelButtonBar")
-	sceneGroupBar:SetAnchor(RIGHT, GuiRoot, nil, -40, -340)
+    local LMMXML = CreateTopLevelWindow("LMMXML")
+    LMMXML:SetAnchor(CENTER, GuiRoot, nil, 0, 28)
+    local categoryBar = CreateControlFromVirtual("$(parent)CategoryBar", LMMXML, "ZO_MenuBarTemplate")
+    categoryBar:SetAnchor(TOP)
+    local sceneGroupBar = CreateControlFromVirtual("$(parent)SceneGroupBar", LMMXML, "ZO_LabelButtonBar")
+    sceneGroupBar:SetAnchor(RIGHT, GuiRoot, nil, -40, -340)
 
-	local libMainMenuSubcategoryBar = CreateControl("libMainMenuSubcategoryBar", GuiRoot, CT_CONTROL)
-	local libMainMenuSubcategoryButton = CreateControl("libMainMenuSubcategoryButton", GuiRoot, CT_LABEL)
-	libMainMenuSubcategoryButton:SetColor(ZO_CONTRAST_TEXT:UnpackRGBA())
-	libMainMenuSubcategoryButton:SetFont("ZoFontHeader3")
-	libMainMenuSubcategoryButton:SetHandler("OnMouseEnter", function(self) self:SetColor(ZO_HIGHLIGHT_TEXT:UnpackRGBA()) end)
-	libMainMenuSubcategoryButton:SetHandler("OnMouseExit", function(self) self:SetColor(ZO_CONTRAST_TEXT:UnpackRGBA()) end)
-	libMainMenuSubcategoryButton:SetMouseEnabled(true)
+    --local libMainMenuSubcategoryBar = CreateControl("libMainMenuSubcategoryBar", GuiRoot, CT_CONTROL)
+    local libMainMenuSubcategoryButton = CreateControl("libMainMenuSubcategoryButton", GuiRoot, CT_LABEL)
+    libMainMenuSubcategoryButton:SetColor(ZO_CONTRAST_TEXT:UnpackRGBA())
+    libMainMenuSubcategoryButton:SetFont("ZoFontHeader3")
+    libMainMenuSubcategoryButton:SetHandler("OnMouseEnter", function(self) self:SetColor(ZO_HIGHLIGHT_TEXT:UnpackRGBA()) end)
+    libMainMenuSubcategoryButton:SetHandler("OnMouseExit", function(self) self:SetColor(ZO_CONTRAST_TEXT:UnpackRGBA()) end)
+    libMainMenuSubcategoryButton:SetMouseEnabled(true)
 
-	local libMainMenuCategoryBarButton = CreateControlFromVirtual("libMainMenuCategoryBarButton", GuiRoot, "ZO_MenuBarButtonTemplate1")
-	libMainMenuCategoryBarButton:SetHandler("OnMouseEnter", function(self) libMainMenuCategoryBarButton_OnMouseEnter(self) end)
-	libMainMenuCategoryBarButton:SetHandler("OnMouseExit", function(self) libMainMenuCategoryBarButton_OnMouseExit(self) end)
+    local libMainMenuCategoryBarButton = CreateControlFromVirtual("libMainMenuCategoryBarButton", GuiRoot, "ZO_MenuBarButtonTemplate1")
+    libMainMenuCategoryBarButton:SetHandler("OnMouseEnter", function(self) libMainMenuCategoryBarButton_OnMouseEnter(self) end)
+    libMainMenuCategoryBarButton:SetHandler("OnMouseExit", function(self) libMainMenuCategoryBarButton_OnMouseExit(self) end)
 
-	local indicator = CreateControlFromVirtual("$(parent)Indicator", libMainMenuCategoryBarButton, "ZO_MultiIcon")
-	indicator:SetHidden(true)
-	indicator:SetAnchor(CENTER, libMainMenuCategoryBarButton, nil, 0, 24)
-	
-	LIBMAINMENU = libMainMenu:New(LMMXML)
-	
-	Initialized = true
+    local indicator = CreateControlFromVirtual("$(parent)Indicator", libMainMenuCategoryBarButton, "ZO_MultiIcon")
+    indicator:SetHidden(true)
+    indicator:SetAnchor(CENTER, libMainMenuCategoryBarButton, nil, 0, 24)
+
+    --LIBMAINMENU is the object created from the class libMainMenu, using the control LMMXML
+    LIBMAINMENU = libMainMenu:New(LMMXML)
+    if LIBMAINMENU ~= nil then
+        libMainMenu.wasInitializedProperly = true
+    end
 end
 
 local function checkIfInitialized(doAbortIfNotInitialized)
     doAbortIfNotInitialized = doAbortIfNotInitialized or false
-    if libMainMenu and (not LIBMAINMENU or Initialized == false) then
+    if libMainMenu and (not LIBMAINMENU or libMainMenu.wasInitializedProperly == false) then
         if doAbortIfNotInitialized then
-            d("[" .. tostring(MAJOR) .. "] Library was not initialized properly (did you forgot to call function \'AddCategory\'?).\nPlease read the library's description on www.esoui.com!")
+            d("[" .. tostring(MAJOR) .. "] Library was not initialized properly (did you forget to call function \'AddCategory\'?).\nPlease read the library's description on www.esoui.com!")
             return
         end
         InitializeLMM()
@@ -90,9 +92,9 @@ local function checkIfInitialized(doAbortIfNotInitialized)
 end
 
 function libMainMenu:New(control)
-    local manager = ZO_Object.New(self)
-    manager:Initialize(control)
-    return manager
+    local libMainMenuManager = ZO_Object.New(self)
+    libMainMenuManager:Initialize(control)
+    return libMainMenuManager
 end
 
 function libMainMenu:Initialize(control)
@@ -106,9 +108,9 @@ function libMainMenu:Initialize(control)
     self.sceneGroupBar = GetControl(self.control, "SceneGroupBar")
     self.sceneGroupBarLabel = GetControl(self.control, "SceneGroupBarLabel")
 
-    self.tabPressedCallback =   function(control)
-                                    if control.sceneGroupName then
-                                        self:OnSceneGroupTabClicked(control.sceneGroupName)
+    self.tabPressedCallback =   function(ctrl)
+                                    if ctrl.sceneGroupName then
+                                        self:OnSceneGroupTabClicked(ctrl.sceneGroupName)
                                     end
                                 end
 
@@ -350,7 +352,7 @@ function libMainMenu:AddSceneGroup(category, sceneGroupName, menuBarIconData)
 
 	local categoryInfo = LIBMAINMENU.categoryInfo[category]
 	local sceneGroup = SCENE_MANAGER:GetSceneGroup(sceneGroupName)
-	
+
 	for i=1, sceneGroup:GetNumScenes() do
 		local sceneName = sceneGroup:GetSceneName(i)
 		local scene = libMainMenu:AddRawScene(sceneName, category, categoryInfo, sceneGroupName)
@@ -467,6 +469,10 @@ function libMainMenu:ToggleScene(sceneName)
     else
         self:ShowScene(sceneName)
     end
+end
+
+function libMainMenu:GetControl()
+    return LIBMAINMENU.control
 end
 
 -- XML

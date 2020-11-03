@@ -5,7 +5,7 @@
 
 PotMaker = {
 	name = "PotionMaker",
-	version = "5.8.2",
+	version = "5.8.3",
 	ResultControls = {},
 	PositiveTraitControls = {},
 	NegativeTraitControls = {},
