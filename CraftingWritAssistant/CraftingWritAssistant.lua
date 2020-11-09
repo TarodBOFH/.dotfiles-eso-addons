@@ -325,7 +325,7 @@ function CraftingWritAssistant.CreateOptionsWindow()
         type = "panel",
         name = "Crafting Writ Assistant",
         author = "@dovah-argus",
-        version = ".30b",
+        version = ".31b",
         slashCommand = "/cwasettings",
         registerForRefresh = true,
         website = "http://www.esoui.com/downloads/info1121-CraftingWritAssistant.html"

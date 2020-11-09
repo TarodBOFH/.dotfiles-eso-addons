@@ -495,6 +495,7 @@ local KioskIDNPCsTable = {
 		GetString(TTC_NPC_MAGUZAK),
 		GetString(TTC_NPC_SADENSARVANI),
 		GetString(TTC_NPC_WUSAVA),
+		"jaflinna", --TODO: Find a way to fix this hack
 	},
 	[93] = {
 		GetString(TTC_NPC_LAYTIVASENDRIS),
@@ -509,6 +510,17 @@ local KioskIDNPCsTable = {
 	},
 	[95] = {
 		GetString(TTC_NPC_MDESHARGO),
+	},
+	[96] = {
+		GetString(TTC_NPC_BODFIRA),
+		GetString(TTC_NPC_BRIGHORTAN),
+		GetString(TTC_NPC_JOTEPMOTA),
+		GetString(TTC_NPC_KELTORGAN),
+		GetString(TTC_NPC_MARILIAVERETHI),
+		GetString(TTC_NPC_VICTOIREMADACH),
+	},
+	[97] = {
+		GetString(TTC_NPC_MORBORGOL),
 	},
 }
 
@@ -552,6 +564,10 @@ function TamrielTradeCentre:GetCurrentKioskID()
 	local kioskID = self:NPCNameToKioskID(npcName, true)
 	if (kioskID ~= nil) then
 		return kioskID
+	end
+
+	if (IsUnitGuildKiosk("interact")) then
+		d(self:StringFormatPOSIX("Unknown kiosk NPC name %1$s. Please report it to TTC author on ESOUI or email admin@tamrieltradecentre.com", npcName))
 	end
 
 	local guildID, _ = GetCurrentTradingHouseGuildDetails()

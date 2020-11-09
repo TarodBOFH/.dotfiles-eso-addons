@@ -516,15 +516,14 @@ CrowdControl.aoeNPCNormal = {
     [103992] = 1, -- Luminescent Burn (Yaghra Spewer)
     [121644] = 1, -- Defiled Ground (Euraxian Necromancer)
 
-    [90182] = 1, -- Oily Smoke (Vvardenfell -- Divine Restoration) -- TODO: Check, maybe is elite?
-
 }
 
 
 -- List of effects sourced by the player that damage self that should be shown
 CrowdControl.LavaAlerts = {
     -- Player
-    [115607] = true, -- Dismount Stun
+    [115607] = true, -- Dismount Stun (Mount)
+    [141004] = true, -- Dismount Stun (Passenger Mount)
 
     -- Consumables
     [68565] = true, -- Stun (Potion of Stun)

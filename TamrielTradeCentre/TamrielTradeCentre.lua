@@ -621,6 +621,7 @@ function TamrielTradeCentre:Init()
 	self:InitSettingMenu()
 
 	ZO_CreateStringId("SI_BINDING_NAME_TTC_SCAN_START", GetString(TTC_SCANALLLISTINGS))
+	ZO_CreateStringId("SI_BINDING_NAME_TTC_TOGGLE_PRICE_TOOLTIP", GetString(TTC_TOGGLEPRICETOOLTIP))
 
 	self.Buttons = {}
 	self.Buttons.StartScanButton = {

@@ -26,10 +26,7 @@ CastBarTable.CastBreakingStatus = {
 CastBarTable.CastBreakingActions = {
     [28549] = true, -- Roll Dodge
     [55146] = true, -- Interrupt Bonus (when player bashes it can interrupt a channel - note that it won't succesfully go off until after the cast if it can't be stopped by bashing so this is safe to apply to everything)
-    --[14890] = true, -- Block -- Replaced with function in Castbar update that checks IsBlockActive
     --[20309] = true, -- Hidden -- Shouldn't break any casts or channels (or is unable to be using during one)
-    --[973] = true, -- Sprint -- TODO: No longer works
-    --[33439] = true, -- Mount Sprint -- TODO: No longer works
 }
 
 -- Used to break Siege Weapon deployment/stoy when the player opens their inventory or another window or tabs out of the game.
@@ -362,7 +359,8 @@ CastBarTable.CastDurationFix = {
     [118287] = 1200, -- Ravenous Goliath Self Snare (Ravenous Goliath)
 
     -- Innate
-    [37059] = 1165, -- Mount Up
+    [37059] = 1165, -- Mount Up (Mount)
+    [141013] = 1165, -- Mount Up (Passenger Mount)
     [14644] = 4000, -- Revive (Death Dialogue)
     [32346] = 5800, -- Skyshard Collect
     [47270] = 5600, -- Ritual of Mara
@@ -382,6 +380,8 @@ CastBarTable.CastDurationFix = {
     [70584] = 5000, -- 68235 Stun (Merethic Restorative Resin)
     [88451] = 5000, -- 88449 Stun (Aetheric Cipher)
 
+    [147795] = 5000, -- 88449 Stun (Chef Arquitius's Torte Dissertation)
+    [147850] = 5000, -- 88449 Stun (Chef Arquitius's Lost Thesis)
     [111190] = 5000, -- 68235 Stun (Arena Gladiator's Exultation)
     [115064] = 5000, -- 68235 Stun (Arena Gladiator's Mockery)
     [106174] = 5000, -- 68235 Stun (Arena Gladiator's Recognition)
@@ -392,6 +392,7 @@ CastBarTable.CastDurationFix = {
     [124789] = 5000, -- 68235 Stun (Siege of Cyrodiil Recognition)
     [126710] = 5000, -- 68235 Stun (Siege of Cyrodiil Recommendation)
     [124624] = 5000, -- 68235 Stun (Alliance Standard-Bearer's License)
+    [148421] = 5000, -- 68235 Stun (Siege of Cyrodiil Commendation)
 
     -- Seasonal Mementos and Items
     [86792] = 3000, -- Eating (High Hrothgar Festival Mints)
@@ -518,7 +519,8 @@ CastBarTable.IsCast = {
     -- Innate
     [6811] = true, -- Recall
     [69293] = true, -- Sigil of Imperial Retreat
-    [37059] = true, -- Mount Up
+    [37059] = true, -- Mount Up (Mount)
+    [141013] = true, -- Mount Up (Passenger Mount)
     [14031] = true, -- Mundus Use
     [14644] = true, -- Revive (Death Dialogue)
     [32346] = true, -- Skyshard Collect
@@ -542,6 +544,8 @@ CastBarTable.IsCast = {
     [76350] = true, -- Moderate Pardon (Leniency Edict)
     [76349] = true, -- Full Pardon (Grand Amnesty Edict)
 
+    [147795] = true, -- 88449 Stun (Chef Arquitius's Torte Dissertation)
+    [147850] = true, -- 88449 Stun (Chef Arquitius's Lost Thesis)
     [111190] = true, -- 68235 Stun (Arena Gladiator's Exultation)
     [115064] = true, -- 68235 Stun (Arena Gladiator's Mockery)
     [106174] = true, -- 68235 Stun (Arena Gladiator's Recognition)
@@ -552,6 +556,7 @@ CastBarTable.IsCast = {
     [124789] = true, -- 68235 Stun (Siege of Cyrodiil Recognition)
     [126710] = true, -- 68235 Stun (Siege of Cyrodiil Recommendation)
     [124624] = true, -- 68235 Stun (Alliance Standard-Bearer's License)
+    [148421] = true, -- 68235 Stun (Siege of Cyrodiil Commendation)
 
     -- Seasonal Mementos and Items
     [86792] = true, -- Eating (High Hrothgar Festival Mints)
@@ -938,7 +943,8 @@ CastBarTable.MultiCast = {
 --------------------------------------------------------------------------------------------------------------------------------
 CastBarTable.IgnoreCastBarStun = {
     -- Player
-    [36434] = true, -- Mount Stun
+    [36434] = true, -- Mount Up (Mount)
+    [141001] = true, -- Mount Up (Passenger Mount)
     [74232] = true, -- Stun (Malacath's Wrathful Flame)
     [92863] = true, -- Stun (Dreamer's Chime)
     [115046] = true, -- 68235 Stun (Nascent Indrik)

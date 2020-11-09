@@ -219,7 +219,7 @@ ZO_CreateStringId("TTC_NPC_RAZZAMIN", "razzamin")
 ZO_CreateStringId("TTC_NPC_BEGOK", "begok")
 ZO_CreateStringId("TTC_NPC_GLAETALDO", "glaetaldo")
 ZO_CreateStringId("TTC_NPC_GOLGAKUL", "golgakul")
-ZO_CreateStringId("TTC_NPC_JAFLINNA", "jaflinna")
+ZO_CreateStringId("TTC_NPC_JAFLINNA", "jaflinna snow-born")
 ZO_CreateStringId("TTC_NPC_MAGUZAK", "maguzak")
 ZO_CreateStringId("TTC_NPC_SADENSARVANI", "saden sarvani")
 ZO_CreateStringId("TTC_NPC_WUSAVA", "wusava")
@@ -232,6 +232,15 @@ ZO_CreateStringId("TTC_NPC_MAEVOLK", "maevolk")
 ZO_CreateStringId("TTC_NPC_TRALLINARIAN", "trallinarian")
 ZO_CreateStringId("TTC_NPC_WITA", "wita")
 ZO_CreateStringId("TTC_NPC_ZUUGOZAG", "zuugozag")
+
+ZO_CreateStringId("TTC_NPC_BODFIRA", "bodfira")
+ZO_CreateStringId("TTC_NPC_BRIGHORTAN", "brighortan")
+ZO_CreateStringId("TTC_NPC_JOTEPMOTA", "jotep-mota")
+ZO_CreateStringId("TTC_NPC_KELTORGAN", "keltorgan")
+ZO_CreateStringId("TTC_NPC_MARILIAVERETHI", "marilia verethi")
+ZO_CreateStringId("TTC_NPC_VICTOIREMADACH", "victoire madach")
+
+ZO_CreateStringId("TTC_NPC_MORBORGOL", "morborgol")
 
 --Master Writ
 ZO_CreateStringId("TTC_MASTER_WRIT_ALCHEMYREGEX", "Craft an? (.-) with")
@@ -269,6 +278,7 @@ ZO_CreateStringId("TTC_ALCHEMY", "alchemy")
 ZO_CreateStringId("TTC_ENCHANTING", "enchanting")
 ZO_CreateStringId("TTC_PROVISIONING", "provisioning")
 ZO_CreateStringId("TTC_SCANALLLISTINGS", "Scan All Listings")
+ZO_CreateStringId("TTC_TOGGLEPRICETOOLTIP", "Toggle Price Tooltip")
 ZO_CreateStringId("TTC_SEARCHONLINE", "Search Online")
 
 --Messages
