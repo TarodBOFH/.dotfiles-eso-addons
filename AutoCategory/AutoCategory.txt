@@ -1,0 +1,35 @@
+## Title: AutoCategory
+## APIVersion: 100032 100033
+## Author: Shadowfen, crafty35a, RockingDice 
+## Description: Type "/ac" for settings
+## Version: 2.11.1
+## AddOnVersion: 38
+## SavedVariables: AutoCategorySavedVars
+## DependsOn: LibAddonMenu-2.0 LibSFUtils LibMediaProvider-1.0 LibDebugLogger
+## OptionalDependsOn: InventoryGridView GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver UnknownTracker
+
+lang/strings.lua
+lang/$(language).lua
+
+AutoCategory_Global.lua
+AutoCategory_Defaults.lua
+Plugin_API.lua
+AutoCategory.xml
+AutoCategory_Hooks.lua
+AutoCategory.lua
+AddonMenu.lua
+AutoCategory_RuleFunc.lua
+AutoCategory_API.lua
+Misc_Plugins.lua
+
+; new style addon plugin files
+ItemSaver_Plugin.lua
+FCOIS_Plugin.lua
+Iakoni_GearChanger_Plugin.lua
+UnknownTracker_Plugin.lua
+
+; old integration with other addons files
+AutoCategory_Integrations_Inventory_Grid_View.lua
+AutoCategory_Integrations_QuickMenu.lua
+
+Bindings.xml

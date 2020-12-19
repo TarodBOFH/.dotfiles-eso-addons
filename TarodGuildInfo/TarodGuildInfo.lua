@@ -4,7 +4,7 @@ TarodGuildInfo = {}
 TarodGuildInfo.name = "Tarod's Guild Info"
 TarodGuildInfo.id = "TarodGuildInfo"
 TarodGuildInfo.currentPlayer = nil
-TarodGuildInfo.maxOnline = 15
+TarodGuildInfo.maxOnline = 50
 TarodGuildInfo.chat = LibChatMessage("TarodGuildInfo", "TGI") -- long and short tag to identify who is printing the message
 
 function TarodGuildInfo:Initialize()
