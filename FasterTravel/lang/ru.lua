@@ -1,0 +1,19 @@
+
+
+ZO_CreateStringId("FASTER_TRAVEL_MODE_WAYSHRINES","Дорожные святилища")
+ZO_CreateStringId("FASTER_TRAVEL_MODE_PLAYERS","Игроки")
+
+ZO_CreateStringId("FASTER_TRAVEL_WAYSHRINES_CATEGORY_RECENT","Недавние")
+ZO_CreateStringId("FASTER_TRAVEL_WAYSHRINES_CATEGORY_FAVOURITES","Любимые")
+ZO_CreateStringId("FASTER_TRAVEL_WAYSHRINES_CATEGORY_CURRENT","Область")
+ZO_CreateStringId("FASTER_TRAVEL_WAYSHRINES_CATEGORY_ALL","Все")
+
+ZO_CreateStringId("FASTER_TRAVEL_PLAYERS_CATEGORY_FRIENDS","Друзья")
+ZO_CreateStringId("FASTER_TRAVEL_PLAYERS_CATEGORY_GROUP","Группа")
+ZO_CreateStringId("FASTER_TRAVEL_PLAYERS_CATEGORY_ZONE","Область")
+
+ZO_CreateStringId("FASTER_TRAVEL_ADD_FAVOURITE","Добавить в любимые")
+ZO_CreateStringId("FASTER_TRAVEL_REMOVE_FAVOURITE","Удалить из любимых")
+ZO_CreateStringId("SI_BINDING_NAME_FASTER_TRAVEL_REJUMP","Отправиться в текущую область")
+
+ZO_CreateStringId("FASTER_TRAVEL_TRADERS", "Торговцы")

@@ -1,0 +1,11 @@
+## APIVersion: 100033
+## Title: Sylirana's New Life Travel
+## Version: 1.0.1
+## AddOnVersion: 2
+## Author: Sylirana
+## Description: Automatically teleports the player to nearest wayshrine for the New Life quest steps.
+## SavedVariables: SyliranasNewLifeTravelSavedVariables
+## DependsOn: LibAddonMenu-2.0>=28
+
+SyliranasNewLifeTravel.lua
+Settings.lua
