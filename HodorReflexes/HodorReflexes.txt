@@ -1,0 +1,35 @@
+## Title: HodorReflexes
+## Version: 1.8.6
+## Author: |cFFFF00andy.s|r
+## APIVersion: 100033
+## AddOnVersion: 1806
+## SavedVariables: HodorReflexesSV
+## DependsOn: LibAddonMenu-2.0>=32 LibMapPing>=1200 LibCombat>=42
+## OptionalDependsOn: RaidNotifier BanditsUserInterface FoundryTacticalCombat TaosGroupTools POC LibGroupSocket RuESO
+
+lang/en.lua
+lang/$(language).lua
+
+HodorReflexes.lua
+bindings.xml
+
+extensions/util.lua
+extensions/units.lua
+extensions/player.lua
+extensions/combat.lua
+extensions/anim.lua
+extensions/hud.lua
+
+HodorReflexesMenu.lua
+
+modules/share/main.lua
+modules/share/menu.lua
+modules/share/menu_icons.lua
+modules/share/menu_style.lua
+modules/share/ui.xml
+modules/share/bindings.xml
+
+modules/vote/main.lua
+modules/vote/menu.lua
+modules/vote/ui.xml
+modules/vote/bindings.xml
