@@ -1,0 +1,181 @@
+<GuiXml>
+
+    <Animations>
+        <AnimationTimeline name="GO_UIFoodOverlayAnimation" playbackType="PING_PONG" loopCount="LOOP_INDEFINITELY">
+            <Animations>
+                <AlphaAnimation startAlpha="0.1" endAlpha="0.9" duration="1200">
+                    <EasingFunction>
+                        return ZO_EaseInOutQuadratic(progress)
+                    </EasingFunction>
+                </AlphaAnimation>
+            </Animations>
+        </AnimationTimeline>
+        <AnimationTimeline name="GO_UIFoodOverlayFadeOut">
+            <Animations>
+                <AlphaAnimation duration="1000">
+                    <OnPlay>
+                        self:SetAlphaValues(animatingControl:GetAlpha(), 0)
+                    </OnPlay>
+                    <OnStop>
+                        animatingControl:SetHidden(true)
+                    </OnStop>
+                </AlphaAnimation>
+            </Animations>
+        </AnimationTimeline>
+        <AnimationTimeline name="KillingBlowScreenFrameAnimation">
+            <Animations>
+                <AlphaAnimation startAlpha="0.0" endAlpha="0.6" delay="200" duration="200">
+                    <EasingFunction>
+                        return ZO_EaseInQuadratic(progress)
+                    </EasingFunction>
+                </AlphaAnimation>
+                <AlphaAnimation startAlpha="0.6" endAlpha="0.0" delay="400" duration="1200">
+                    <EasingFunction>
+                        return ZO_EaseOutQuadratic(progress)
+                    </EasingFunction>
+                </AlphaAnimation>
+            </Animations>
+        </AnimationTimeline>
+    </Animations>
+
+    <Controls movable="true" clampedToScreen="true" mouseEnabled="true">
+        <Control name="APMeter_KeyboardTemplate" virtual="true" >
+            <Controls>
+                <Texture name="$(parent)Frame" textureFile="APMeter/meter_frame_3tier.dds">
+                    <TextureCoords left="1" right="0" top="1" bottom="0" />
+                </Texture>
+                <Control name="$(parent)Bar">
+                    <Anchor point="LEFT" offsetX="AP_METER_KEYBOARD_BAR_OFFSET_X" offsetY="-18" />
+                    <Controls>
+                        <Cooldown name="$(parent)Fill" textureFile="EsoUI/Art/HUD/Telvar_Meter_Fill.dds" fillColor="00c717" />
+                        <Cooldown name="$(parent)TargetFill" textureFile="EsoUI/Art/HUD/Telvar_Meter_Fill.dds" fillColor="1e9fce">
+                            <Anchor offsetX="10" offsetY="10" />
+                        </Cooldown>
+                    </Controls>
+                </Control>
+                <Texture name="$(parent)Overlay" textureFile="EsoUI/Art/HUD/Telvar_Meter_Maximum.dds">
+                    <Anchor point="LEFT" offsetX="AP_METER_KEYBOARD_BAR_OFFSET_X" offsetY="-50" />
+                </Texture>
+                <Control name="$(parent)MultiplierContainer">
+                    <Anchor point="CENTER" offsetX="79" offsetY="-18"/>
+                    <Dimensions x="51" y="51" />
+                    <Controls>
+                        <Label name="$(parent)TargetValue" font="$(BOLD_FONT)|$(KB_24)" color="1e9fce"/>
+                        <Label name="$(parent)TargetGlobalValue" font="$(BOLD_FONT)|$(KB_18)" color="ffffff"/>
+                        <Label name="$(parent)WholePart" font="ZoFontAnnounceLargeNoShadow"/>
+                        <Label name="$(parent)FractionalPart" font="ZoFontHeaderNoShadow"/>
+                        <Label name="$(parent)FractionalTargetPart" font="$(BOLD_FONT)|$(KB_16)" color="1e9fce"/>
+                        <Label name="$(parent)FractionalTargetGlobalPart" font="$(BOLD_FONT)|$(KB_12)" color="ffffff"/>
+                    </Controls>
+                </Control>
+                <Label name="$(parent)Display">.
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Frame" relativePoint="TOPLEFT" offsetX="100" offsetY="10" />
+                </Label>
+                <Button tier="MEDIUM" level="3">
+                    <Anchor point="TOPLEFT" offsetX="190" offsetY="9" relativeTo="$(parent)Frame" relativePoint="TOPLEFT"/>
+                    <Dimensions x="28" y="28" />
+                    <Textures normal="esoui/art/buttons/info_up.dds" mouseOver="esoui/art/buttons/info_over.dds"/>
+                    <OnClicked>APMeter_OpenReportCard()</OnClicked>
+                </Button>
+                <Label name="$(parent)Zone">.
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Frame" relativePoint="TOPLEFT" offsetX="100" offsetY="38" />
+                </Label>
+                <Label name="$(parent)ApH">.
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Frame" relativePoint="TOPLEFT" offsetX="92" offsetY="60" />
+                </Label>
+            </Controls>
+        </Control>
+
+
+
+<!--         <TopLevelControl name="GO_HUDTelvarAlertBorder" alpha="0" tier="HIGH">
+            <AnchorFill/>
+            <Controls>
+
+        <Label name="GO_ScreenLabelTest" width="1000" height="300" color="f442d9" font="$(BOLD_FONT)|240|thick-outline" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER" text="EAT YO FOOD">
+          <Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" />
+        </Label>
+
+                <Backdrop name="$(parent)Overlay" edgeColor="f442d9">
+                    <AnchorFill/>
+                    <Center file="EsoUI/Art/UICombatOverlay/UICombatOverlayCenter.dds" />
+                    <Edge file="EsoUI/Art/UICombatOverlay/UICombatOverlayEdge.dds" edgeFileWidth="2048" edgeFileHeight="256" />
+                    <Insets left="256" top="256" right="-256" bottom="-256" />
+                </Backdrop>
+            </Controls>
+        </TopLevelControl> -->
+
+        <TopLevelControl name="KillingBlowScreenFrame" alpha="0" tier="HIGH">
+            <AnchorFill/>
+            <Controls>
+                <Backdrop name="$(parent)Overlay" edgeColor="39EE31">
+                    <AnchorFill/>
+                    <Center file="EsoUI/Art/HUD/UITelvarOverlayCenter.dds" />
+                    <Edge file="EsoUI/Art/HUD/UITelvarOverlayEdge.dds" edgeColor="000000" edgeFileWidth="2048" edgeFileHeight="256" />
+                    <Insets left="256" top="256" right="-256" bottom="-256" />
+                </Backdrop>
+            </Controls>
+        </TopLevelControl>
+        
+        <TopLevelControl name="APMeterPanel" hidden="true" mouseEnabled="true" movable="true" clampedToScreen="true">
+            <!-- <OnUpdate>
+                APMeter_onUpdate()
+            </OnUpdate> -->
+            <Dimensions x="AP_METER_WIDTH" y="AP_METER_HEIGHT" />
+            <Anchor point="TOPLEFT" relativeTo="GuiRoot" offsetX="150" offsetY="150"/>
+            <OnMoveStop>
+                APMeter_SaveLoc()
+            </OnMoveStop>
+            <Controls>
+            
+                <Texture name="$(parent)Frame" tier="MEDIUM" level="1">
+                    <Anchor point="TOPLEFT" />
+                    <Dimensions x="AP_METER_WIDTH" y="AP_METER_HEIGHT" />
+                </Texture>
+                <Control name="$(parent)Bar" tier="MEDIUM" level="2">
+                    <Dimensions x="AP_METER_HEIGHT" y="AP_METER_HEIGHT" />
+                    <Controls>
+                        <Cooldown name="$(parent)Fill" tier="MEDIUM" level="1">
+                            <Anchor point="TOPLEFT" />
+                            <Dimensions x="AP_METER_HEIGHT" y="AP_METER_HEIGHT" />
+                        </Cooldown>
+                        <Cooldown name="$(parent)TargetFill" tier="MEDIUM" level="2" hidden="true">
+                            <Anchor point="TOPLEFT" />
+                            <Dimensions x="108" y="108" />
+                            <!-- <RadialCooldownGradient startAlpha="1.0" angularDistance="0.8"/> -->
+                        </Cooldown>
+                    </Controls>
+                </Control>
+                <Texture name="$(parent)Overlay" tier="MEDIUM" level="3" alpha="0">
+                    <Anchor point="LEFT" />
+                    <Dimensions x="-200" y="-100" />
+                </Texture>
+                <Control name="$(parent)MultiplierContainer" tier="MEDIUM" level="4">
+                    <Controls>
+                        <Label name="$(parent)TargetValue" hidden="true">
+                            <Anchor point="RIGHT" relativePoint="LEFT" offsetX="-125" offsetY="-10"/>
+                        </Label>
+                        <Label name="$(parent)TargetGlobalValue" hidden="true">
+                            <Anchor point="RIGHT" relativeTo="$(parent)TargetValue" offsetX="0" offsetY="23"/>
+                        </Label>
+                        <Label name="$(parent)WholePart">
+                            <Anchor point="LEFT" relativePoint="LEFT" offsetX="-152" />
+                        </Label>
+                        <Label name="$(parent)FractionalPart" text="%">
+                            <Anchor point="LEFT" relativeTo="$(parent)WholePart" relativePoint="RIGHT" />
+                        </Label>
+                        <Label name="$(parent)FractionalTargetPart" text="%" hidden="true">
+                            <Anchor point="LEFT" relativeTo="$(parent)TargetValue" relativePoint="RIGHT"/>
+                        </Label>
+                        <Label name="$(parent)FractionalTargetGlobalPart" text="%" hidden="true">
+                            <Anchor point="LEFT" relativeTo="$(parent)TargetGlobalValue" relativePoint="RIGHT"/>
+                        </Label>
+                    </Controls>
+                </Control>
+                <Label name="$(parent)Display" inherits="ZO_CurrencyTemplate" mouseEnabled="true" tier="MEDIUM" level="3"/>
+                <Label name="$(parent)Zone" font="$(BOLD_FONT)|$(KB_14)|soft-shadow-thin" color="EEEEEE" tier="MEDIUM" level="3"/>
+                <Label name="$(parent)ApH" font="$(BOLD_FONT)|$(KB_14)|soft-shadow-thin" color="999999" tier="MEDIUM" level="3" text="ApH: |c00a313 -"/>
+            </Controls>
+        </TopLevelControl>
+    </Controls>
+</GuiXml>

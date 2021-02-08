@@ -1,0 +1,271 @@
+<GuiXml>
+  <Controls>
+
+    <TopLevelControl name="APAddGoal" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true">
+
+      <Dimensions x="320" y="200" />
+      <Anchor point="CENTER" relativePoint="CENTER" />
+      <Controls>  
+
+        <Backdrop name="$(parent)_BG" centerColor="000000" alpha="0.8">
+          <Dimensions x="320" y="200" />
+          <Anchor point="TOPLEFT" />
+          <Edge file="APMeter/edgeframeGamepadBorder.dds" edgeFileWidth="128" edgeFileHeight="16" />
+          <Insets left="2" top="2" right="-2" bottom="-2" />
+        </Backdrop>
+
+        <Button>
+          <Anchor point="TOPRIGHT" offsetX="-15" offsetY="15" />
+          <Dimensions x="22" y="22" />
+          <Textures normal="esoui/art/buttons/decline_up.dds" pressed="esoui/art/buttons/decline_down.dds" mouseOver="esoui/art/buttons/decline_over.dds" />
+          <OnClicked>APMeter_CloseAddGoalWindow()</OnClicked>
+        </Button>
+
+        <Label name="$(parent)ToLabel" font="ZoFontWinH3" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_NORMAL" text="Enter your target goal (eg 10000):">
+            <Anchor point="TOPLEFT" offsetY="60" offsetX="20"/>
+        </Label>
+        <Backdrop name="$(parent)To" inherits="ZO_SingleLineEditBackdrop_Keyboard">
+            <Anchor point="TOPLEFT" relativeTo="$(parent)ToLabel" relativePoint="BOTTOMLEFT" offsetY="5"/>
+            <Dimensions x="280"/>
+            <Controls>
+                <EditBox name="$(parent)Field" inherits="ZO_DefaultEditForBackdrop ZO_EditDefaultText"/>
+                
+                <Backdrop name="$(parent)_AB_BG" edgeColor="333333" inheritAlpha="true" centerColor="000000">
+                  <Dimensions x="102" y="30" />
+                  <Anchor point="TOPRIGHT" offsetY="50" />
+                  <Edge edgeSize="2"/>
+                    <Controls>
+                      <Button text="Add a Goal" font="ZoFontWinH4" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+                        <Anchor point="TOPRIGHT" />
+                        <Dimensions x="102" y="30" />
+                        <OnClicked>APMeter_SetGoal()</OnClicked>
+                      </Button>
+                    </Controls>
+                </Backdrop>
+
+            </Controls>
+        </Backdrop>
+
+      </Controls>
+
+    </TopLevelControl>
+  
+    <TopLevelControl name="APReportCard" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true">
+
+      <Dimensions x="500" y="500" />
+        <Anchor point="CENTER" relativePoint="CENTER" />
+      <Controls>       
+        
+        
+        <Backdrop name="$(parent)_BG" centerColor="000000" alpha="0.8">
+          <Dimensions x="500" y="500" />
+          <Anchor point="TOPLEFT" />
+          <Edge file="APMeter/edgeframeGamepadBorder.dds" edgeFileWidth="128" edgeFileHeight="16" />
+          <Insets left="2" top="2" right="-2" bottom="-2" />
+        </Backdrop>
+
+        <Button name="$(parent)GoalButton" text="Add a Goal" font="ZoFontGameSmall" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+            <Anchor point="TOPRIGHT" offsetX="-50" offsetY="15" />
+            <Dimensions x="102" y="30" />
+            <OnClicked>APMeter_ToggleGoalWindow()</OnClicked>
+        </Button>
+        
+        <Backdrop name="$(parent)_AB_BG" edgeColor="333333" inheritAlpha="true" centerColor="000000">
+          <Dimensions x="102" y="30" />
+          <Anchor point="TOPRIGHT" offsetX="-50" offsetY="15" />
+          <Edge edgeSize="2"/>
+        </Backdrop>
+
+        <Button>
+            <Anchor point="TOPRIGHT" offsetX="-15" offsetY="15" />
+            <Dimensions x="22" y="22" />
+            <Textures normal="esoui/art/buttons/decline_up.dds" pressed="esoui/art/buttons/decline_down.dds" mouseOver="esoui/art/buttons/decline_over.dds" />
+            <OnClicked>APMeter_CloseReportCard()</OnClicked>
+        </Button>
+
+        <Label name="$(parent)PlayerName" font="ZoFontGameSmall" color="777777" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="LEFT">
+          <Dimensions x="500" y="30" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT" offsetX="20" offsetY="10"/>
+        </Label>
+
+          <Label name="$(parent)SessionDuration" font="ZoFontWinH4" color="555555" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="LEFT" text="0h 0m 0s">
+            <Dimensions x="500" y="30" />
+            <Anchor point="TOPLEFT" relativeTo="$(parent)PlayerName" relativePoint="TOPLEFT" offsetX="0" offsetY="20"/>
+          </Label>
+
+           <Label name="$(parent)SessionDeaths" font="ZoFontWinH5" color="353535" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="LEFT" text="0 deaths">
+            <Dimensions x="500" y="30" />
+            <Anchor point="TOPLEFT" relativeTo="$(parent)PlayerName" relativePoint="TOPLEFT" offsetX="0" offsetY="42"/>
+          </Label>
+
+        <Label name="$(parent)PointsEarned" font="ZoFontWinH1" color="00a313" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Dimensions x="500" y="30" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT" offsetX="0" offsetY="50"/>
+        </Label>
+
+        <Label name="$(parent)APH" font="ZoFontWinH5" color="888888" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Dimensions x="500" y="60" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)PointsEarned" relativePoint="TOPLEFT" offsetX="0" offsetY="20"/>
+        </Label>
+
+
+
+
+        <Label name="$(parent)KillLabel" text="Kills |c888888 50%" color="ffffff" font="ZoFontWinH2" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Dimensions x="200" y="15" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT" offsetX="20" offsetY="130"/>
+        </Label>
+
+          <StatusBar name="$(parent)KillBar" color="00a313" alpha="1" value="50">
+            <Dimensions x="200" y="8" />
+            <Anchor point="TOPLEFT" relativeTo="$(parent)KillLabel" relativePoint="TOPLEFT" offsetX="0" offsetY="40"/>
+            <Limits min="0" max="100" />
+          </StatusBar>
+
+          <Backdrop name="$(parent)KillBG" edgeColor="000000" layer="0" level="0" centerColor="222222" alpha="0.6"  hidden="false">
+            <Dimensions x="200" y="8" />
+            <Anchor point="TOPLEFT"  relativeTo="$(parent)KillBar" relativePoint="TOPLEFT"/>
+            <Edge edgeSize="0" />
+          </Backdrop>
+
+
+        <Label name="$(parent)RepairLabel" text="Kills |c888888 50%" color="ffffff" font="ZoFontWinH2" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Dimensions x="200" y="15" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT" offsetX="280" offsetY="130"/>
+        </Label>
+
+          <StatusBar name="$(parent)RepairBar" color="00a313" alpha="1" value="50">
+            <Dimensions x="200" y="8" />
+            <Anchor point="TOPLEFT" relativeTo="$(parent)RepairLabel" relativePoint="TOPLEFT" offsetX="0" offsetY="40"/>
+            <Limits min="0" max="100" />
+          </StatusBar>
+
+          <Backdrop name="$(parent)RepairBG" edgeColor="000000" layer="0" level="0" centerColor="222222" alpha="0.6"  hidden="false">
+            <Dimensions x="200" y="8" />
+            <Anchor point="TOPLEFT"  relativeTo="$(parent)RepairBar" relativePoint="TOPLEFT"/>
+            <Edge edgeSize="0" />
+          </Backdrop>
+
+        <Label name="$(parent)DefenceLabel" text="Kills |c888888 50%" color="ffffff" font="ZoFontWinH2" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Dimensions x="200" y="15" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)KillLabel" relativePoint="TOPLEFT" offsetX="0" offsetY="80"/>
+        </Label>
+
+          <StatusBar name="$(parent)DefenceBar" color="00a313" alpha="1" value="50">
+            <Dimensions x="200" y="8" />
+            <Anchor point="TOPLEFT" relativeTo="$(parent)DefenceLabel" relativePoint="TOPLEFT" offsetX="0" offsetY="40"/>
+            <Limits min="0" max="100" />
+          </StatusBar>
+
+          <Backdrop name="$(parent)DefenceBG" edgeColor="000000" layer="0" level="0" centerColor="222222" alpha="0.6"  hidden="false">
+            <Dimensions x="200" y="8" />
+            <Anchor point="TOPLEFT"  relativeTo="$(parent)DefenceBar" relativePoint="TOPLEFT"/>
+            <Edge edgeSize="0" />
+          </Backdrop>
+
+        <Label name="$(parent)CaptureLabel" text="Kills |c888888 50%" color="ffffff" font="ZoFontWinH2" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Dimensions x="200" y="15" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)KillLabel" relativePoint="TOPLEFT" offsetX="260" offsetY="80"/>
+        </Label>
+
+          <StatusBar name="$(parent)CaptureBar" color="00a313" alpha="1" value="50">
+            <Dimensions x="200" y="8" />
+            <Anchor point="TOPLEFT" relativeTo="$(parent)CaptureLabel" relativePoint="TOPLEFT" offsetX="0" offsetY="40"/>
+            <Limits min="0" max="100" />
+          </StatusBar>
+
+          <Backdrop name="$(parent)CaptureBG" edgeColor="000000" layer="0" level="0" centerColor="222222" alpha="0.6"  hidden="false">
+            <Dimensions x="200" y="8" />
+            <Anchor point="TOPLEFT"  relativeTo="$(parent)CaptureBar" relativePoint="TOPLEFT"/>
+            <Edge edgeSize="0" />
+          </Backdrop>
+
+
+
+
+        <Label name="$(parent)QuestLabel" text="Kills |c888888 50%" color="ffffff" font="ZoFontWinH2" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Dimensions x="200" y="15" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)KillLabel" relativePoint="TOPLEFT" offsetX="0" offsetY="160"/>
+        </Label>
+
+          <StatusBar name="$(parent)QuestBar" color="00a313" alpha="1" value="50">
+            <Dimensions x="200" y="8" />
+            <Anchor point="TOPLEFT" relativeTo="$(parent)QuestLabel" relativePoint="TOPLEFT" offsetX="0" offsetY="40"/>
+            <Limits min="0" max="100" />
+          </StatusBar>
+
+          <Backdrop name="$(parent)QuestBG" edgeColor="000000" layer="0" level="0" centerColor="222222" alpha="0.6"  hidden="false">
+            <Dimensions x="200" y="8" />
+            <Anchor point="TOPLEFT"  relativeTo="$(parent)QuestBar" relativePoint="TOPLEFT"/>
+            <Edge edgeSize="0" />
+          </Backdrop>
+
+        <Label name="$(parent)RessLabel" text="Kills |c888888 50%" color="ffffff" font="ZoFontWinH3" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Dimensions x="200" y="15" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)KillLabel" relativePoint="TOPLEFT" offsetX="260" offsetY="160"/>
+        </Label>
+
+          <StatusBar name="$(parent)RessBar" color="00a313" alpha="1" value="50">
+            <Dimensions x="200" y="8" />
+            <Anchor point="TOPLEFT" relativeTo="$(parent)RessLabel" relativePoint="TOPLEFT" offsetX="0" offsetY="40"/>
+            <Limits min="0" max="100" />
+          </StatusBar>
+
+          <Backdrop name="$(parent)RessBG" edgeColor="000000" layer="0" level="0" centerColor="222222" alpha="0.6"  hidden="false">
+            <Dimensions x="200" y="8" />
+            <Anchor point="TOPLEFT"  relativeTo="$(parent)RessBar" relativePoint="TOPLEFT"/>
+            <Edge edgeSize="0" />
+          </Backdrop>
+
+
+        <Label name="$(parent)IconPercLabel" color="ffffff" font="ZoFontWinH3" inheritAlpha="true" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Dimensions x="490" y="40" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)GlobalBar" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="-69"/>
+        </Label>
+
+        <Label name="$(parent)IconNumLabel" color="ffffff" font="$(BOLD_FONT)|$(KB_14)|soft-shadow-thick" inheritAlpha="true" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Dimensions x="490" y="40" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)GlobalBar" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="-49"/>
+        </Label>
+
+        <Label name="$(parent)PrevRankLabel" color="ffffff" font="ZoFontWinH4" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="LEFT">
+          <Dimensions x="490" y="40" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)GlobalBar" relativePoint="BOTTOMLEFT" offsetX="22" offsetY="-92"/>
+        </Label>
+
+        <Label name="$(parent)NextRankLabel" color="ffffff" font="ZoFontWinH4" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="RIGHT">
+          <Dimensions x="490" y="40" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)GlobalBar" relativePoint="BOTTOMLEFT" offsetX="-18" offsetY="-92"/>
+        </Label>
+
+        <Label name="$(parent)PrevIconLabel" color="ffffff" font="ZoFontWinH2" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Dimensions x="34" y="34" />
+          <Anchor point="TOPLEFT" relativeTo="$(parent)GlobalBar" relativePoint="BOTTOMLEFT" offsetX="18" offsetY="-59"/>
+        </Label>
+
+        <Label name="$(parent)NextIconLabel" color="ffffff" font="ZoFontWinH2" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Dimensions x="34" y="34" />
+          <Anchor point="TOPRIGHT" relativeTo="$(parent)GlobalBar" relativePoint="BOTTOMRIGHT" offsetX="-18" offsetY="-59"/>
+        </Label>
+
+        <Label name="$(parent)ActiveGoalLabel" color="1e9fce" font="ZoFontWinH3" inheritAlpha="true" wrapMode="TRUNCATE" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Dimensions x="500" y="30" />
+          <Anchor point="BOTTOMLEFT" relativeTo="$(parent)GlobalBar" offsetX="0" offsetY="-104"/>
+        </Label>
+
+        <StatusBar name="$(parent)GlobalBar" color="00a313" alpha="0.3" value="50">
+          <Dimensions x="460" y="40" />
+          <Anchor point="BOTTOM" relativeTo="$(parent)" relativePoint="BOTTOM" offsetX="0" offsetY="-21"/>
+          <Limits min="0" max="100" />
+        </StatusBar>
+
+          <Backdrop name="$(parent)GlobalBG" layer="0" level="0" centerColor="111111" alpha="0.6"  hidden="false">
+            <Dimensions x="460" y="40" />
+            <Anchor point="TOPLEFT"  relativeTo="$(parent)GlobalBar" relativePoint="TOPLEFT"/>
+          </Backdrop>
+      
+
+      </Controls>
+    </TopLevelControl>  
+  </Controls>
+</GuiXml>
