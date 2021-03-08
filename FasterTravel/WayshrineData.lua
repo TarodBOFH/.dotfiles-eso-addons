@@ -104,6 +104,7 @@ local _zoneNodeLookup = {
         { poiIndex = 61, nodeIndex = 319, name = "Quondam Indorilia" },
         { poiIndex = 62, nodeIndex = 309, name = "Velothi Reverie" },
         { poiIndex = 63, nodeIndex = 287, name = "Flaming Nix Deluxe Garret" },
+        { poiIndex = 64, nodeIndex = 454, name = "Dungeon: The Cauldron" },
 
     },
     [ 11] = { -- Malabal Tor
@@ -393,6 +394,8 @@ local _zoneNodeLookup = {
         { poiIndex = 23, nodeIndex = 343, name = "Linchal Grand Manor" },
         { poiIndex = 24, nodeIndex = 362, name = "The Erstwhile Sanctuary" },
         { poiIndex = 25, nodeIndex = 390, name = "Dungeon: Depths of Malatar" },
+        { poiIndex = 26, nodeIndex = 437, name = "Dungeon: Black Drake Villa" },
+        { poiIndex = 27, nodeIndex = 466, name = "Varlaisvea Ayleid Ruins" },
 
     },
     [467] = { -- Vvardenfell
@@ -416,6 +419,7 @@ local _zoneNodeLookup = {
         { poiIndex = 68, nodeIndex = 336, name = "Tel Galen" },
         { poiIndex = 72, nodeIndex = 282, name = "Valley of the Wind Wayshrine" },
         { poiIndex = 85, nodeIndex = 328, name = "Vivec Temple Wayshrine" },
+        { poiIndex = 91, nodeIndex = 465, name = "Kushalit Sanctuary" },
 
     },
     [500] = { -- Craglorn
@@ -543,7 +547,7 @@ local _zoneNodeLookup = {
         { poiIndex = 30, nodeIndex = 435, name = "Dungeon: Stone Garden" },
 
     },
-    [783] = { -- The Reach
+    [783] = { -- The Reach 784?
         { poiIndex = 25, nodeIndex = 443, name = "North Markarth Wayshrine" },
         { poiIndex = 26, nodeIndex = 445, name = "Karthwasten Wayshrine" },
         { poiIndex = 27, nodeIndex = 441, name = "Briar Rock Wayshrine" },
@@ -554,7 +558,7 @@ local _zoneNodeLookup = {
         { poiIndex = 35, nodeIndex = 456, name = "Stone Eagle Aerie" },
 
     },
-    [784] = { -- Blackreach: Arkthzand Cavern
+    [784] = { -- Blackreach: Arkthzand Cavern 785?
         { poiIndex = 9,  nodeIndex = 446, name = "Arkthzand Wayshrine" },
         { poiIndex = 10, nodeIndex = 448, name = "Nighthollow Wayshrine" },
 
@@ -597,9 +601,7 @@ local function GetNodeInfo(nodeIndex)
     return known,name,normalizedX, normalizedY, textureName ,textureName,poiType,isShown
 end
 
-local d = Data
+Data.GetNodesByZoneIndex = GetNodesByZoneIndex
+Data.GetNodeInfo = GetNodeInfo
 
-d.GetNodesByZoneIndex = GetNodesByZoneIndex
-d.GetNodeInfo = GetNodeInfo
-
-FasterTravel.Wayshrine.Data = d
+FasterTravel.Wayshrine.Data = Data

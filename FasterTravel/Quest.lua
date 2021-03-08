@@ -88,11 +88,8 @@ end
 
 FasterTravel.addEvent(EVENT_QUEST_POSITION_REQUEST_COMPLETE,OnQuestPositionRequestComplete)
 
+Quest.GetQuestLocations = GetQuestLocations
+Quest.GetQuests = GetQuests
+Quest.GetQuestLocations = GetQuestLocations
 
-local q = Quest
-
-q.GetQuestLocations = GetQuestLocations
-q.GetQuests = GetQuests
-q.GetQuestLocations = GetQuestLocations
-
-FasterTravel.Quest = q
+FasterTravel.Quest = Quest

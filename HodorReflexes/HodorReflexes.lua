@@ -1,6 +1,6 @@
 HodorReflexes = {
 	name = "HodorReflexes",
-	version = "1.8.6",
+	version = "1.8.10",
 
 	-- Default settings
 	default = {
@@ -37,6 +37,16 @@ local LAM = LibAddonMenu2
 
 local optionControls = {} -- additional addon settings provided by modules
 
+local KEYBOARD_STYLES = {
+	titleTemplate = "HodorReflexes_Updated_Title_Keyboard_Template",
+	dismissTemplate = "HodorReflexes_Updated_Dismiss_Keyboard_Template",
+}
+
+local GAMEPAD_STYLES =  {
+	titleTemplate = "HodorReflexes_Updated_Title_Gamepad_Template",
+	dismissTemplate = "HodorReflexes_Updated_Dismiss_Gamepad_Template",
+}
+
 -- Add some toxicity
 local mockText = {}
 local mockZones = {
@@ -67,7 +77,7 @@ local function GenerateMock()
 	local lang = GetCVar("language.2")
 	if (lang == "en" or lang == "ru" or lang == "fr") and mockZones[zoneId] then
 		-- Create new table
-		mockText = {HR_MOCK1, HR_MOCK2, HR_MOCK3, HR_MOCK4, HR_MOCK5, HR_MOCK6, HR_MOCK7, HR_MOCK8, HR_MOCK9, HR_MOCK10, HR_MOCK11, HR_MOCK12, HR_MOCK13, HR_MOCK14, HR_MOCK15, HR_MOCK16, HR_MOCK17}
+		mockText = {HR_MOCK1, HR_MOCK2, HR_MOCK3, HR_MOCK4, HR_MOCK5, HR_MOCK6, HR_MOCK7, HR_MOCK8, HR_MOCK9, HR_MOCK10, HR_MOCK11, HR_MOCK12, HR_MOCK13, HR_MOCK14, HR_MOCK15, HR_MOCK16, HR_MOCK17, HR_MOCK18, HR_MOCK19, HR_MOCK20}
 		if zoneId < 700 then text = table.insert(mockText, HR_MOCK_AA1) end
 		if GetWorldName() == "EU Megaserver" then table.insert(mockText, HR_MOCK_EU1) end
 		if GetCurrentZoneDungeonDifficulty() == DUNGEON_DIFFICULTY_NORMAL then
@@ -77,6 +87,13 @@ local function GenerateMock()
 		end
 		DEATH_RECAP:RegisterCallback("OnDeathRecapAvailableChanged", DeathRecapChanged)
 	end
+end
+
+local function UpdatePlatformStyles(styleTable)
+
+    ApplyTemplateToControl(HodorReflexes_Updated_Title, styleTable.titleTemplate)
+    ApplyTemplateToControl(HodorReflexes_Updated_Dismiss, styleTable.dismissTemplate)
+
 end
 
 local function Initialize()
@@ -99,6 +116,10 @@ local function Initialize()
 
 	-- Bindings
 	ZO_CreateStringId('SI_BINDING_NAME_HR_EXIT_INSTANCE', GetString(HR_BINDING_EXIT_INSTANCE))
+	ZO_CreateStringId('HR_UPDATED_TITLE', 'Hodor Reflexes ' .. HR.version)
+
+	-- Apply platform styles
+	ZO_PlatformStyle:New(UpdatePlatformStyles, KEYBOARD_STYLES, GAMEPAD_STYLES)
 
 	HR.BuildMenu()
 

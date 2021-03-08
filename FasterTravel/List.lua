@@ -53,7 +53,8 @@ function List:init(items,key,size)
 	end
 	
 	self.push = function(self,key,value)
-		local idx = lookup[value[key]]
+		local vk = value[key]
+		local idx = lookup[vk]
 		local count = #items
 		if idx ~= nil then 
 			RemoveItem(idx,key,value)
@@ -70,7 +71,7 @@ function List:init(items,key,size)
 				table.remove(items)
 			end
 			table.insert(items,1,value)
-			lookup[value[key]]=1
+			lookup[vk]=1
 		end
 		return self
 	end

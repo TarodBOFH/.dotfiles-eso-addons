@@ -275,24 +275,24 @@ local Localization={
 	"Информация Триала",		"Добавляет информацию о продолжительности рейда, набранным очкам.",
 	"Время в данже",			"Добавляет информацию о времени нахождения в данже.",
 	"Сундуки в данже",		"Показывает колличество собранных/доступных сундуков в текущем данже.",
-	"Наемники (beta)",		"Время до стедующей доставкию",
+	"Наемники (beta)",		"Время до следующей доставки.",
 	"Сообщения чата",		"",
-	"Обновления достижений",	"Вывод в чат информации о обновлении достижений",
+	"Обновления достижений",	"Вывод в чат информации о обновлении достижений.",
 	"Получение AP gain",		"При получении большого колличества AP выводить сообщение в окно чата.",
 	"Получение Telvar-ов",		"При получении большого колличества Telvar-ов выводить сообщение в окно чата.",
 	"Получение Опыта",		"При получении большого колличества опыта выводить сообщение в окно чата.",
 	"Настройки панели",		"",
 	"Включить панель",		"Добавляет к стандартной панели производительности дополнительную информацию.",
-	"Прозрачность фона",		"Если выставить на 0 то фон будет полностью отключен",
+	"Прозрачность фона",		"Если выставить на 0 то фон будет полностью отключен.",
 	"Масштаб панели",			"",
-	"Время обновления",		"Частота обновления (секунды)",
+	"Время обновления",		"Частота обновления (секунды).",
 	"Центрировать",			"",
 	"Сброс настроек",			"Настройки бутыт выставлены на значения по умолчанию. Фреймы будут возвращены на их стандартные позиции.",
 	"Авто починка/зарядка",		"",
 	"Авто починка у торговца",	"Автоматически ремонтирует доспехи при диалоге с торговцем.",
-	"Авто починка в бою",		"Автоматически ремонтирует доспехи когда они теряют прочность (используются [Grand Repair Kit])",
-	"Авто зарядка",			"Автоматически заряжает оружие камнями душ",
-	"Вывод в чат",			"Вывод в чат информации о починке одежды/зарядке оружия",
+	"Авто починка в бою",		"Автоматически ремонтирует доспехи когда они теряют прочность (используются [Grand Repair Kit]).",
+	"Авто зарядка",			"Автоматически заряжает оружие камнями душ.",
+	"Вывод в чат",			"Вывод в чат информации о починке одежды/зарядке оружия.",
 	Name="Панель информации",
 	AutoRepair="Авто починка",
 	choices={"всего","всего/из","выключено"},
@@ -811,16 +811,20 @@ end
 
 local function GetXP()
 	local icon="/esoui/art/icons/icon_experience.dds"
-	local color={0,1,1,1}
+	local color={1,1,1,1}
 	local current, effectiveMax
 	local level=GetUnitLevel('player')
 	if level>=50 then
+		icon="/esoui/art/champion/champion_icon_32.dds"
+		color={.8,.9,0,1}
 		level=GetPlayerChampionPointsEarned()
+--[[	<100034
 		local poolSize=0
 		local rank=GetChampionPointAttributeForRank(level+1)
 		if (rank==1) then icon="/esoui/art/champion/champion_points_health_icon-hud-32.dds" color={0.6,0.2,0,1}
 		elseif (rank==2) then icon="/esoui/art/champion/champion_points_magicka_icon-hud-32.dds" color={0,0.3,0.8,1}
 		else icon="/esoui/art/champion/champion_points_stamina_icon-hud-32.dds" color={0.3,0.6,0.1,1} end
+--]]
 		effectiveMax=GetNumChampionXPInChampionPoint(level) current=GetPlayerChampionXP()	--poolSize=self:GetEnlightenedPool()
 	else
 		effectiveMax=GetUnitXPMax('player') current=GetUnitXP('player')
@@ -835,7 +839,7 @@ local function GetStable()
 	local tstring=format_timer(t)
 	return zo_iconFormat(Settings[15].icon,icon_p_size1,icon_p_size1).." "..color..tstring.."|r", string.len(tstring)
 end
---	/script d("|t26:26:/esoui/art/treeicons/outfit_styles_up.dds|t abcde")
+--	/script d("|t26:26:/esoui/art/icons/icon_experience.dds|t abcde")
 local function GetCurency(currencyType)
 	local location=(currencyType==CURT_CHAOTIC_CREATIA or currencyType==CURT_UNDAUNTED_KEYS or currencyType==CURT_EVENT_TICKETS) and CURRENCY_LOCATION_ACCOUNT or CURRENCY_LOCATION_CHARACTER
 	local amount=GetCurrencyAmount(currencyType, location)

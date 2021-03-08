@@ -1,7 +1,7 @@
 ## Title: LibAddonKeybinds
 ## Description: Splits |c76bcc3Controls – Keybindings|r menu into |ce5ca5cStandard Keybinds|r and |ce5ca5cAddon Keybinds|r. Also provides hooks for add-ons to augment keybind settings.
 ## Author: Merlight & votan
-## APIVersion: 100032 100033
+## APIVersion: 100033 100034
 ## AddOnVersion: 4
 ## IsLibrary: true
 ## OptionalDependsOn: LibStub LibAddonMenu-2.0 LibHarvensAddonSettings

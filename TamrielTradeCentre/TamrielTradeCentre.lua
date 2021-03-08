@@ -455,7 +455,7 @@ local function RequestAllOldStoreHistory()
 	EVENT_MANAGER:RegisterForEvent(TamrielTradeCentre.AddonName, EVENT_GUILD_HISTORY_CATEGORY_UPDATED, ScanStoreHistory)
 end
 
-function OnTradingHouseConfirmItemPurchase(eventCode, pendingPurchaseIndex) --fires before the confirm prompt shows up
+local function OnTradingHouseConfirmItemPurchase(eventCode, pendingPurchaseIndex) --fires before the confirm prompt shows up
 	if (LastSearchTimeStamp == nil or pendingPurchaseIndex == nil) then
 		return
 	end

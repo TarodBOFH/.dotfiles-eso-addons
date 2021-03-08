@@ -377,34 +377,32 @@ local function GetQueueStateText(id)
 	return {individual=itext, group=gtext}
 end
 
-local c = Campaign
+Campaign.FACTION_IDS = _alliances
 
-c.FACTION_IDS = _alliances
+Campaign.ICON_ID_HOME = "home"
+Campaign.ICON_ID_GUEST = "guest"
+Campaign.ICON_ID_JOINING = "joining"
+Campaign.ICON_ID_READY = "ready"
 
-c.ICON_ID_HOME = "home"
-c.ICON_ID_GUEST = "guest"
-c.ICON_ID_JOINING = "joining"
-c.ICON_ID_READY = "ready"
+Campaign.ICONS_FACTION_POPULATION = _populationFactionIcons
+Campaign.COLOURS_FACTION_POPULATION = _populationFactionColors
 
-c.ICONS_FACTION_POPULATION = _populationFactionIcons
-c.COLOURS_FACTION_POPULATION = _populationFactionColors
-
-c.GetIcon = function(key)
+Campaign.GetIcon = function(key)
 	return _campaignIcons[key]
 end
 
-c.GetPopulationText = GetPopulationText
+Campaign.GetPopulationText = GetPopulationText
 
-c.GetQueueStateText = GetQueueStateText
+Campaign.GetQueueStateText = GetQueueStateText
 
-c.GetPlayerCampaigns = GetPlayerCampaigns
-c.IsPlayerQueued = IsPlayerQueued
-c.GetQueueState = GetQueueState
-c.IsQueueState = IsQueueState
-c.EnterLeaveOrJoin =  EnterLeaveOrJoin
+Campaign.GetPlayerCampaigns = GetPlayerCampaigns
+Campaign.IsPlayerQueued = IsPlayerQueued
+Campaign.GetQueueState = GetQueueState
+Campaign.IsQueueState = IsQueueState
+Campaign.EnterLeaveOrJoin =  EnterLeaveOrJoin
 
 
-c.SetDirty = SetDirty
-c.RefreshIfRequired = RefreshIfRequired
+Campaign.SetDirty = SetDirty
+Campaign.RefreshIfRequired = RefreshIfRequired
 
-FasterTravel.Campaign = c 
+FasterTravel.Campaign = Campaign 

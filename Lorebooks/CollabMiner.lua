@@ -64,7 +64,7 @@ if GetDisplayName() == "@Kyoma" then
 		local _, _, _, totalBooks, h = GetLoreCollectionInfo(3, i)
 		if not h then t = t + totalBooks end
 	end
-	if t ~= c.EIDETIC_BOOKS then
+	if t ~= LoreBooks.Constants.EIDETIC_BOOKS then
 		zo_callLater(function() d("OUTDATED EIDETIC BOOKS COUNT: " .. t) end, 2000)
 	end
 end
@@ -399,20 +399,6 @@ local function CheckShalidorBook(bookId)
 
 	return true
 
-end
-
-local maps
-local function GetZoneIdWithMapIndex(mapIndex)
-	if not maps then
-		maps = {}
-		for i=1, GetNumMaps() do
-			local _, mapType, _, zoneId = GetMapInfo(i)
-			if mapType == MAPTYPE_ZONE then
-				maps[i] = zoneId 
-			end
-		end
-	end
-	return maps[mapIndex]
 end
 
 local function ExtractBookData() end

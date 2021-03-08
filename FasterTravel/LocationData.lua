@@ -1,9 +1,14 @@
 local Location = FasterTravel.Location
 local Utils = FasterTravel.Utils
+local Options = FasterTravel.Options
 
 local ALLIANCE_ALL = -2147483646
 local ALLIANCE_SHARED = -2147483647
 local ALLIANCE_WORLD = -2147483648
+
+local LocationDirection = Options.LocationDirection
+local LocationOrder = Options.LocationOrder
+local AllWSOrder = Options.AllWSOrder
 
 local _factionZoneOrderLookup = {
 	[ALLIANCE_ALDMERI_DOMINION] = {
@@ -114,21 +119,6 @@ local _locationsList = {
 }
 
 local ZONE_INDEX_CYRODIIL = 37
-
-local LocationOrder = {
-	ZONE_NAME = 0,
-	ZONE_LEVEL = 2,
-}
-
-local LocationDirection = {
-	ASCENDING = 0,
-	DESCENDING = 1
-}
-
-local AllWSOrder = {
-	NAME = 1,
-	TRADERS = 2
-}
 
 local _locations
 local _locationsLookup
@@ -330,17 +320,6 @@ local _locationSortOrder = {
 		end)
 		return list
 	end,
---[[
-	[LocationOrder.FACTION_NAME] = function(direction,currentFaction) 
-		local lookup = GetLookup()
-		local tbl = GetFactionOrderedList(currentFaction, lookup, { 
-			zoneSortFunc = function(x,y) 
-				return GetDirectionValue(direction,x,y)
-			end
-		})
-		return tbl
-	end, 
-]]--
 	[LocationOrder.ZONE_LEVEL] = function(direction,currentFaction)
 		local lookup = GetLookup()
 		local tbl = GetFactionOrderedList(currentFaction, lookup, {
@@ -374,38 +353,6 @@ local function UpdateLocationOrder(locations,order,...)
 	end
 end
 
--- dropdown labels
-local s1, s2, s3, s4, s5, s6
-s1, s2 = string.match(GetString(SI_GAMEPAD_BANK_SORT_ORDER_UP_TEXT), "(.+)/(.+)")
-s3, s4 = string.match(GetString(SI_GAMEPAD_BANK_SORT_ORDER_DOWN_TEXT), "(.+)/(.+)")
-s5 = GetString(SI_CHAT_CHANNEL_NAME_ZONE)
-s6 = GetString(SI_FRIENDS_LIST_PANEL_TOOLTIP_LEVEL)
-
-local function DropdownLabel(id, x, y)
-	return { id = id, text = string.format("%s %s", x, y) }
-end
-
-local _sortOrders = {
-	DropdownLabel(LocationOrder.ZONE_NAME + LocationDirection.ASCENDING,   s5, s2),
-	DropdownLabel(LocationOrder.ZONE_NAME + LocationDirection.DESCENDING,  s5, s4),
-	DropdownLabel(LocationOrder.ZONE_LEVEL + LocationDirection.ASCENDING,  s6, s1),
-	DropdownLabel(LocationOrder.ZONE_LEVEL + LocationDirection.DESCENDING, s6, s3),
-}
-
-local _sortAllWSOrders = {
-	{ id = AllWSOrder.NAME, text = GetString(SI_INVENTORY_SORT_TYPE_NAME) },
-	{ id = AllWSOrder.TRADERS, text = GetString(FASTER_TRAVEL_TRADERS)}
-}
-
--- accessor functions
-local function GetSortOrders()
-	return _sortOrders
-end 
-
-local function GetSortAllWSOrders()
-	return _sortAllWSOrders
-end 
-
 local function GetZoneFactionIcon(loc)
 	local faction = GetZoneFaction(loc)
 	return _factionAllianceIcons[faction]
@@ -423,13 +370,8 @@ Data.GetZoneFaction = GetZoneFaction
 Data.GetFactionOrderedList = GetFactionOrderedList
 Data.IsFactionWorldOrShared = IsFactionWorldOrShared
 Data.LocationOrder = LocationOrder
-Data.LocationDirection = LocationDirection
-Data.AllWSOrder = AllWSOrder
 Data.UpdateLocationOrder = UpdateLocationOrder
-Data.GetSortOrders = GetSortOrders
-Data.GetSortAllWSOrders = GetSortAllWSOrders
 Data.GetZoneFactionIcon = GetZoneFactionIcon
-
 FasterTravel.Location.Data = Data
 	
 	

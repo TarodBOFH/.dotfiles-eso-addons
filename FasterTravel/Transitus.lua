@@ -92,10 +92,8 @@ local function GetKnownNodes(nodeIndex,known,ctx)
 	return nodes
 end
 
-local t = Transitus
+Transitus.GetNodeInfo = GetNodeInfo
+Transitus.GetNodes = GetNodes
+Transitus.GetKnownNodes = GetKnownNodes
 
-t.GetNodeInfo = GetNodeInfo
-t.GetNodes = GetNodes
-t.GetKnownNodes = GetKnownNodes
-
-FasterTravel.Transitus = t
+FasterTravel.Transitus = Transitus

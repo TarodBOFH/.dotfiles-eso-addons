@@ -1287,20 +1287,24 @@ function CombatInfo.OnEffectChanged(eventCode, changeType, effectSlot, effectNam
                             if g_toggledSlotsFront[abilityId] and g_uiCustomToggle[g_toggledSlotsFront[abilityId]] then
                                 if not Effects.HideGroundMineStacks[abilityId] then
                                     local slotNum = g_toggledSlotsFront[abilityId]
-                                    if g_mineStacks[abilityId] > 0 then
-                                        g_uiCustomToggle[slotNum].stack:SetText(g_mineStacks[abilityId])
-                                    else
-                                        g_uiCustomToggle[slotNum].stack:SetText("")
+                                    if g_uiCustomToggle[slotNum] then
+                                        if g_mineStacks[abilityId] > 0 then
+                                            g_uiCustomToggle[slotNum].stack:SetText(g_mineStacks[abilityId])
+                                        else
+                                            g_uiCustomToggle[slotNum].stack:SetText("")
+                                        end
                                     end
                                 end
                             end
                             if g_toggledSlotsBack[abilityId] and g_uiCustomToggle[g_toggledSlotsBack[abilityId]] then
                                 if not Effects.HideGroundMineStacks[abilityId] then
                                     local slotNum = g_toggledSlotsBack[abilityId]
-                                    if g_mineStacks[abilityId] > 0 then
-                                        g_uiCustomToggle[slotNum].stack:SetText(g_mineStacks[abilityId])
-                                    else
-                                        g_uiCustomToggle[slotNum].stack:SetText("")
+                                    if g_uiCustomToggle[slotNum] then
+                                        if g_mineStacks[abilityId] > 0 then
+                                            g_uiCustomToggle[slotNum].stack:SetText(g_mineStacks[abilityId])
+                                        else
+                                            g_uiCustomToggle[slotNum].stack:SetText("")
+                                        end
                                     end
                                 end
                             end
@@ -2150,18 +2154,23 @@ function CombatInfo.OnCombatEventBar(eventCode, result, isError, abilityName, ab
                 end
                 if g_toggledSlotsFront[abilityId] then
                     local slotNum = g_toggledSlotsFront[abilityId]
-                    if g_toggledSlotsStack[abilityId] and g_toggledSlotsStack[abilityId] > 0 then
-                        g_uiCustomToggle[slotNum].stack:SetText(g_toggledSlotsStack[abilityId])
-                    else
-                        g_uiCustomToggle[slotNum].stack:SetText("")
+                    if g_uiCustomToggle[slotNum] then
+                        if g_toggledSlotsStack[abilityId] and g_toggledSlotsStack[abilityId] > 0 then
+                            g_uiCustomToggle[slotNum].stack:SetText(g_toggledSlotsStack[abilityId])
+                        else
+                            g_uiCustomToggle[slotNum].stack:SetText("")
+                        end
                     end
                 end
                 if g_toggledSlotsBack[abilityId] then
+
                     local slotNum = g_toggledSlotsBack[abilityId]
-                    if g_toggledSlotsStack[abilityId] and g_toggledSlotsStack[abilityId] > 0 then
-                        g_uiCustomToggle[slotNum].stack:SetText(g_toggledSlotsStack[abilityId])
-                    else
-                        g_uiCustomToggle[slotNum].stack:SetText("")
+                    if g_uiCustomToggle[slotNum] then
+                        if g_toggledSlotsStack[abilityId] and g_toggledSlotsStack[abilityId] > 0 then
+                            g_uiCustomToggle[slotNum].stack:SetText(g_toggledSlotsStack[abilityId])
+                        else
+                            g_uiCustomToggle[slotNum].stack:SetText("")
+                        end
                     end
                 end
             end

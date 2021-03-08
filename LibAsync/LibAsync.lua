@@ -12,6 +12,7 @@ if LibStub and async then
 	warn("Someone using LibAsync via LibStub!")
 end
 async = async or {}
+--async.registered = {}
 
 if async.Unload then
 	async:Unload()
@@ -26,11 +27,13 @@ local function RemoveCall(job, callstackIndex)
 end
 
 local current, call
+local currentStackIndex = 0
 local function safeCall()
 	return call(current)
 end
 
 local function DoCallback(job, callstackIndex)
+	currentStackIndex = callstackIndex
 	local success, shouldContinue = pcall(safeCall)
 	if success then
 		-- If the call returns true, the call wants to be called again
@@ -57,6 +60,7 @@ async.jobs = jobs
 
 local function DoJob(job)
 	current = job
+	--assert(job.lastCallIndex >= 0, "lastCallIndex gets negative.")
 	local index = #job.callstack
 	call = job.callstack[index]
 	if call then
@@ -97,9 +101,11 @@ function async.Scheduler()
 		return
 	end
 
-	job, name, runTime = nil, nil
+	job = nil
+	local name, runTime = nil, nil
 	local GetGameTimeSeconds = GetGameTimeSeconds
 	local start, now = GetFrameTimeSeconds(), GetGameTimeSeconds()
+	async.frameTimeSeconds = start
 	runTime, cpuLoad = start, now - start
 	if cpuLoad > spendTime then
 		spendTime = min(0.030, spendTime + spendTime * 0.02)
@@ -119,8 +125,8 @@ function async.Scheduler()
 			break
 		end
 	end
+	spendTime = max(GetThreshold(), spendTime * 0.5)
 	if (now - start) <= spendTime then
-		spendTime = max(GetThreshold(), spendTime - spendTime * 0.005)
 		-- loops
 		local allOnlyOnce = true
 		while (now - start) <= spendTime do
@@ -148,8 +154,6 @@ function async.Scheduler()
 				return
 			end
 		end
-	else
-		spendTime = max(GetThreshold() * 0.5, spendTime * 0.75)
 	end
 	if debug and job then
 		local freezeTime = now - start
@@ -187,7 +191,7 @@ end
 function task:Initialize()
 	self.callstack = {}
 	self.lastCallIndex = 0
-	-- async.registered[#async.registered + 1] = self
+	--async.registered[#async.registered + 1] = self
 end
 
 -- Resume the execution context.
@@ -217,18 +221,36 @@ function task:Cancel()
 end
 
 do
+	local insert = table.insert
 	-- Run the given FuncOfTask in your task context execution.
 	function task:Call(funcOfTask)
-		self.lastCallIndex = #self.callstack + 1
-		self.callstack[self.lastCallIndex] = funcOfTask
+		self.lastCallIndex = self.lastCallIndex + 1
+		if current == self then
+			-- assert(self.lastCallIndex > 0 and self.lastCallIndex <= #self.callstack, "cap!")
+			insert(self.callstack, self.lastCallIndex, funcOfTask)
+		else
+			insert(self.callstack, 1, funcOfTask)
+		end
 		return self:Resume()
 	end
 
-	local insert = table.insert
 	-- Continue your task context execution with the given FuncOfTask after the previous as finished.
 	function task:Then(funcOfTask)
+		if current == self then
+			if self.lastCallIndex <= currentStackIndex then
+				-- first nested Then should be a Call
+				return self:Call(funcOfTask)
+			end
+			insert(self.callstack, self.lastCallIndex, funcOfTask)
+		else
+			if self.lastCallIndex == 0 then
+				-- First Then should be a Call
+				return self:Call(funcOfTask)
+			end
+			insert(self.callstack, 1, funcOfTask)
+			self.lastCallIndex = self.lastCallIndex + 1
+		end
 		-- assert(self.lastCallIndex > 0 and self.lastCallIndex <= #self.callstack, "cap!")
-		insert(self.callstack, self.lastCallIndex, funcOfTask)
 		return self
 	end
 end
@@ -236,18 +258,22 @@ end
 -- Start an interruptible for-loop.
 function task:For(p1, p2, p3)
 	-- If called as a normal job, false will prevent it is kept in callstack doing an endless loop
-	self.callstack[#self.callstack + 1] = function()
-		return false, p1, p2, p3
-	end
+	self:Call(
+		function()
+			return false, p1, p2, p3
+		end
+	)
 	return self
 end
 
 -- Start an interruptible while-loop.
 function task:While(func)
 	-- If called as a normal job, false will prevent it is kept in callstack doing an endless loop
-	self.callstack[#self.callstack + 1] = function()
-		return false, func
-	end
+	self:Call(
+		function()
+			return false, func
+		end
+	)
 	return self
 end
 
@@ -297,18 +323,15 @@ do
 
 	-- Execute the async-for with the given step-function. The parameters of the step-function are those you would use in your for body.
 	function task:Do(func)
-		local callstackIndex = #self.callstack
+		local callstackIndex = current == self and self.lastCallIndex or 1
 		local shouldBeFalse, p1, p2, p3 = self.callstack[callstackIndex]()
 		assert(shouldBeFalse == false and p1, "Do without For")
 		remove(self.callstack, callstackIndex)
 
 		local DoLoop = type(p1) == "number" and asyncForWithStep(self, func, p1, p2, p3) or asyncForPairs(self, func, p1, p2, p3)
 
-		if current or #self.callstack == 0 then
-			return self:Call(DoLoop)
-		else
-			return self:Then(DoLoop)
-		end
+		self.lastCallIndex = self.lastCallIndex - 1
+		return self:Call(DoLoop)
 	end
 end
 
@@ -330,12 +353,22 @@ function task:Delay(delay, funcOfTask)
 	return self
 end
 
+function task:ThenDelay(delay, funcOfTask)
+	self:Then(
+		function(self)
+			self:Delay(delay, funcOfTask)
+		end
+	)
+	return self
+end
+
 function task:WaitUntil(funcOfTask)
-	self.lastCallIndex = #self.callstack + 1
-	self.callstack[self.lastCallIndex] = function(self)
-		self.oncePerFrame = not funcOfTask(self)
-		return self.oncePerFrame
-	end
+	self:Then(
+		function(self)
+			self.oncePerFrame = not funcOfTask(self)
+			return self.oncePerFrame
+		end
+	)
 	return self:Resume()
 end
 
@@ -402,14 +435,11 @@ do
 
 	-- This sort function works like table.sort(). The compare function is optional.
 	function task:Sort(array, compare)
-		local sortJob = function(task)
-			sort(task, array, compare or simpleCompare)
-		end
-		if current or #self.callstack == 0 then
-			return self:Call(sortJob)
-		else
-			return self:Then(sortJob)
-		end
+		return self:Then(
+			function(task)
+				sort(task, array, compare or simpleCompare)
+			end
+		)
 	end
 end
 

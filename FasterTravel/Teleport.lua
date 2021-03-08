@@ -20,19 +20,12 @@ local function GetGuildPlayers(guildId)
 
     local tbl = {}
 
-    -- {1} Avoid alliance check. No restrictions for teleport in OneTamriel update.
-    -- local pAlliance = GetUnitAlliance("player")
     local playerIndex = GetPlayerGuildMemberIndex(guildId)
     for i = 1, GetNumGuildMembers(guildId) do
         if i ~= playerIndex then
             local name, note, rankIndex, playerStatus, secsSinceLogoff = GetGuildMemberInfo(guildId, i)
-
             if playerStatus ~= PLAYER_STATUS_OFFLINE and secsSinceLogoff == 0 then
-
                 local hasChar, charName, zoneName, classtype, alliance = GetGuildMemberCharacterInfo(guildId, i)
-
-                -- {1}
-                --if hasChar == true and alliance == pAlliance then
                 if hasChar == true then
                     zoneName = GetZoneName(zoneName)
                     table.insert(tbl, { tag = name, zoneName = zoneName, name = charName })
@@ -41,12 +34,11 @@ local function GetGuildPlayers(guildId)
         end
     end
 
-    table.sort(tbl, function(x, y) return x.name < y.name end)
-
+    -- table.sort(tbl, function(x, y) return x.name < y.name end)
     return tbl
 end
 
--- get a table of zoneName->{playerName,alliance} from guilds
+-- get a table of zoneName-> array of {tag, name, zoneName, alliance} from guilds
 local function GetZonesGuildLookup()
     local returnValue = {}
     local gCount = GetNumGuilds()
@@ -183,7 +175,7 @@ end
 local function IsPlayerTeleportable(destination)
     if destination == nil then return false end
     local unitName = GetUnitName(string.lower(destination))
-    Utils.chat(3, "%s Check teleportable: %s, %s", destination, unitName)
+    Utils.chat(3, "Check teleportable: %s, %s", destination, unitName)
     if not Utils.stringIsEmpty(unitName) then
         return not IsCurrentPlayerName(destination)
                 and (IsPlayerReallyInGroup(unitName) or IsFriend(unitName) or IsPlayerInGuild(unitName))
@@ -196,10 +188,10 @@ end
 -- Tries to teleport to player by his login. For guildmate or friend name.
 local function TeleportToPlayerByLogin(login)
     if login == nil then
-		Utils.chat(2, "%s Empty player name to travel.")
+		Utils.chat(3, "Empty player name to travel to.")
 		return false 
 	end
-    Utils.chat(2, "%s Travel to player by name: %s", login)
+    Utils.chat(3, "Trying player named %s", login)
     local jumpFunction
     if IsFriend(login) then
         jumpFunction = JumpToFriend
@@ -208,18 +200,19 @@ local function TeleportToPlayerByLogin(login)
     else
         return false, login
     end
+	Utils.chat(2, "Teleporting to player %s", Utils.bold(login))
     jumpFunction(login)
     return true, login
 end
 
 local function TeleportToPlayer(tag)
     if tag == nil then
-        Utils.chat(2, "%s Empty player tag")
+        Utils.chat(3, "Empty player tag")
         return false, nil
     end
     local mateName = GetUnitName(tag)
-	Utils.chat(3, "%s tag %s, mateName %s", tag, mateName)
-    if mateName ~= "" and GetGroupIndexByUnitTag(tag) then
+	if mateName ~= "" and GetGroupIndexByUnitTag(tag) then
+        Utils.chat(3, "Try tag %s, mateName %s", tag, mateName)
         -- player var contains group tag
         JumpToGroupMember(mateName)
         return true, mateName
@@ -232,27 +225,27 @@ local function TeleportToGroup()
     local target = nil
     local leaderTag = GetGroupLeaderUnitTag()
 	if leaderTag == "" then
-		Utils.chat(2, "%s Not in group")
+		Utils.chat(1, "Not in group")
 		return false, nil
 	elseif IsCurrentPlayerName(GetUnitName(leaderTag)) then
 		-- you're the leader
         local groupInfo = GetGroupInfo()
 		for _, player in ipairs(groupInfo) do
 			if player and not IsCurrentPlayerName(player.name) then
-				Utils.chat(3, "%s Player: %s Tag: %s CanJump: %s", player.name, player.tag,
+				Utils.chat(3, "Player: %s Tag: %s CanJump: %s", player.name, player.tag,
 					(CanJumpToGroupMember(player.tag) and "yes" or "no"))
 				target = player.tag
 				break
 			end
 		end
         if Utils.stringIsEmpty(target) then
-			Utils.chat(2, "%s Failed to find group member")
+			Utils.chat(2, "Failed to find group member")
 		end
 	else
         -- Another player is a leader.
         target = leaderTag
     end
-    Utils.chat(3, "%s group target %s", target)
+    Utils.chat(3, "group target %s", target)
 	return TeleportToPlayer(target)
 end
 
@@ -268,12 +261,12 @@ end
 local function checkPartialMatch(partialKey, name)
     if name then
         local index = string.find(string.lower(name), partialKey)
-        Utils.chat(4, "%s Name: %s Key: %s Match found: %s", name, partialKey, (index or "false"))
+        Utils.chat(4, "Name: %s Key: %s Match found: %s", name, partialKey, (index or "false"))
 		if index ~= nil then
 			return true
 		end
     end
-    Utils.chat(4, "%s Name empty, no match.")
+    Utils.chat(4, "Name empty, no match.")
     return false
 end
 
@@ -287,6 +280,7 @@ local function ExpandZoneName(zoneName)
 	end
 	for k, v in pairs(zonesList) do
 		if checkPartialMatch(lowerZoneName, v.name) then 
+            Utils.chat(2, "%s expanded to %s", Utils.bold(zoneName), Utils.bold(v.name))
 			return string.lower(v.name)
 		end
 	end
@@ -299,23 +293,45 @@ local function GetClosestGuildLookup(lowerZoneName)
 	return lookups[expandedZoneName]
 end
 
+local function GetRandomGuildLookup()
+    local lookups = GetZonesGuildLookup()
+    local k, v, result
+    local maxlen = 0
+    -- not really random, the zone with most guildies is selected
+    for k, v in pairs(lookups)  do
+        if #v > maxlen then
+            maxlen = #v
+            result = v
+        end
+    end
+	return result
+end
+
 local function GetTeleportIterator(zoneName)
-    local expandedZoneName = ExpandZoneName(zoneName)
+    local expandedZoneName
 	
 	local checkItem = function(item)
-		return expandedZoneName == item.zoneName
+		return expandedZoneName == item.zoneName 
 	end
 	
+    local function alwaysTrue(item) return true end
+    
 	local randomizeTable = {}
-    Utils.copy(Utils.where(GetFriendsInfo(), checkItem), randomizeTable)
-    Utils.copy(GetClosestGuildLookup(expandedZoneName), randomizeTable)
-	
     local locTable = {}
-	Utils.copy(Utils.where(GetGroupInfo(), checkItem), locTable)
+    if zoneName then 
+        expandedZoneName = ExpandZoneName(zoneName)
+        Utils.copy(GetClosestGuildLookup(expandedZoneName), randomizeTable)
+        Utils.copy(Utils.where(GetFriendsInfo(), checkItem), randomizeTable)
+        Utils.copy(Utils.where(GetGroupInfo(), checkItem), locTable)
+    else
+        Utils.copy(GetRandomGuildLookup(), randomizeTable)
+        Utils.copy(Utils.where(GetFriendsInfo(), alwaysTrue), randomizeTable)
+        Utils.copy(Utils.where(GetGroupInfo(), alwaysTrue), locTable)
+    end
     Utils.shuffle(randomizeTable, locTable)
 	
     if #locTable == 0 then
-        Utils.chat(2, "%s No possible way found for FasterTravel.")
+        Utils.chat(3, "No possible way found for FasterTravel.")
         return nil
     end    
 
@@ -368,9 +384,11 @@ function ZoneTeleporter:init()
             if player ~= nil then
                 local r = { reason = "attempt", player = _player, expiry = GetGameTimeMilliseconds() + _errorTime }
                 _result = r
-                Utils.chat(3, "%s Try teleport to %s character %s", player.tag, player.name)
+                Utils.chat(3, "Try player %s character %s zone %s",
+                    player.tag, zo_strformat("<<1>>", player.name), player.zoneName)
                 local success, playerName = TeleportToPlayerByLogin(player.tag)
                 if success then
+           			Utils.chat(1, "Teleporting to %s", Utils.bold(player.zoneName))
                     return true, player.zoneName
                 else
                     return false
@@ -429,24 +447,42 @@ function ZoneTeleporter:init()
 
     self.TeleportToZone = function(self, zoneName, callback)
         _teleportIter = GetTeleportIterator(zoneName)
+        if _teleportIter == nil then
+            if zoneName and zoneName ~= "" then
+                Utils.chat(3, "No eligible players in zone %s.", zoneName)
+                if FasterTravel.settings.jumpHereBehaviour == FasterTravel.Options.JumpHereBehaviour.ASK then
+                    ZO_Dialogs_ShowDialog(
+                        Utils.UniqueDialogName("RandomJumpConfirmation"),
+                        nil,
+                        { mainTextParams = { zoneName } }
+                    )
+                elseif FasterTravel.settings.jumpHereBehaviour == FasterTravel.Options.JumpHereBehaviour.ALWAYS then
+                    Utils.chat(1, "Attempting jump to random zone, as per Settings")
+                    _teleportIter = GetTeleportIterator()
+                end
+            else
+                Utils.chat(3, "Don't you have any friends in this game?!")
+            end
+        end
         _teleportCallback = callback
         return TryNextPlayer()
     end
 end
 
 local _zoneTeleporter = ZoneTeleporter()
-local function TeleportToZone(zoneName) return _zoneTeleporter:TeleportToZone(zoneName) end
+local function TeleportToZone(zoneName)
+    return _zoneTeleporter:TeleportToZone(zoneName)
+end
 
-local t = Teleport
-t.GetGuildPlayers = GetGuildPlayers
-t.GetZonesGuildLookup = GetZonesGuildLookup
-t.GetFriendsInfo = GetFriendsInfo
-t.GetGroupInfo = GetGroupInfo
-t.IsPlayerReallyInGroup = IsPlayerReallyInGroup
-t.IsPlayerInGuild = IsPlayerInGuild
-t.IsPlayerTeleportable = IsPlayerTeleportable
-t.TeleportToPlayerByLogin = TeleportToPlayerByLogin
-t.TeleportToPlayer = TeleportToPlayer
-t.TeleportToGroup = TeleportToGroup
-t.TeleportToZone = TeleportToZone
-FasterTravel.Teleport = t
+Teleport.GetGuildPlayers = GetGuildPlayers
+Teleport.GetZonesGuildLookup = GetZonesGuildLookup
+Teleport.GetFriendsInfo = GetFriendsInfo
+Teleport.GetGroupInfo = GetGroupInfo
+Teleport.IsPlayerReallyInGroup = IsPlayerReallyInGroup
+Teleport.IsPlayerInGuild = IsPlayerInGuild
+Teleport.IsPlayerTeleportable = IsPlayerTeleportable
+Teleport.TeleportToPlayerByLogin = TeleportToPlayerByLogin
+Teleport.TeleportToPlayer = TeleportToPlayer
+Teleport.TeleportToGroup = TeleportToGroup
+Teleport.TeleportToZone = TeleportToZone
+FasterTravel.Teleport = Teleport

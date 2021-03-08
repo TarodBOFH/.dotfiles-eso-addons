@@ -98,6 +98,8 @@ SpellCastBuffs.Defaults = {
     IgnoreFoodTarget                    = false,
     IgnoreExperiencePlayer              = false,
     IgnoreExperienceTarget              = false,
+    IgnoreAllianceXPPlayer              = false,
+    IgnoreAllianceXPTarget              = false,
     IgnoreDisguise                      = false,
     IgnoreCostume                       = true,
     IgnoreHat                           = true,
@@ -578,9 +580,27 @@ function SpellCastBuffs.SetupContainerAlignment()
     g_alignmentDirection.targetb = SpellCastBuffs.SV.AlignmentBuffsTarget
     g_alignmentDirection.target2 = SpellCastBuffs.SV.AlignmentDebuffsTarget -- No icon holder for anchored buffs/debuffs - This value gets passed to SpellCastBuffs.updateIcons()
     g_alignmentDirection.targetd = SpellCastBuffs.SV.AlignmentDebuffsTarget
-    g_alignmentDirection.player_long = SpellCastBuffs.SV.AlignmentLongVert
-    g_alignmentDirection.prominentbuffs = SpellCastBuffs.SV.AlignmentPromBuffsVert
-    g_alignmentDirection.prominentdebuffs = SpellCastBuffs.SV.AlignmentPromDebuffsVert
+
+    -- Set Long Term Effects Alignment
+    if SpellCastBuffs.SV.LongTermEffectsSeparateAlignment == 1 then -- Horizontal
+        g_alignmentDirection.player_long = SpellCastBuffs.SV.AlignmentLongHorz
+    elseif SpellCastBuffs.SV.LongTermEffectsSeparateAlignment == 2 then -- Vertical
+        g_alignmentDirection.player_long = SpellCastBuffs.SV.AlignmentLongVert
+    end
+
+    -- Set Prominent Buffs Alignment
+    if SpellCastBuffs.SV.ProminentBuffContainerAlignment == 1 then -- Horizontal
+        g_alignmentDirection.prominentbuffs = SpellCastBuffs.SV.AlignmentPromBuffsHorz
+    elseif SpellCastBuffs.SV.ProminentBuffContainerAlignment == 2 then -- Vertical
+        g_alignmentDirection.prominentbuffs = SpellCastBuffs.SV.AlignmentPromBuffsVert
+    end
+
+    -- Set Prominent Debuffs Alignment
+    if SpellCastBuffs.SV.ProminentDebuffContainerAlignment == 1 then -- Horizontal
+        g_alignmentDirection.prominentdebuffs = SpellCastBuffs.SV.AlignmentPromDebuffsHorz
+    elseif SpellCastBuffs.SV.ProminentDebuffContainerAlignment == 2 then -- Vertical
+        g_alignmentDirection.prominentdebuffs = SpellCastBuffs.SV.AlignmentPromDebuffsVert
+    end
 
     for k, v in pairs(g_alignmentDirection) do
         if v == "Left" then
@@ -1754,7 +1774,7 @@ function SpellCastBuffs.OnEffectChanged(eventCode, changeType, effectSlot, effec
 
     -- Override name or icon based off unitName
     if Effects.EffectOverrideByName[abilityId] then
-        unitName = zo_strformat("<<t:1>>", unitName)
+        unitName = zo_strformat("<<C:1>>", unitName)
         if Effects.EffectOverrideByName[abilityId][unitName] then
             if Effects.EffectOverrideByName[abilityId][unitName].hide then
                 return
@@ -2042,7 +2062,7 @@ function SpellCastBuffs.AddNameOnBossEngaged(eventCode)
 
     -- Check for bosses and add name auras when engaged.
     for i = 1, 4 do
-        local bossName = DoesUnitExist('boss' .. i) and zo_strformat("<<t:1>>", GetUnitName('boss' .. i)) or ""
+        local bossName = DoesUnitExist('boss' .. i) and zo_strformat("<<C:1>>", GetUnitName('boss' .. i)) or ""
         if Effects.AddNameOnBossEngaged[bossName] then
             for k, v in pairs(Effects.AddNameOnBossEngaged[bossName]) do
                 Effects.AddNameAura[k] = {}
@@ -2181,7 +2201,7 @@ function SpellCastBuffs.OnCombatEventIn( eventCode, result, isError, abilityName
 
         -- Override name or icon based off unitName
         if Effects.EffectOverrideByName[abilityId] then
-            local unitName = zo_strformat("<<t:1>>", sourceName)
+            local unitName = zo_strformat("<<C:1>>", sourceName)
             if Effects.EffectOverrideByName[abilityId][unitName] then
                 if Effects.EffectOverrideByName[abilityId][unitName].hide then
                     if Effects.EffectOverrideByName[abilityId][unitName].zone then
@@ -2315,8 +2335,8 @@ function SpellCastBuffs.OnCombatEventIn( eventCode, result, isError, abilityName
         duration = Effects.FakeExternalBuffs[abilityId].duration
         local beginTime = GetGameTimeMilliseconds()
         local endTime = beginTime + duration
-        local source = zo_strformat("<<t:1>>",sourceName)
-        local target = zo_strformat("<<t:1>>",targetName)
+        local source = zo_strformat("<<C:1>>",sourceName)
+        local target = zo_strformat("<<C:1>>",targetName)
         if source ~= "" and target == LUIE.PlayerNameFormatted then
             SpellCastBuffs.EffectsList.player1[ abilityId ] = {
                 type=1,
@@ -2386,8 +2406,8 @@ function SpellCastBuffs.OnCombatEventIn( eventCode, result, isError, abilityName
         duration = Effects.FakeExternalDebuffs[abilityId].duration
         local beginTime = GetGameTimeMilliseconds()
         local endTime = beginTime + duration
-        local source = zo_strformat("<<t:1>>",sourceName)
-        local target = zo_strformat("<<t:1>>",targetName)
+        local source = zo_strformat("<<C:1>>",sourceName)
+        local target = zo_strformat("<<C:1>>",targetName)
 
         if Effects.ZoneDataOverride[abilityId] then
             local index = GetZoneId(GetCurrentMapZoneIndex())
@@ -2509,8 +2529,8 @@ function SpellCastBuffs.OnCombatEventIn( eventCode, result, isError, abilityName
         local forcedType = Effects.FakePlayerBuffs[abilityId].long and "long" or "short"
         local beginTime = GetGameTimeMilliseconds()
         local endTime = beginTime + duration
-        local source = zo_strformat("<<t:1>>",sourceName)
-        local target = zo_strformat("<<t:1>>",targetName)
+        local source = zo_strformat("<<C:1>>",sourceName)
+        local target = zo_strformat("<<C:1>>",targetName)
         -- Pull unbreakable info from Shift Id if present
         unbreakable = (Effects.EffectOverride[finalId] and Effects.EffectOverride[finalId].unbreakable) or unbreakable
         if source == LUIE.PlayerNameFormatted and target == LUIE.PlayerNameFormatted then
@@ -2564,9 +2584,9 @@ function SpellCastBuffs.OnCombatEventIn( eventCode, result, isError, abilityName
         duration = Effects.FakeStagger[abilityId].duration
         local beginTime = GetGameTimeMilliseconds()
         local endTime = beginTime + duration
-        local source = zo_strformat("<<t:1>>",sourceName)
-        local target = zo_strformat("<<t:1>>",targetName)
-        local unitName = zo_strformat("<<t:1>>", GetUnitName("reticleover") )
+        local source = zo_strformat("<<C:1>>",sourceName)
+        local target = zo_strformat("<<C:1>>",targetName)
+        local unitName = zo_strformat("<<C:1>>", GetUnitName("reticleover") )
         if source ~= "" and target == LUIE.PlayerNameFormatted then
             SpellCastBuffs.EffectsList.player2[ abilityId ] = {
                 type=BUFF_EFFECT_TYPE_DEBUFF,
@@ -2667,8 +2687,8 @@ function SpellCastBuffs.OnCombatEventOut( eventCode, result, isError, abilityNam
         local forcedType = Effects.FakePlayerOfflineAura[abilityId].long and "long" or "short"
         local beginTime = GetGameTimeMilliseconds()
         local endTime = beginTime + duration
-        local source = zo_strformat("<<t:1>>",sourceName)
-        local target = zo_strformat("<<t:1>>",targetName)
+        local source = zo_strformat("<<C:1>>",sourceName)
+        local target = zo_strformat("<<C:1>>",targetName)
         -- Pull unbreakable info from Shift Id if present
         unbreakable = Effects.EffectOverride[finalId].unbreakable or unbreakable
         if source == LUIE.PlayerNameFormatted then
@@ -2728,9 +2748,9 @@ function SpellCastBuffs.OnCombatEventOut( eventCode, result, isError, abilityNam
         effectType = BUFF_EFFECT_TYPE_DEBUFF
         local beginTime = GetGameTimeMilliseconds()
         local endTime = beginTime + duration
-        local source = zo_strformat("<<t:1>>",sourceName)
-        local target = zo_strformat("<<t:1>>",targetName)
-        local unitName = zo_strformat("<<t:1>>", GetUnitName("reticleover") )
+        local source = zo_strformat("<<C:1>>",sourceName)
+        local target = zo_strformat("<<C:1>>",targetName)
+        local unitName = zo_strformat("<<C:1>>", GetUnitName("reticleover") )
         --if unitName ~= target then return end
         if source == LUIE.PlayerNameFormatted and target ~= nil then
             if SpellCastBuffs.SV.HideTargetDebuffs then
@@ -2784,9 +2804,9 @@ function SpellCastBuffs.OnCombatEventOut( eventCode, result, isError, abilityNam
         duration = Effects.FakeStagger[abilityId].duration
         local beginTime = GetGameTimeMilliseconds()
         local endTime = beginTime + duration
-        local source = zo_strformat("<<t:1>>",sourceName)
-        local target = zo_strformat("<<t:1>>",targetName)
-        local unitName = zo_strformat("<<t:1>>", GetUnitName("reticleover") )
+        local source = zo_strformat("<<C:1>>",sourceName)
+        local target = zo_strformat("<<C:1>>",targetName)
+        local unitName = zo_strformat("<<C:1>>", GetUnitName("reticleover") )
         if source == LUIE.PlayerNameFormatted and target ~= nil then
             if SpellCastBuffs.SV.HideTargetDebuffs then
                 return
@@ -3133,13 +3153,11 @@ function SpellCastBuffs.OnUpdate(currentTime)
                 if v.starts < currentTime then
                     -- Filter Long-Term effects:
                     -- Always show debuffs and short-term buffs
-                    if v.type == 2 or v.forced == "short" or not (v.forced == "long" or v.ends == nil or v.dur == 0 or v.ends-currentTime > 120000) then
+                    if v.type == 2 or v.forced == "short" or not (v.forced == "long" or v.ends == nil or v.dur == 0) then
                         table.insert(buffsSorted[container], v)
-
                     -- Show long-term target buffs in same container
                     elseif v.target == "reticleover" and SpellCastBuffs.SV.LongTermEffects_Target then
                         table.insert(buffsSorted[container], v)
-
                     -- Show long-term player buffs
                     elseif v.target == "player" and SpellCastBuffs.SV.LongTermEffects_Player then
                         -- Choose container for long-term player buffs
@@ -3616,6 +3634,16 @@ function SpellCastBuffs.UpdateContextHideList()
     end
     if SpellCastBuffs.SV.IgnoreExperienceTarget then
         for k, v in pairs(Effects.IsExperienceBuff) do
+            hideTargetEffects[k] = v
+        end
+    end
+    if SpellCastBuffs.SV.IgnoreAllianceXPPlayer then
+        for k, v in pairs(Effects.IsAllianceXPBuff) do
+            hidePlayerEffects[k] = v
+        end
+    end
+    if SpellCastBuffs.SV.IgnoreAllianceXPTarget then
+        for k, v in pairs(Effects.IsAllianceXPBuff) do
             hideTargetEffects[k] = v
         end
     end

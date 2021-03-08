@@ -7,6 +7,7 @@ local Wayshrine = FasterTravel.Wayshrine
 local Transitus = FasterTravel.Transitus
 local Campaign = FasterTravel.Campaign
 local Utils = FasterTravel.Utils
+local Options = FasterTravel.Options
 
 local empty_prefix = '   '
 
@@ -308,19 +309,19 @@ function MapTabWayshrines:init(control,locations,locationsLookup,recentList,favo
 
 	self.SetAllWSOrder = function(self, order)
 		local lookup = {
-			[Location.Data.AllWSOrder.TRADERS] =
+			[Options.AllWSOrder.TRADERS] =
 				function(x,y) -- sort by number of traders at the WS
 					return 	(y.traders_cnt or 0) < (x.traders_cnt or 0) or
 							(y.traders_cnt or 0) == (x.traders_cnt or 0) and
 							(x.barename or x.name) < (y.barename or y.name)
    					end,
-			[Location.Data.AllWSOrder.NAME] = Utils.SortByBareName -- sort alphabetically
+			[Options.AllWSOrder.NAME] = Utils.SortByBareName -- sort alphabetically
 		}
 		self.ws_order_func = lookup[order]
 	end
 	
 	self.Refresh = function(self,nodeIndex,isKeep)
-		_rowLookup.categories ={}
+		_rowLookup.categories = {}
 		_rowLookup.current = {}
 		_rowLookup.favourites = {}
 		_rowLookup.recent = {}
@@ -350,21 +351,14 @@ function MapTabWayshrines:init(control,locations,locationsLookup,recentList,favo
 
 		local curLoc = _locationsLookup[currentZoneIndex] or _locationsLookup["tamriel"]
 
-		local categories = {
-			{
-				name = GetString(FASTER_TRAVEL_WAYSHRINES_CATEGORY_RECENT),
-				data = recent,
-				hidden = not _first and self:IsCategoryHidden(1)
-			},
+		local categories = { 
 			{
 				name = GetString(FASTER_TRAVEL_WAYSHRINES_CATEGORY_FAVOURITES),
 				data = faves,
-				hidden = not _first and self:IsCategoryHidden(2)
 			},
 			{
 				name = string.format("%s (%s)", GetString(FASTER_TRAVEL_WAYSHRINES_CATEGORY_CURRENT), curLoc.name),
 				data = current,
-				hidden = not _first and self:IsCategoryHidden(3),
 				clicked=function(data,control,c)
 					HandleCategoryClicked(self,3,{zoneIndex=currentZoneIndex,mapIndex=currentMapIndex},currentlookup,data,control,c)
 					if self:IsCategoryHidden(3) == false and curLoc.click then
@@ -375,15 +369,25 @@ function MapTabWayshrines:init(control,locations,locationsLookup,recentList,favo
 			},
 			{
 				name = GetString(FASTER_TRAVEL_WAYSHRINES_CATEGORY_ALL),
-				hidden = not _first and self:IsCategoryHidden(4)
 			}
 		}
 
-		PopulateLookup(recentlookup,recent)
+		table.insert(categories, FasterTravel.settings.recentsPosition, -- either 1 or 2
+			{
+				name = GetString(FASTER_TRAVEL_WAYSHRINES_CATEGORY_RECENT),
+				data = recent,
+			}
+		)
 
-		PopulateLookup(favouriteslookup,faves)
+		for i = 1, 4 do 
+			categories[i].hidden = not _first and self:IsCategoryHidden(i)
+		end
+		
+		PopulateLookup(recentlookup, recent)
 
-		PopulateLookup(currentlookup,current)
+		PopulateLookup(favouriteslookup, faves)
+
+		PopulateLookup(currentlookup, current)
 
 		local zoneLookup = _rowLookup.zone
 
@@ -494,4 +498,38 @@ end
 
 function MapTabWayshrines:RowMouseClicked(...)
 
+end
+
+function MapTabWayshrines:ChangeFilter(listcontrol, editbox)
+	local listdata = ZO_ScrollList_GetDataList(listcontrol)
+	local substring = string.lower(editbox:GetText())
+	if substring == "" then
+		-- reinstate default text
+		ZO_EditDefaultText_Initialize(editbox, GetString(FASTER_TRAVEL_WAYSHRINES_SEARCH))
+		return
+	end
+	-- remove default text
+	ZO_EditDefaultText_Disable(editbox)
+	-- unhide Recent, Favourites, Zone and All
+	for i = 1, nonZoneCategoriesCount do
+		ZO_ScrollList_ShowCategory(listcontrol, i)
+	end
+	local chat = FasterTravel.Utils.chat
+	local itemIndex, item
+	for itemIndex, item in ipairs(listdata) do
+		if item.categoryId == nonZoneCategoriesCount then
+			if (item.data.barename and string.find(string.lower(item.data.barename), substring) or
+				item.data.name and string.find(string.lower(item.data.name), substring)) then
+				chat(3, "%s in %s (%s)", substring, item.data.name, itemIndex)
+				ZO_ScrollList_ScrollDataToCenter(listcontrol, itemIndex, nil, True)
+				return
+			end
+		end
+	end
+end
+
+function MapTabWayshrines:ResetFilter(editbox)
+	editbox:SetText("")
+	editbox:LoseFocus()
+	ZO_EditDefaultText_Initialize(editbox, GetString(FASTER_TRAVEL_WAYSHRINES_SEARCH))
 end

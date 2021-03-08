@@ -13,3 +13,8 @@ $RECYCLE.BIN/
 # Others
 ~$*
 *~
+
+# Not tracked data
+SavedVariables/CombatMetricsFightData.lua
+TamrielTradeCentre/ItemLookUpTable_EN.lua
+TamrielTradeCentre/PriceTable.lua

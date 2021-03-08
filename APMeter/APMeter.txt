@@ -1,5 +1,5 @@
 ## Title: AP Meter
-## APIVersion: 100033
+## APIVersion: 100034
 ## Description: In 2017 an addon was sent to esoui by a military court for a push they didn't commit. Today, still wanted by zos, they survive as soldiers of meta. If you have a problem, if no one else can help, and if you can find it, maybe you can hire the AP Meter.
 ## Version: 1.6
 ## AddOnVersion: 1.6

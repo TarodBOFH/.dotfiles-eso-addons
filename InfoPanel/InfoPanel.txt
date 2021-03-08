@@ -7,8 +7,8 @@
 ## Title: |c4B8BFEInfo Panel|r
 ## Description: 
 ## Author: |c4B8BFEHoft|r
-## Version: 1.53
-## APIVersion: 100030 100031
+## Version: 1.54
+## APIVersion: 100033 100034
 ## SavedVariables: InfoPanel_Settings InfoPanel_Character
 ## OptionalDependsOn: LibAddonMenu-2.0 BanditsUserInterface
 

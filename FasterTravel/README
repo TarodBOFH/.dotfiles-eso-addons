@@ -1,58 +1,86 @@
 Original code by XanDDemoX
 Updates by upyachka, Valandil, SimonIllyan
+Currently maintained by SimonIllyan
 
-FasterTravel adds two new tabs to the default world map information/navigation control and suggests approximately the closest known wayshrines to your current quest objectives.
+Faster Travel adds two new tabs to the default world map information/navigation control and suggests approximately the closest known wayshrines to your current quest objectives.
 Adds favourite wayshrines!
 Also supports Cyrodiil campaigns and Transitus Wayshrines including queuing, entering, travelling and tooltip display!
+
+Mandatory dependencies:
+	LibWorldMapInfoTab
+	LibAddonMenu-2.0
+	LibSavedVars
 
 WAYSHRINES TAB
 Marks the closest known wayshrine to your quests with the quest's icon from the map (when it is possible to obtain the data).
 Displays quest objective tooltips when the mouse is over quest icons.
+Numbers in magenta denote how many guild traders are close to every wayshrine.
 Lets you fast travel to:
-	- a recently used wayshrine
-	- a favourite wayshrine
-	- a wayshrine in the current zone
-	- a wayshrine in another zone
-	- a wayshrine from an alphabetically sorted list
-	(normal costs apply to all fast travel)
+- a recently used wayshrine
+- a favourite wayshrine
+- a wayshrine in the current zone
+- a wayshrine in another zone
+- a wayshrine from an alphabetically sorted list
+(normal costs apply to all the above, if you're not travelling from another wayshrine)
+- a random wayshrine on the current map.
 Right-click on wayshrines in this menu to add or remove favourites.
 
 PLAYERS TAB
 Lets you easily teleport (for free) to:
-	- players in your group
-	- players on your friends list
-	- zones using players on your friends list, in your group or guild
-	- players in any of your guilds
-	(you land at the wayshrine closest to your friend/guildmate's position)
-Zones where you have survey or treasure maps are prefixed with green + or yellow * and suffixed with the number of treasure map (in yellow) and survey (in green) locations for maps you have in inventory (please note: locations, not maps, so if you have three surveys pointing to the same location, the number is 1, not 3).
+- players in your group
+- players on your friends list
+- zones using players on your friends list, in your group or guild
+- players in any of your guilds
+(you land at the wayshrine closest to your friend/guildmate's position).
+Zones where you have survey or treasure maps are prefixed with green + or yellow *
+and suffixed with the number of treasure map (in yellow) and survey (in green) locations
+for maps you have in inventory (please note: locations, not maps, so if you have three surveys
+pointing to the same location, the number is 1, not 3).
 
 SLASH COMMANDS
-/goto zoneName - attempts to teleport to a zone via a player (zoneName can be partial)
-/goto zone - if zoneName is literally "zone", use current zone name
-/goto @PlayerName - attempts to teleport to a player
-/goto CharacterName - attempts to teleport a player using their character name
-/goto group - attempts to teleport to the group leader (or a random member of your group if you are the leader)
-/goto UnitTag - attempts to teleport to a group member using their unit tag (group1, group2 etc.)
+/ft zoneName - attempts to teleport to a zone via a player (zoneName can be partial)
+/ft zone - if zoneName is literally "zone", use current zone name
+/ft @PlayerName - attempts to teleport to a player
+/ft CharacterName - attempts to teleport a player using their character name
+/ft group - attempts to teleport to the group leader (or a random member of your group if you are the leader)
+/ft UnitTag - attempts to teleport to a group member using their unit tag (group1, group2 etc.)
+
+For all of the above you can use /goto instead of /ft (for backward compatibility).
+
 /ft alias name zonename - defines an alias "name" pointing to "zonename", so that if you use:
-	/ft alias fen Shadowfen
-	you can then go to Shadowfen with "/goto fen" 
+/ft alias fen Shadowfen
+you can then go to Shadowfen with "/ft fen"
 /ft alias name - removes a previously defined alias "name"
 /ft alias - lists defined aliases
-/ft recents on|off - turns on/off WfD's fix for F5 housing preview:
-	- when ON, your "recent" list is available, but you have to press Alt/Cancel *twice* if cancelling a teleport;
-	- when OFF, the "recent" list is not available, but cancelling teleport requires pressing Alt only once.
-	Sorry about this tradeoff, cannot be fixed.
 /ft verbosity n - sets verbosity level to n, where:
-	n = 0 - quiet (almost no messages in chat)
-	n = 1 - normal verbosity level (default)
-	n = 2 - a bit more verbose
-	n > 2 - for debugging only
+n = 0 - quiet (almost no messages in chat)
+n = 1 - normal verbosity level (default)
+n = 2 - a bit more verbose
+n > 2 - for debugging only
 /ft verbosity - shows verbosity level
-/ft listlen - shows listlen value; it is the max length of "Favourites" and "Recent" lists (default 25)
-/ft listlen n - sets listlen to n, where 0<n<100; the new value will come into effect after relog/reloadui
-When the word following /ft is not one of the above subcommands, /ft acts exactly like /goto.
+/ft recents on|off - turns on/off your "Recent" list
+/ft listlen n - sets the max length of "Recent" list to n, where 0<n<100 (default value is 10)
+/ft listlen - shows the max length of "Recent" list
 
 RECENT CHANGE LOG
+Version 2.5.2 (by SimonIllyan 2021-03-05)
+	- added the option (can be set to Never, Always or Ask) to jump to random zone 
+	  if "Jump to This Zone" is impossible for lack of eligible players 
+	- fixed storing Wayshrine tab settings
+	- completely redesigned code responsible for updating Recents list
+	
+Version 2.5.1 (by SimonIllyan 2021-02-18)
+	- fixed a bug regarding binding items (sic!) reported by Lexynide
+	- probably fixed the double-cancel problem that I couldn't solve since version 2.1
+	
+Version 2.5.0 (by SimonIllyan 2021-02-14)
+	- finally, Options/Addons/FasterTravel added
+		* LibAddonMenu-2.0 and LibSavedVars become mandatory dependencies
+		* settings from older versions not preserved
+
+Version 2.4.4 (by SimonIllyan 2021-01-16)
+	- search in Wayshrines tab added - centers the list on a wayshrine matching entered string
+	
 Version 2.4.3 (by SimonIllyan 2020-12-06)
 	- the number of guild traders near every wayshrine is shown in zones and "All"
 	- ability to sort "All" category either alphabetically by name (as it was before)

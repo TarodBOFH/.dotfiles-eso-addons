@@ -1,16 +1,17 @@
 ## Title: HodorReflexes
-## Version: 1.8.6
+## Version: 1.8.10
 ## Author: |cFFFF00andy.s|r
-## APIVersion: 100033
-## AddOnVersion: 1806
+## APIVersion: 100033 100034
+## AddOnVersion: 1810
 ## SavedVariables: HodorReflexesSV
-## DependsOn: LibAddonMenu-2.0>=32 LibMapPing>=1200 LibCombat>=42
+## DependsOn: LibAddonMenu-2.0>=32 LibMapPing>=1200 LibCombat>=45
 ## OptionalDependsOn: RaidNotifier BanditsUserInterface FoundryTacticalCombat TaosGroupTools POC LibGroupSocket RuESO
 
 lang/en.lua
 lang/$(language).lua
 
 HodorReflexes.lua
+HodorReflexes.xml
 bindings.xml
 
 extensions/util.lua

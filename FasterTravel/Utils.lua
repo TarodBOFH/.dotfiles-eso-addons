@@ -1,5 +1,5 @@
 
-local u = FasterTravel.Utils or {}
+local Utils = FasterTravel.Utils or {}
 
 local function stringIsEmpty(str)
 	return str == nil or str == ""
@@ -188,29 +188,54 @@ local function bold(arg)
 	return string.format("|c%s%s|r", "ffaa00", arg or "(nil)")
 end
 
+local function Highlight(wayshrine_name)
+	local prefix = ""
+	if string.find(wayshrine_name, '|c') then
+		prefix = string.sub(wayshrine_name, 1, 12)
+		wayshrine_name = string.sub(wayshrine_name, 13, -1)
+	end
+	return string.format("%s|cf0f000%s|r", prefix, wayshrine_name)
+end
+
 local function chat(level, fmt, ...)
-	if level <= FasterTravel.verbosity then
-		df(fmt, FasterTravel.prefix, ...)
+	if FasterTravel.settings.verbosity and level <= FasterTravel.settings.verbosity then
+		local t = {}
+		for i, v in ipairs({...}) do
+			local w = v
+			if v == nil then w = "nil" end
+			table.insert(t, tostring(w))
+		end
+		if #t > 0 then
+			df(FasterTravel.prefix .. fmt, unpack(t))
+		else
+			d(FasterTravel.prefix .. fmt)
+		end
 	end
 end
 
-u.copy = copy
-u.shuffle = shuffle
-u.stringIsEmpty = stringIsEmpty
-u.stringStartsWith = stringStartsWith
-u.stringTrim = stringTrim
-u.toTable = toTable
-u.map = map
-u.where = where 
-u.extend = extend
-u.FormatStringLanguage = FormatStringLanguage
-u.FormatStringCurrentLanguage = FormatStringCurrentLanguage
-u.concatToString = concatToString
-u.reverseTable = reverseTable
-u.pairsByKeys = pairsByKeys
-u.BareName = BareName
-u.ShortName = ShortName
-u.SortByBareName = SortByBareName
-u.bold = bold
-u.chat = chat
-FasterTravel.Utils = u
+local function UniqueDialogName(dialogName)
+	return string.format("%s_%s", FasterTravel.addon.name, dialogName) 
+end
+
+
+Utils.copy = copy
+Utils.shuffle = shuffle
+Utils.stringIsEmpty = stringIsEmpty
+Utils.stringStartsWith = stringStartsWith
+Utils.stringTrim = stringTrim
+Utils.toTable = toTable
+Utils.map = map
+Utils.where = where 
+Utils.extend = extend
+Utils.FormatStringLanguage = FormatStringLanguage
+Utils.FormatStringCurrentLanguage = FormatStringCurrentLanguage
+Utils.concatToString = concatToString
+Utils.reverseTable = reverseTable
+Utils.pairsByKeys = pairsByKeys
+Utils.BareName = BareName
+Utils.ShortName = ShortName
+Utils.SortByBareName = SortByBareName
+Utils.bold = bold
+Utils.chat = chat
+Utils.UniqueDialogName = UniqueDialogName
+FasterTravel.Utils = Utils

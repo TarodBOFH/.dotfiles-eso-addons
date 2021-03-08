@@ -21,6 +21,16 @@ function M.BuildStyleMenu()
 			requiresReload = true,
 		},
 		{
+			type = "checkbox",
+			name = GetString(HR_MENU_ANIMATIONS),
+			tooltip = GetString(HR_MENU_ANIMATIONS_TT),
+			default = M.default.enableAnimations,
+			getFunc = function() return M.sw.enableAnimations end,
+			setFunc = function(value)
+				M.ToggleAnimations(value, true)
+			end,
+		},
+		{
 			type = "header",
 			name = string.format("|cFFFACD%s|r", GetString(HR_MENU_STYLE_DPS)),
 		},

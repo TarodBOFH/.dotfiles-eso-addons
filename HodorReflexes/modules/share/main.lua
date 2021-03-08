@@ -1,6 +1,6 @@
 HodorReflexes.modules.share = {
 	name = "HodorReflexes_Share",
-	version = "0.6.3",
+	version = "0.6.7",
 
 	uiLocked = true,
 
@@ -25,6 +25,7 @@ HodorReflexes.modules.share = {
 		enableColosIcons = true,
 		enableAnimIcons = true,
 		enableColoredNames = true,
+		enableAnimations = true, -- animated messages
 		colosPriority = 'default',
 		colosSupportRange = true,
 		enableColosCountdown = true,
@@ -112,6 +113,8 @@ local colosOrder = 10 -- Current player's order in the colossus chain
 local colosEnd = 0 -- Colossus end time
 local mvEnd = 0 -- Major Vulnerability end time
 
+local countdownTimeline = nil -- Horn and Colossus animation timeline
+
 local MAP_PIN_TYPE_PING = MAP_PIN_TYPE_PING
 local MAP_INDEX = 30 -- Vvardenfell
 local MAP_STEP_SIZE = 0.0000022224494387046 -- Min distance between pings
@@ -126,6 +129,7 @@ end
 
 local dpsMult = 1
 
+local isDuel = false -- is player currently dueling
 local isTestRunning = false
 
 -- https://springrts.com/wiki/Lua_Performance
@@ -443,6 +447,9 @@ local function ResolveConflicts()
 			BUI.Vars.StatShare = false
 			BUI.StatShare:Initialize(true)
 		end
+		if BUI.Vars.StatsShareDPS then
+			BUI.Vars.StatsShareDPS = false
+		end
 		if BUI.Vars.StatsUpdateDPS then
 			BUI.Vars.StatsUpdateDPS = false
 			EM:UnregisterForUpdate("BUI_ShareDPS")
@@ -503,36 +510,35 @@ local function CreateSceneFragments()
 
 	local function CntFragmentCondition()
 		-- Changing label text here is not a clean approach, but it allows us to just call CNT_FRAGMENT:Refresh() to do it
-		if not controlsVisible or not SV.enableColosCountdown then
-			return false
+		local result = false
+		if not controlsVisible or not SV.enableColosCountdown or isDuel then
+			result = false
 		elseif not M.uiLocked then -- unlocked UI, show default notification
 			HodorReflexes_Share_ColosCountdown_Label:SetText(strformat("%s: |cFFFF002.5|r", SV.colosCountdownText))
-			return true
+			result = true
 		elseif colosOrder == 0 and IsUnitInCombat('player') and M.GetColosPercent(true) >= 100 and (DoesUnitExist('boss1') or DoesUnitExist('boss2') or player.GetCurrentHouseId() > 0) then
 			local t = time()
 			local count = mvEnd - t - 1000
-			if colosEnd - t >= 0 or count > 5000 then
-				return false -- hide if colos is casting or remaining time is over 5s
-			else
+			if colosEnd - t < 0 and count <= 5000 then -- show if colos is not being casted by anyone and major vuln remaining time is below 5000
 				if count > 0 then
 					HodorReflexes_Share_ColosCountdown_Label:SetText(strformat("%s: |cFFFF00%0.1f|r", SV.colosCountdownText, count / 1000))
 				else
 					HodorReflexes_Share_ColosCountdown_Label:SetText(strformat("%s: |cFF0000%s!|r", SV.colosCountdownText, GetString(HR_NOW)))
 				end
-				return true
+				result = true
 			end
-		else -- hide by default
-			return false
 		end
+		return result
 	end
 
 	local function HntFragmentCondition()
 		-- Changing label text here is not a clean approach, but it allows us to just call CNT_FRAGMENT:Refresh() to do it
-		if not controlsVisible or SV.hornCountdownType == 'none' then
-			return false
+		local result = false
+		if not controlsVisible or SV.hornCountdownType == 'none' or isDuel then
+			result = false
 		elseif not M.uiLocked then -- unlocked UI, show default notification
 			HodorReflexes_Share_HornCountdown_Label:SetText(strformat("%s: |cFFFF003.0|r", GetString(HR_HORN)))
-			return true
+			result = true
 		elseif IsUnitInCombat('player') and ((SV.hornCountdownType == 'horn_all' or SV.hornCountdownType == 'force_all') and anyHorn or (SV.hornCountdownType == 'horn_self' or SV.hornCountdownType == 'force_self') and myHorn and hornOrder == 1) then
 			local t = GetFrameTimeSeconds()
 			local count = 0
@@ -547,11 +553,10 @@ local function CreateSceneFragments()
 				else
 					HodorReflexes_Share_HornCountdown_Label:SetText(strformat("%s: |cFF0000%s!|r", GetString(HR_HORN), GetString(HR_NOW)))
 				end
-				return true
+				result = true
 			end
-		else -- hide by default
-			return false
 		end
+		return result
 	end
 
 	local function HrnFragmentCondition()
@@ -637,6 +642,7 @@ function M.Initialize()
 	-- Version update.
 	if SW.lastIconsVersion ~= HR.version then
 		SW.lastIconsVersion = HR.version
+		zo_callLater(function() PlaySound(SOUNDS.BOOK_COLLECTION_COMPLETED); HodorReflexes_Updated:SetHidden(false) end, 1000)
 	end
 
 	-- Set default values for custom name and color.
@@ -677,6 +683,9 @@ function M.Initialize()
 
 	-- Create control pools
 	CreateControlPools()
+
+	-- Create control animations
+	M.ToggleAnimations(SW.enableAnimations, false)
 
 	M.ApplyStyle()
 
@@ -733,6 +742,9 @@ function M.ToggleEnabled()
 	for i, id in ipairs(mvIds) do
 		EM:UnregisterForEvent(M.name .. "MV" .. i, EVENT_COMBAT_EVENT)
 	end
+
+	-- Duel
+	isDuel = GetDuelInfo() > 0
 
 	-- Check slotted ults
 	EM:UnregisterForEvent(M.name, EVENT_ACTION_SLOTS_ALL_HOTBARS_UPDATED)
@@ -880,7 +892,7 @@ do
 			if t - lastHornTime > 100 then -- don't register for update for each group member
 				lastHornTime = t
 				EM:UnregisterForUpdate(eventNameTick)
-				EM:RegisterForUpdate(eventNameTick, 200, HornTick)
+				EM:RegisterForUpdate(eventNameTick, 100, HornTick)
 				zo_callLater(HornTick, 50) -- wait 50ms for major force to apply
 			end
 		end
@@ -930,7 +942,7 @@ do
 		if mvEnd < t + 11800 then
 			mvEnd = t + 12000
 			EM:UnregisterForUpdate(eventNameTick)
-			EM:RegisterForUpdate(eventNameTick, 200, ColosTick)
+			EM:RegisterForUpdate(eventNameTick, 100, ColosTick)
 			ColosTick()
 		end
 	end
@@ -1475,6 +1487,7 @@ end
 function M.ResetFight()
 
 	mvEnd = 0
+	isDuel = GetDuelInfo() > 0
 	M.RefreshVisibility()
 
 end
@@ -1556,6 +1569,42 @@ function M.RestoreColors()
 	HodorReflexes_Share_HornCountdown_Label:SetColor(unpack(SV.hornCountdownColor))
 	HodorReflexes_Share_ColosCountdown_Label:SetColor(unpack(SV.colosCountdownColor))
 
+end
+
+-- Toggle message animations. Update account wide variables if needed.
+function M.ToggleAnimations(enabled, updateSW)
+
+	enabled = enabled and true or false
+
+	-- Create timeline only if animations are enabled.
+	if enabled and not countdownTimeline then
+		countdownTimeline = ANIMATION_MANAGER:CreateTimeline()
+		local anim1 = countdownTimeline:InsertAnimation(ANIMATION_SCALE, HodorReflexes_Share_ColosCountdown)
+		anim1:SetScaleValues(0.9, 1.1)
+		anim1:SetDuration(400)
+		anim1:SetEasingFunction(ZO_EaseInOutCubic)
+		local anim2 = countdownTimeline:InsertAnimation(ANIMATION_SCALE, HodorReflexes_Share_HornCountdown)
+		anim2:SetScaleValues(0.9, 1.1)
+		anim2:SetDuration(400)
+		anim2:SetEasingFunction(ZO_EaseInOutCubic)
+		countdownTimeline:SetPlaybackType(ANIMATION_PLAYBACK_PING_PONG, LOOP_INDEFINITELY)
+	end
+
+	if enabled then
+		-- Play animations.
+		countdownTimeline:SetEnabled(true)
+		countdownTimeline:PlayFromStart()
+	elseif countdownTimeline then
+		-- Stop animations and restore scales.
+		countdownTimeline:SetEnabled(false)
+		HodorReflexes_Share_ColosCountdown:SetScale(1)
+		HodorReflexes_Share_HornCountdown:SetScale(1)
+	end
+
+	if updateSW then
+		SW.enableAnimations = enabled
+	end
+	
 end
 
 function M.UltimatesOnMoveStop()
