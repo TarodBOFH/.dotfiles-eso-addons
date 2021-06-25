@@ -1,5 +1,60 @@
+[COLOR="DeepSkyBlue"]2.20 (47)[/COLOR]:
+[LIST]
+[*] Merged in code from @Saenic to turn on/off the display of the plus/minus to expand/condense individual categories within the inventory. 
+    The default setting is to have the display of plus/minus be ON (as it worked before).
+[*] Added the following new item trait types introduced with the companions: 
+    o armor: 
+	  [COLOR="MediumSeaGreen"]armor_aggressive, armor_augmented, armor_bolstered, armor_focused, armor_prolific, armor_quickened, armor_shattering, armor_soothing, armor_vigorous[/COLOR]
+    o jewelry: 
+	  [COLOR="MediumSeaGreen"]jewelry_aggressive, jewelry_augmented, jewelry_bolstered, jewelry_focused, jewelry_prolific, jewelry_quickened, jewelry_shattering, jewelry_soothing, jewelry_vigorous[/COLOR]
+    o weapon: 
+	  [COLOR="MediumSeaGreen"]weapon_aggressive, weapon_augmented, weapon_bolstered, weapon_focused, weapon_prolific, weapon_quickened, weapon_shattering, weapon_soothing, weapon_vigorous[/COLOR]
+[*] Added the following item type (type): [COLOR="MediumSeaGreen"]group_repair[/COLOR]
+[*] Added the following specialized item types (sptype): 
+    [COLOR="MediumSeaGreen"]collectible_style_page, container_currency, container_style_page, siege_lancer, trophy_dungeon_buff_ingredient[/COLOR]
+[*] Removed the former item filter type (filtertype) [COLOR="LightSeaGreen"]reuse[/COLOR] that was removed by ESO.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.19 (46)[/COLOR]:
+[LIST]
+[*] New function [COLOR="MediumSeaGreen"]iscompaniononly()[/COLOR] allows you to select companion gear.[/COLOR]
+[*] New operand for [COLOR="MediumSeaGreen"]filtertype(...)[/COLOR] which now also allows you to specify [COLOR="MediumSeaGreen"]companion[/COLOR] as one of the filters.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.18 (45)[/COLOR]:
+[LIST]
+[*] Reworked rule matching to continue matching against other rules after a rule errors out. Previously it would stop trying to match and just toss everything after that item into "Others".
+[*] Fixed problem reported by RufusRedBeard that turning of a AutoCategory plugin addon would cause errors when the plugin-reliant rule was tried to be evaluated anyway.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.17 (44)[/COLOR]:
+[LIST]
+[*] Reworked the inventory sorting to avoid errors with new Blackwood chapter.
+[*] API bump (Blackwood)
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.16 (43)[/COLOR]:
+[LIST]
+[*]  New function [COLOR="MediumSeaGreen"]isreconstructed() allows you to select gear that has been reconstructed using the transmute station.[/COLOR]
+[*]  New function [COLOR="MediumSeaGreen"]istransmuted() allows you to select gear that has had the trait changed using the transmute station.[/COLOR]
+[*]  New function [COLOR="MediumSeaGreen"]isunbound() is a convenience function which is essentially equivalent to [CODE]not isbound()[/CODE].[/COLOR]
+[/LIST]
+Gamepad changes from [COLOR="Gold"]Friday-the13-rus.[/COLOR]
+[LIST]
+[*] Fixed assigning and removing item to quickslot using Extended Supplies Category.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.15 (42)[/COLOR]:
+From [COLOR="Gold"]Friday-the13-rus.[/COLOR]
+[LIST]
+[*] Update 29 compatibility
+[*] Added gamepad Fence (sell and launder)
+[*] Fixed gamepad Buy back
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.14 (41)[/COLOR]:
 From [COLOR="Gold"]Friday-the13-rus.[/COLOR] New gamepad functionality and fixes, and Russian language updates:
+[LIST]
 [*] Fixed error when opening container if it on the first place
 [*] Fixed error when equipping poisons
 [*] Fixed situation when all items shown in poisons category
@@ -8,10 +63,12 @@ From [COLOR="Gold"]Friday-the13-rus.[/COLOR] New gamepad functionality and fixes
 [*] The addon categories are applying to all gamepad inventory categories
 [*] Added option to disable "Extended" Supplies category
 [*] Updated RU translation
+[/LIST]
 
 [COLOR="Teal"]About the gamepad "Extended Supplies":[/COLOR]
-"Extended" Supplies category is Supplies category that contains all items from inventory.
-The gamepad settings for the addon contains 2 options: "Enable inventory support" and "Enable extended Supplies category".
+[LIST]
+[*] "Extended" Supplies category is Supplies category that contains all items from inventory.
+[*] The gamepad settings for the addon contains 2 options: "Enable inventory support" and "Enable extended Supplies category".
 If the first option disabled, the addon is not affect gamepad inventory at all.
 If the first option enabled, the addon categories are applying to whole gamepad inventory.
 If the second option disabled, gamepad inventory contains all default categories (Materials, Furnishings and Slottable items) and default Supplies category.
@@ -19,15 +76,18 @@ If the second option enabled, Supplies category transforms to "Extended" Supplie
 [/LIST]
 
 [COLOR="DeepSkyBlue"]2.13 (40)[/COLOR]:
+[LIST]
 [*] Added a setting to Enable the new gamepad support introduced by 2.12. (The setting is OFF/DISABLED by default.)
 [*] Separated the gamepad and the keyboard hooks into separate files.
 [/LIST]
 
 [COLOR="DeepSkyBlue"]2.12 (39)[/COLOR]:
+[LIST]
 [*] New gamepad support. Code provided by [COLOR="Gold"]Friday-the13-rus.[/COLOR] I do not have a gamepad to be able to test with, so I have no idea how well it will work for you.
 [/LIST]
 
 [COLOR="DeepSkyBlue"]2.11.1 (38)[/COLOR]:
+[LIST]
 [*] Modified function [COLOR="MediumSeaGreen"]isnotcollected()[/COLOR] so that it returns true if the gear is [COLOR="MediumSeaGreen"]non-crafted set[/COLOR] gear that is not collected. Returns false if the gear is not set get or it has already been collected.
 [/LIST]
 

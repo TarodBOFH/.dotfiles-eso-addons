@@ -12,8 +12,11 @@ local specializedItemTypeMap = {
 	["clothier_raw_material"] = SPECIALIZED_ITEMTYPE_CLOTHIER_RAW_MATERIAL,
 	["collectible_monster_trophy"] = SPECIALIZED_ITEMTYPE_COLLECTIBLE_MONSTER_TROPHY,
 	["collectible_rare_fish"] = SPECIALIZED_ITEMTYPE_COLLECTIBLE_RARE_FISH,
+	["collectible_style_page"] = SPECIALIZED_ITEMTYPE_COLLECTIBLE_STYLE_PAGE,
 	["container"] = SPECIALIZED_ITEMTYPE_CONTAINER,
+	["container_currency"] = SPECIALIZED_ITEMTYPE_CONTAINER_CURRENCY,
 	["container_event"] = SPECIALIZED_ITEMTYPE_CONTAINER_EVENT,
+	["container_style_page"] = SPECIALIZED_ITEMTYPE_CONTAINER_STYLE_PAGE,
 	["costume"] = SPECIALIZED_ITEMTYPE_COSTUME,
 	["crown_item"] = SPECIALIZED_ITEMTYPE_CROWN_ITEM,
 	["crown_repair"] = SPECIALIZED_ITEMTYPE_CROWN_REPAIR,
@@ -103,6 +106,7 @@ local specializedItemTypeMap = {
 	["siege_battle_standard"] = SPECIALIZED_ITEMTYPE_SIEGE_BATTLE_STANDARD,
 	["siege_catapult"] = SPECIALIZED_ITEMTYPE_SIEGE_CATAPULT,
 	["siege_graveyard"] = SPECIALIZED_ITEMTYPE_SIEGE_GRAVEYARD,
+	["siege_lancer"] = SPECIALIZED_ITEMTYPE_SIEGE_LANCER,
 	["siege_monster"] = SPECIALIZED_ITEMTYPE_SIEGE_MONSTER,
 	["siege_oil"] = SPECIALIZED_ITEMTYPE_SIEGE_OIL,
 	["siege_ram"] = SPECIALIZED_ITEMTYPE_SIEGE_RAM,
@@ -117,6 +121,7 @@ local specializedItemTypeMap = {
 	["trash"] = SPECIALIZED_ITEMTYPE_TRASH,
 	["treasure"] = SPECIALIZED_ITEMTYPE_TREASURE,
 	["trophy_collectible_fragment"] = SPECIALIZED_ITEMTYPE_TROPHY_COLLECTIBLE_FRAGMENT,
+	["trophy_dungeon_buff_ingredient"] = SPECIALIZED_ITEMTYPE_TROPHY_DUNGEON_BUFF_INGREDIENT,
 	["trophy_key"] = SPECIALIZED_ITEMTYPE_TROPHY_KEY,
 	["trophy_key_fragment"] = SPECIALIZED_ITEMTYPE_TROPHY_KEY_FRAGMENT,
 	["trophy_material_upgrader"] = SPECIALIZED_ITEMTYPE_TROPHY_MATERIAL_UPGRADER,
@@ -176,6 +181,7 @@ local itemTypeMap = {
 	["glyph_armor"] = ITEMTYPE_GLYPH_ARMOR,
 	["glyph_jewelry"] = ITEMTYPE_GLYPH_JEWELRY,
 	["glyph_weapon"] = ITEMTYPE_GLYPH_WEAPON,
+	["group_repair"] = ITEMTYPE_GROUP_REPAIR,
 	["ingredient"] = ITEMTYPE_INGREDIENT,
     ["jewelry_booster"] = ITEMTYPE_JEWELRYCRAFTING_BOOSTER,
     ["jewelry_material"] = ITEMTYPE_JEWELRYCRAFTING_MATERIAL,
@@ -234,6 +240,7 @@ local filterTypeMap = {
 	["buyback"] = ITEMFILTERTYPE_BUYBACK,
 	["clothing"] = ITEMFILTERTYPE_CLOTHING,
 	["collectible"] = ITEMFILTERTYPE_COLLECTIBLE,
+	["companion"] = ITEMFILTERTYPE_COMPANION,
 	["consumable"] = ITEMFILTERTYPE_CONSUMABLE,
 	["crafting"] = ITEMFILTERTYPE_CRAFTING,
 	["damaged"] = ITEMFILTERTYPE_DAMAGED,
@@ -247,7 +254,7 @@ local filterTypeMap = {
 	["provisioning"] = ITEMFILTERTYPE_PROVISIONING,
 	["quest"] = ITEMFILTERTYPE_QUEST,
 	["quickslot"] = ITEMFILTERTYPE_QUICKSLOT,
-	["reuse"] = ITEMFILTERTYPE_REUSE,
+	--["reuse"] = ITEMFILTERTYPE_REUSE,
 	["style_materials"] = ITEMFILTERTYPE_STYLE_MATERIALS,
 	["trait_items"] = ITEMFILTERTYPE_TRAIT_ITEMS,
 	["weapons"] = ITEMFILTERTYPE_WEAPONS,
@@ -300,41 +307,66 @@ local boundTypeMap = {
 }
 
 local traitMap = {
+	["armor_aggressive"] = ITEM_TRAIT_TYPE_ARMOR_AGGRESSIVE,
+	["armor_augmented"] = ITEM_TRAIT_TYPE_ARMOR_AUGMENTED,
+	["armor_bolstered"] = ITEM_TRAIT_TYPE_ARMOR_BOLSTERED,
 	["armor_divines"] = ITEM_TRAIT_TYPE_ARMOR_DIVINES,
+	["armor_focused"] = ITEM_TRAIT_TYPE_ARMOR_FOCUSED,
 	["armor_impenetrable"] = ITEM_TRAIT_TYPE_ARMOR_IMPENETRABLE,
 	["armor_infused"] = ITEM_TRAIT_TYPE_ARMOR_INFUSED,
 	["armor_intricate"] = ITEM_TRAIT_TYPE_ARMOR_INTRICATE,
 	["armor_nirnhoned"] = ITEM_TRAIT_TYPE_ARMOR_NIRNHONED,
 	["armor_ornate"] = ITEM_TRAIT_TYPE_ARMOR_ORNATE,
+	["armor_prolific"] = ITEM_TRAIT_TYPE_ARMOR_PROLIFIC,
 	["armor_prosperous"] = ITEM_TRAIT_TYPE_ARMOR_PROSPEROUS,
+	["armor_quickened"] = ITEM_TRAIT_TYPE_ARMOR_QUICKENED,
 	["armor_reinforced"] = ITEM_TRAIT_TYPE_ARMOR_REINFORCED,
+	["armor_shattering"] = ITEM_TRAIT_TYPE_ARMOR_SHATTERING,
+	["armor_soothing"] = ITEM_TRAIT_TYPE_ARMOR_SOOTHING,
 	["armor_sturdy"] = ITEM_TRAIT_TYPE_ARMOR_STURDY,
 	["armor_training"] = ITEM_TRAIT_TYPE_ARMOR_TRAINING,
+	["armor_vigorous"] = ITEM_TRAIT_TYPE_ARMOR_VIGOROUS,
 	["armor_well_fitted"] = ITEM_TRAIT_TYPE_ARMOR_WELL_FITTED,
 	["deprecated"] = ITEM_TRAIT_TYPE_DEPRECATED,
+	["jewelry_aggressive"] = ITEM_TRAIT_TYPE_JEWELRY_AGRESSIVE,
 	["jewelry_arcane"] = ITEM_TRAIT_TYPE_JEWELRY_ARCANE,
+	["jewelry_augmented"] = ITEM_TRAIT_TYPE_JEWELRY_AUGMENTED,
    	["jewelry_bloodthirsty"] = ITEM_TRAIT_TYPE_JEWELRY_BLOODTHIRSTY,
+   	["jewelry_bolstered"] = ITEM_TRAIT_TYPE_JEWELRY_BOLSTERED,
    	["jewelry_harmony"] = ITEM_TRAIT_TYPE_JEWELRY_HARMONY,
 	["jewelry_healthy"] = ITEM_TRAIT_TYPE_JEWELRY_HEALTHY,
     ["jewelry_infused"] = ITEM_TRAIT_TYPE_JEWELRY_INFUSED,
     ["jewelry_intricate"] = ITEM_TRAIT_TYPE_JEWELRY_INTRICATE,
 	["jewelry_ornate"] = ITEM_TRAIT_TYPE_JEWELRY_ORNATE,
+	["jewelry_prolific"] = ITEM_TRAIT_TYPE_JEWELRY_PROLIFIC,
 	["jewelry_protective"] = ITEM_TRAIT_TYPE_JEWELRY_PROTECTIVE,
 	["jewelry_robust"] = ITEM_TRAIT_TYPE_JEWELRY_ROBUST,
+	["jewelry_shattering"] = ITEM_TRAIT_TYPE_JEWELRY_SHATTERING,
+	["jewelry_soothing"] = ITEM_TRAIT_TYPE_JEWELRY_SOOTHING,
 	["jewelry_swift"] = ITEM_TRAIT_TYPE_JEWELRY_SWIFT,
 	["jewelry_triune"] = ITEM_TRAIT_TYPE_JEWELRY_TRIUNE,
+	["jewelry_vigorous"] = ITEM_TRAIT_TYPE_JEWELRY_VIGOROUS,
 	["none"] = ITEM_TRAIT_TYPE_NONE,
+	["weapon_aggressive"] = ITEM_TRAIT_TYPE_WEAPON_AGGRESSIVE,
+	["weapon_augmented"] = ITEM_TRAIT_TYPE_WEAPON_AUGMENTED,
+	["weapon_bolstered"] = ITEM_TRAIT_TYPE_WEAPON_BOLSTERED,
 	["weapon_charged"] = ITEM_TRAIT_TYPE_WEAPON_CHARGED,
 	["weapon_decisive"] = ITEM_TRAIT_TYPE_WEAPON_DECISIVE,
 	["weapon_defending"] = ITEM_TRAIT_TYPE_WEAPON_DEFENDING,
+	["weapon_focused"] = ITEM_TRAIT_TYPE_WEAPON_FOCUSED,
 	["weapon_infused"] = ITEM_TRAIT_TYPE_WEAPON_INFUSED,
 	["weapon_intricate"] = ITEM_TRAIT_TYPE_WEAPON_INTRICATE,
 	["weapon_nirnhoned"] = ITEM_TRAIT_TYPE_WEAPON_NIRNHONED,
 	["weapon_ornate"] = ITEM_TRAIT_TYPE_WEAPON_ORNATE,
 	["weapon_powered"] = ITEM_TRAIT_TYPE_WEAPON_POWERED,
 	["weapon_precise"] = ITEM_TRAIT_TYPE_WEAPON_PRECISE,
+	["weapon_prolific"] = ITEM_TRAIT_TYPE_WEAPON_PROLIFIC,
+	["weapon_quickened"] = ITEM_TRAIT_TYPE_WEAPON_QUICKENED,
 	["weapon_sharpened"] = ITEM_TRAIT_TYPE_WEAPON_SHARPENED,
+	["weapon_shattering"] = ITEM_TRAIT_TYPE_WEAPON_SHATTERING,
+	["weapon_soothing"] = ITEM_TRAIT_TYPE_WEAPON_SOOTHING,
 	["weapon_training"] = ITEM_TRAIT_TYPE_WEAPON_TRAINING,
+	["weapon_vigorous"] = ITEM_TRAIT_TYPE_WEAPON_VIGOROUS,
 }
 
 traitMap.intricate = { 
@@ -565,6 +597,14 @@ function AutoCategory.RuleFunc.IsBound( ... )
 	return isBound
 end
 
+function AutoCategory.RuleFunc.IsUnbound( ... )
+	local fn = "isunbound"
+	
+	local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local isBound = IsItemLinkBound(itemLink)
+	return not isBound
+end
+
 function AutoCategory.RuleFunc.IsCharBound( ... )
 	local fn = "ischarbound"
     
@@ -625,6 +665,21 @@ function AutoCategory.RuleFunc.IsBoPTradeable( ... )
 	local fn = "isboptradeable"
 	local result = IsItemBoPAndTradeable(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	return result
+end
+
+function AutoCategory.RuleFunc.IsCompanionOnly( ... )
+	local fn = "iscompaniononly"
+
+	local itemFilterType = { GetItemFilterTypeInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex) }
+		
+	local testFilterType = ITEMFILTERTYPE_COMPANION
+	for i = 1, #itemFilterType do
+		if itemFilterType[i] == testFilterType then
+			return true
+		end
+	end
+	
+	return false
 end
 
 function AutoCategory.RuleFunc.IsCrafted( ... )
@@ -825,7 +880,18 @@ function AutoCategory.RuleFunc.KeepForResearch( ... )
 	return traitInformation == ITEM_TRAIT_INFORMATION_CAN_BE_RESEARCHED
 end
 
+function AutoCategory.RuleFunc.isReconstructed( ... )
+	local traitInformation = GetItemTraitInformation(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	return traitInformation == ITEM_TRAIT_INFORMATION_RECONSTRUCTED
+end
 
+function AutoCategory.RuleFunc.isTransmuted( ... )
+	local traitInformation = GetItemTraitInformation(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	return traitInformation == ITEM_TRAIT_INFORMATION_RETRAITED
+end
+
+-- item is part of one of the specified sets (by set name)
+-- returns true/false
 function AutoCategory.RuleFunc.SetName( ... )
 	local fn = "set"
 	local ac = select( '#', ... )
@@ -871,10 +937,13 @@ function AutoCategory.RuleFunc.AutoSetName( ... )
 	local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	local hasSet, setName = GetItemLinkSetInfo(itemLink)
 	if not hasSet then
+		-- item is not part of a set
 		return false
 	end
 	--fix german language issue
 	setName = string.gsub( setName , "%^.*", "")
+	
+	-- add in the category (set name) if necessary and assign item to it
 	AutoCategory.AdditionCategoryName = AutoCategory.AdditionCategoryName .. string.format(" (%s)", setName)
 	return true
 end
@@ -899,6 +968,8 @@ function AutoCategory.RuleFunc.IsMonsterSet( ... )
 	return false
 end
 
+-- item has one of the traits specified (divines, ornate, etc.)
+-- returns true/false
 function AutoCategory.RuleFunc.TraitType( ... )
 	local fn = "traittype"
 	local ac = select( '#', ... )
@@ -933,6 +1004,8 @@ function AutoCategory.RuleFunc.TraitType( ... )
 	return false
 end
 
+-- armor belongs to one of the armor classes specified (heavy, medium, etc.)
+-- returns true/false
 function AutoCategory.RuleFunc.ArmorType( ... )
 	local fn = "armortype"
 	local ac = select( '#', ... )
@@ -967,6 +1040,8 @@ function AutoCategory.RuleFunc.ArmorType( ... )
 	return false
 end
 
+-- weapon belongs to one of the weapon classes specified (one-hand, two-hand, etc.)
+-- returns true/false
 function AutoCategory.RuleFunc.WeaponType( ... )
 	local fn = "weapontype"
 	local ac = select( '#', ... )
@@ -1000,6 +1075,8 @@ function AutoCategory.RuleFunc.WeaponType( ... )
 	return false
 end
 
+-- see if item trait matches one of the specified traits
+-- return true/false
 function AutoCategory.RuleFunc.TraitString( ... )
 	local fn = "traitstring"
 	local ac = select( '#', ... )
@@ -1007,9 +1084,9 @@ function AutoCategory.RuleFunc.TraitString( ... )
 		error( string.format("error: %s(): require arguments." , fn))
 	end
 	
-  local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-  local traitType, _ = GetItemLinkTraitInfo(itemLink)
-  local traitText = string.lower(GetString("SI_ITEMTRAITTYPE", traitType))
+	local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local traitType, _ = GetItemLinkTraitInfo(itemLink)
+	local traitText = string.lower(GetString("SI_ITEMTRAITTYPE", traitType))
 	for ax = 1, ac do
 		
 		local arg = select( ax, ... )
@@ -1036,6 +1113,8 @@ function AutoCategory.RuleFunc.TraitString( ... )
 	
 end
 
+-- name of item matches one of the specified names
+-- returns true/false
 function AutoCategory.RuleFunc.ItemName( ... )
 	local fn = "itemname"
 	local ac = select( '#', ... )
@@ -1077,6 +1156,7 @@ function AutoCategory.RuleFunc.ItemName( ... )
 	return false
 end
 
+-- returns true/false
 function AutoCategory.RuleFunc.IsTreasure( ... )
 	local fn = "istreasure"
 	
@@ -1103,6 +1183,8 @@ function AutoCategory.RuleFunc.IsTreasure( ... )
 	return false
 end
 
+-- Addon Integration - AlphaGear
+-- returns true/false
 function AutoCategory.RuleFunc.AlphaGear( ... ) 
 	if not AG then
 		return false
@@ -1147,25 +1229,31 @@ function AutoCategory.RuleFunc.AlphaGear( ... )
 end
 
 
+-- returns true/false
 function AutoCategory.RuleFunc.IsEquipping( ... )
 	local fn = "isequipping"
 	return AutoCategory.checkingItemBagId == BAG_WORN
 end
 
+-- returns true/false
 function AutoCategory.RuleFunc.IsInBank( ... )
 	return AutoCategory.checkingItemBagId == BAG_BANK or AutoCategory.checkingItemBagId == BAG_SUBSCRIBER_BANK
 end
 
+-- returns true/false
 function AutoCategory.RuleFunc.IsInBackpack( ... )
 	return AutoCategory.checkingItemBagId == BAG_BACKPACK or AutoCategory.checkingItemBagId == BAG_WORN
 end
 
+-- returns true/false
 function AutoCategory.RuleFunc.IsInQuickslot( ... )
 	local fn = "isinquickslot"
 	local slotIndex = FindActionSlotMatchingItem(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	return slotIndex ~= nil
 end
 
+-- Addon Integration - TamrielTradeCentre
+-- returns number (price)
 function AutoCategory.RuleFunc.GetPriceTTC( ... )
 	local fn = "getpricettc"
 	if TamrielTradeCentre then
@@ -1203,6 +1291,8 @@ function AutoCategory.RuleFunc.GetPriceTTC( ... )
 	return 0 
 end
 
+-- Addon Integration - MasterMerchant
+-- returns number (price)
 function AutoCategory.RuleFunc.GetPriceMM( ... )
 	local fn = "getpricemm"
 	if MasterMerchant then
@@ -1215,6 +1305,8 @@ function AutoCategory.RuleFunc.GetPriceMM( ... )
 	return 0 
 end
 
+-- Addon Integration - SetTracker
+-- returns true/false
 function AutoCategory.RuleFunc.IsTracked( ... )
   local fn = "istracked"
   if SetTrack == nil then
@@ -1250,12 +1342,15 @@ function AutoCategory.RuleFunc.IsTracked( ... )
 end
 
 -- code donated by Tonyleila
+-- returns true/false
 local function IsCraftedPotion(itemLink)
     local itemType = GetItemLinkItemType(itemLink)
-    return (itemType == ITEMTYPE_POTION or itemType == ITEMTYPE_POISON) and (select(24, ZO_LinkHandler_ParseLink(itemLink)) ~= "0")
+    return ((itemType == ITEMTYPE_POTION or itemType == ITEMTYPE_POISON) 
+				and (select(24, ZO_LinkHandler_ParseLink(itemLink)) ~= "0"))
 end
  
 -- code donated by Tonyleila
+-- returns ITEM_DISPLAY_QUALITY_*
 function AutoCategory.RuleFunc.GetMaxTraits( ... )
     local fn = "getmaxtraits"
     local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
@@ -1275,6 +1370,8 @@ function AutoCategory.RuleFunc.GetMaxTraits( ... )
     end
 end
 
+-- see if any of the listed character names matches your character name
+-- returns true/false
 function AutoCategory.RuleFunc.CharName(...)
     local fn = "charname" 
     -- zo_strformat(SI_UNIT_NAME, GetUnitName("player")) 
@@ -1320,99 +1417,92 @@ end
 AutoCategory.Environment = {
 	-- rule functions
 	
-	type = AutoCategory.RuleFunc.ItemType,
-	
-	sptype = AutoCategory.RuleFunc.SpecializedItemType,
-
-	equiptype = AutoCategory.RuleFunc.EquipType,
-
+	-- -------------------------------------------
+	-- types of items	
+	type       = AutoCategory.RuleFunc.ItemType,
+	sptype     = AutoCategory.RuleFunc.SpecializedItemType,
+	equiptype  = AutoCategory.RuleFunc.EquipType,
 	filtertype = AutoCategory.RuleFunc.FilterType,
-	
-	itemstyle = AutoCategory.RuleFunc.ItemStyle,
-
-	traittype = AutoCategory.RuleFunc.TraitType,
-	
-	armortype = AutoCategory.RuleFunc.ArmorType,
-	
+	itemstyle  = AutoCategory.RuleFunc.ItemStyle,
+	traittype  = AutoCategory.RuleFunc.TraitType,
+	armortype  = AutoCategory.RuleFunc.ArmorType,
 	weapontype = AutoCategory.RuleFunc.WeaponType,
-
-	isnew = AutoCategory.RuleFunc.IsNew,
-	
-	islocked = AutoCategory.RuleFunc.IsLocked,
-	
-	isbound = AutoCategory.RuleFunc.IsBound,
-	
-	iscollected = AutoCategory.RuleFunc.IsCollected,
-	isnotcollected = AutoCategory.RuleFunc.IsNotCollected,
-    
-    ischarbound = AutoCategory.RuleFunc.IsCharBound,
-	
-	isstolen = AutoCategory.RuleFunc.IsStolen,
-    
+	boundtype  = AutoCategory.RuleFunc.BoundType,
 	islockpick = AutoCategory.RuleFunc.IsLockpick,
 	
+	-- -------------------------------------------
+	-- properties of items
+	
+	iscompaniononly = AutoCategory.RuleFunc.IsCompanionOnly,
+
+	isnew          = AutoCategory.RuleFunc.IsNew,
+	islocked       = AutoCategory.RuleFunc.IsLocked,
+	isbound        = AutoCategory.RuleFunc.IsBound,
+    ischarbound    = AutoCategory.RuleFunc.IsCharBound,
+	isunbound        = AutoCategory.RuleFunc.IsUnbound,
 	isboptradeable = AutoCategory.RuleFunc.IsBoPTradeable,
 	
-	iscrafted = AutoCategory.RuleFunc.IsCrafted,
+	iscollected    = AutoCategory.RuleFunc.IsCollected,
+	isnotcollected = AutoCategory.RuleFunc.IsNotCollected, 
 	
-	islearnable = AutoCategory.RuleFunc.IsLearnable,
+	isstolen       = AutoCategory.RuleFunc.IsStolen,	
+	iscrafted      = AutoCategory.RuleFunc.IsCrafted,
+	islearnable    = AutoCategory.RuleFunc.IsLearnable,
 	
-	quality = AutoCategory.RuleFunc.Quality,
-	
-	getquality = AutoCategory.RuleFunc.GetQuality,
-	
-	boundtype = AutoCategory.RuleFunc.BoundType,
-	
-	level = AutoCategory.RuleFunc.Level,
-	
-	cp = AutoCategory.RuleFunc.CPLevel,
-	
-	charlevel = AutoCategory.RuleFunc.CharLevel,
-	
-	charcp = AutoCategory.RuleFunc.CharCP,
-	
-    charname = AutoCategory.RuleFunc.CharName,
+	isset          = AutoCategory.RuleFunc.IsSet,
+	ismonsterset   = AutoCategory.RuleFunc.IsMonsterSet,
+	set            = AutoCategory.RuleFunc.SetName,
+		
+	traitstring    = AutoCategory.RuleFunc.TraitString,
 
-	sellprice = AutoCategory.RuleFunc.SellPrice,
+	isequipping    = AutoCategory.RuleFunc.IsEquipping,
 	
-	stacksize = AutoCategory.RuleFunc.StackSize,
+	isinbank       = AutoCategory.RuleFunc.IsInBank,
+	isinbackpack   = AutoCategory.RuleFunc.IsInBackpack,
 
-	set = AutoCategory.RuleFunc.SetName,
-
-	autoset = AutoCategory.RuleFunc.AutoSetName,
-	
-	isset = AutoCategory.RuleFunc.IsSet,
-	
-	itemname = AutoCategory.RuleFunc.ItemName,
-	
-	ismonsterset = AutoCategory.RuleFunc.IsMonsterSet,
-
-	traitstring = AutoCategory.RuleFunc.TraitString,
-
-	isequipping = AutoCategory.RuleFunc.IsEquipping,
-	
-	isinbank = AutoCategory.RuleFunc.IsInBank,
-	isinbackpack = AutoCategory.RuleFunc.IsInBackpack,
-
-	isinquickslot = AutoCategory.RuleFunc.IsInQuickslot,
+	isinquickslot  = AutoCategory.RuleFunc.IsInQuickslot,
 	 
-	keepresearch = AutoCategory.RuleFunc.KeepForResearch,
+	keepresearch   = AutoCategory.RuleFunc.KeepForResearch,
+	isreconstructed = AutoCategory.RuleFunc.isReconstructed,
+	istransmuted   = AutoCategory.RuleFunc.isTransmuted,
 	
-	istreasure = AutoCategory.RuleFunc.IsTreasure,
-    
+	istreasure     = AutoCategory.RuleFunc.IsTreasure,
+
+	-- -------------------------------------------
+	-- values of items (returns values rather than true/false)
+	quality      = AutoCategory.RuleFunc.Quality,
+	getquality   = AutoCategory.RuleFunc.GetQuality,
+	
+	level        = AutoCategory.RuleFunc.Level,
+	cp           = AutoCategory.RuleFunc.CPLevel,
+	charlevel    = AutoCategory.RuleFunc.CharLevel,
+	charcp       = AutoCategory.RuleFunc.CharCP,
+    charname     = AutoCategory.RuleFunc.CharName,
+
+	sellprice    = AutoCategory.RuleFunc.SellPrice,
+	stacksize    = AutoCategory.RuleFunc.StackSize,
+
+	itemname     = AutoCategory.RuleFunc.ItemName,
+
     -- Potion/Poison Traits
     getmaxtraits = AutoCategory.RuleFunc.GetMaxTraits,
 
+	-- -------------------------------------------
+	-- special sort gear into sets functionality
+	autoset      = AutoCategory.RuleFunc.AutoSetName,	
+    
+	-- -------------------------------------------
+	-- Addon Integrations (old)
 	-- Alpha Gear
-	alphagear = AutoCategory.RuleFunc.AlphaGear,
+	alphagear    = AutoCategory.RuleFunc.AlphaGear,
 	
 	-- Tamriel Trade Centre
-	getpricettc = AutoCategory.RuleFunc.GetPriceTTC,
+	getpricettc  = AutoCategory.RuleFunc.GetPriceTTC,
 	
 	-- Master Merchant
-	getpricemm = AutoCategory.RuleFunc.GetPriceMM,
+	getpricemm   = AutoCategory.RuleFunc.GetPriceMM,
 	
 	-- Set Tracker
-	istracked = AutoCategory.RuleFunc.IsTracked,
+	istracked    = AutoCategory.RuleFunc.IsTracked,
 
 }

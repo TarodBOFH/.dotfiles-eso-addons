@@ -1,5 +1,9 @@
 local DTAddon = _G['DTAddon']
 
+-- Update these when adding new entries to the database
+DTAddon.GDTotal = 53 -- total available group dungeons
+DTAddon.PDTotal = 28 -- total available public delves
+
 DTAddon.DungeonIndex = {
 -- vII = ID (in [] to left) of alt version if dungeon has two versions
 -- nA = Full normal mode dungeon clear achievement ID
@@ -62,6 +66,8 @@ DTAddon.DungeonIndex = {
 [49] =	{nodeIndex = 425,	vII = 0,	nA = 2549,	vA = 2550,	fP = 0,		hM = 2551,	tT = 2552,	nD = 2553,	icon = "|t48:48:/esoui/art/mappins/ava_borderkeep_pin_daggerfall.dds|t"},			-- Unhallowed Grave
 [50] =	{nodeIndex = 436,	vII = 0,	nA = 2704,	vA = 2705,	fP = 0,		hM = 2706,	tT = 2707,	nD = 2708,	icon = "|t48:48:/esoui/art/mappins/ava_borderkeep_pin_ebonheart.dds|t"},			-- Castle Thorn
 [51] =	{nodeIndex = 435,	vII = 0,	nA = 2694,	vA = 2695,	fP = 0,		hM = 2755,	tT = 2697,	nD = 2698,	icon = "|t48:48:/esoui/art/mappins/ava_borderkeep_pin_ebonheart.dds|t"},			-- Stone Garden
+[52] =	{nodeIndex = 437,	vII = 0,	nA = 2831,	vA = 2832,	fP = 0,		hM = 2833,	tT = 2834,	nD = 2835,	icon = "|t48:48:/esoui/art/campaign/gamepad/gp_overview_menuicon_emperor.dds|t"},	-- Black Drake Villa
+[53] =	{nodeIndex = 454,	vII = 0,	nA = 2841,	vA = 2842,	fP = 0,		hM = 2843,	tT = 2844,	nD = 2845,	icon = "|t48:48:/esoui/art/mappins/ava_borderkeep_pin_ebonheart.dds|t"},			-- The Cauldron
 }
 
 DTAddon.DelveIndex = {
@@ -94,6 +100,8 @@ DTAddon.DelveIndex = {
 [24] =	{zoneIndex = 681,	poiIndex = 13,	bA = 2440,	gA = 2444,	fP = 0,		icon = "|t48:48:/esoui/art/mappins/ava_borderkeep_pin_aldmeri.dds|t"}, 			-- Rimmen Necropolis
 [25] =	{zoneIndex = 743,	poiIndex = 12,	bA = 2717,	gA = 2714,	fP = 0,		icon = "|t48:48:/esoui/art/mappins/ava_borderkeep_pin_ebonheart.dds|t"}, 		-- Labyrinthian
 [26] =	{zoneIndex = 744,	poiIndex = 17,	bA = 2718,	gA = 2715,	fP = 0,		icon = "|t48:48:/esoui/art/mappins/ava_borderkeep_pin_ebonheart.dds|t"}, 		-- Nchuthnkarst
+[27] =	{zoneIndex = 834,	poiIndex = 32,	bA = 2996,	gA = 2994,	fP = 0,		icon = "|t48:48:/esoui/art/mappins/ava_borderkeep_pin_ebonheart.dds|t"}, 		-- Silent Halls
+[28] =	{zoneIndex = 834,	poiIndex = 19,	bA = 2997,	gA = 2995,	fP = 0,		icon = "|t48:48:/esoui/art/mappins/ava_borderkeep_pin_ebonheart.dds|t"}, 		-- Zenithar's Abbey
 }
 
 DTAddon.FinderNormalIndex = {
@@ -137,8 +145,10 @@ DTAddon.FinderNormalIndex = {
 [494]	=	{svI = 47, control = nil},		-- Moongrave Fane
 [503]	=	{svI = 48, control = nil},		-- Icereach
 [505]	=	{svI = 49, control = nil},		-- Unhallowed Grave
-[509]	=	{svI = 50, control = nil},		-- Castle Thorn 
-[507]	=	{svI = 51, control = nil},		-- Stone Garden 
+[509]	=	{svI = 50, control = nil},		-- Castle Thorn
+[507]	=	{svI = 51, control = nil},		-- Stone Garden
+[591]	=	{svI = 52, control = nil},		-- Black Drake Villa
+[593]	=	{svI = 53, control = nil},		-- The Cauldron
 }
 
 DTAddon.FinderVeteranIndex = {
@@ -182,8 +192,10 @@ DTAddon.FinderVeteranIndex = {
 [495]	=	{svI = 47, control = nil},		-- Moongrave Fane
 [504]	=	{svI = 48, control = nil},		-- Icereach
 [506]	=	{svI = 49, control = nil},		-- Unhallowed Grave
-[510]	=	{svI = 50, control = nil},		-- Castle Thorn 
-[508]	=	{svI = 51, control = nil},		-- Stone Garden 
+[510]	=	{svI = 50, control = nil},		-- Castle Thorn
+[508]	=	{svI = 51, control = nil},		-- Stone Garden
+[592]	=	{svI = 52, control = nil},		-- Black Drake Villa
+[594]	=	{svI = 53, control = nil},		-- The Cauldron
 }
 
 
@@ -199,7 +211,11 @@ end
 --]]
 
 --[[
+
+-- use nil for 2nd value to see category base entries
+
 /script DTInfo(5, 1, 1)
+
 
 /script local a=GetAchievementId(5, nil, 21) d(tostring(a)) d(GetAchievementInfo(a))
 

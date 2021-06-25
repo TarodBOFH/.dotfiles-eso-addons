@@ -46,7 +46,7 @@ local breakdown_graph = nil
 local breakdown_death_graph = nil
 local killing_blow_spells_table = nil
 
-local LMM = LibMainMenu
+local LMM = LibMainMenu2
 local LAM2 = LibAddonMenu2
 
 function KC_G.showingStats() return showingStats end
@@ -59,7 +59,7 @@ function KC_G.CreateConfigMenuX()
         name = "Kill Counter",
         displayName = "|cdb1414Kill Counter|r",
         author = "Casterial",
-        version = "3.3.2",
+        version = "3.3.4",
         website = "https://www.esoui.com/downloads/info337-KillCounter.html"
     }
     LAM2:RegisterAddonPanel(KC_G.name .. "Config", panelData)

@@ -12,6 +12,8 @@ local anims = {}
 -- Don't add anything here! Use files in HodorReflexes/users/
 local u = HR.anim.users
 u["pikadab"] = {"HodorReflexes/users/animated/pikadab.dds", 7, 7, 20}
+u["pikahi"] = {"HodorReflexes/users/animated/pikahi.dds", 69, 1, 33}
+u["catjam"] = {"HodorReflexes/users/animated/catjam.dds", 10, 5, 25}
 
 -- Initialize a user.
 function M.RegisterUser(user)

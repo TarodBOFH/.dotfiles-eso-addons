@@ -19,11 +19,13 @@ function ASApp:Initialize()
     -- Create Key Binding Labels
     ZO_CreateStringId('SI_BINDING_NAME_SHOW_AS_WINDOW', "Toggle Main Window")
 
+    local worldName = GetWorldName()
+
 	-- initialize AlphaStyle settings
-    ASModel.Settings = ZO_SavedVars:NewAccountWide(ASModel.SavedSettings.Name, ASModel.SavedSettings.Version, nil, ASModel.SavedSettings.Defaults)
+    ASModel.Settings = ZO_SavedVars:NewAccountWide(ASModel.SavedSettings.Name, ASModel.SavedSettings.Version, worldName, ASModel.SavedSettings.Defaults)
 	
 	-- initialize character styles
-    ASModel.StyleData = ZO_SavedVars:New(ASModel.SavedStyles.Name, ASModel.SavedStyles.Version, nil, ASModel.SavedStyles.Defaults)
+    ASModel.StyleData = ZO_SavedVars:NewCharacterIdSettings(ASModel.SavedStyles.Name, ASModel.SavedStyles.Version, worldName, ASModel.SavedStyles.Defaults)
 end
 
 function ASApp.OnAddOnLoaded(event, addonName)

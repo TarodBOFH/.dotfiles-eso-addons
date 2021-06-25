@@ -1,6 +1,6 @@
 HodorReflexes = {
 	name = "HodorReflexes",
-	version = "1.8.10",
+	version = "1.8.16",
 
 	-- Default settings
 	default = {
@@ -75,7 +75,7 @@ local function GenerateMock()
 	mockText = {} -- wipe the current table
 	local zoneId = GetZoneId(GetUnitZoneIndex('player'))
 	local lang = GetCVar("language.2")
-	if (lang == "en" or lang == "ru" or lang == "fr") and mockZones[zoneId] then
+	if (lang == "en" or lang == "ru" or lang == "fr" or lang == "it") and mockZones[zoneId] then
 		-- Create new table
 		mockText = {HR_MOCK1, HR_MOCK2, HR_MOCK3, HR_MOCK4, HR_MOCK5, HR_MOCK6, HR_MOCK7, HR_MOCK8, HR_MOCK9, HR_MOCK10, HR_MOCK11, HR_MOCK12, HR_MOCK13, HR_MOCK14, HR_MOCK15, HR_MOCK16, HR_MOCK17, HR_MOCK18, HR_MOCK19, HR_MOCK20}
 		if zoneId < 700 then text = table.insert(mockText, HR_MOCK_AA1) end
@@ -146,6 +146,7 @@ function HR.PlayerActivated()
 	EM:RegisterForEvent(HR.name, EVENT_GROUP_MEMBER_JOINED, OnGroupChangeDelayed)
 	EM:RegisterForEvent(HR.name, EVENT_GROUP_MEMBER_LEFT, OnGroupChangeDelayed)
 	EM:RegisterForEvent(HR.name, EVENT_GROUP_UPDATE, OnGroupChangeDelayed)
+	EM:RegisterForEvent(HR.name, EVENT_GROUP_MEMBER_CONNECTED_STATUS, OnGroupChangeDelayed)
 	OnGroupChangeDelayed()
 
 	GenerateMock()

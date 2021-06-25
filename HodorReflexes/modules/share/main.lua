@@ -1,6 +1,6 @@
 HodorReflexes.modules.share = {
 	name = "HodorReflexes_Share",
-	version = "0.6.7",
+	version = "0.7.0",
 
 	uiLocked = true,
 
@@ -48,6 +48,9 @@ HodorReflexes.modules.share = {
 		styleDamageNumFont = 'gamepad',
 		styleBossDamageColor = 'b2ffb2',
 		styleTotalDamageColor = 'faffb2',
+		styleHornColor =  {0, 1, 1},
+		styleForceColor = {1, 1, 0},
+		styleColosColor = {1, 1, 0},
 	},
 
 	sv = nil, -- saved variables
@@ -639,16 +642,33 @@ function M.Initialize()
 	SV = M.sv
 	SW = M.sw
 
-	-- Version update.
-	if SW.lastIconsVersion ~= HR.version then
-		SW.lastIconsVersion = HR.version
-		zo_callLater(function() PlaySound(SOUNDS.BOOK_COLLECTION_COMPLETED); HodorReflexes_Updated:SetHidden(false) end, 1000)
+	-- Load user icon, if he has one.
+	local userId = GetUnitDisplayName('player')
+	local userIcon = player.GetIconForUserId(userId)
+	HodorReflexes_Updated_Icon5:SetTextureCoords(0, 1, 0, 1)
+	if HR.anim.RegisterUser(userId) then
+		HR.anim.RegisterUserControl(userId, HodorReflexes_Updated_Icon5)
+		HR.anim.RunUserAnimations(userId)
+	elseif userIcon then
+		HodorReflexes_Updated_Icon5:SetTexture(userIcon)
 	end
 
+	-- Show version update window and notify player if his icon is missing.
+	zo_callLater(function()
+		if not HodorReflexes_Updated_Icon5:IsTextureLoaded() then
+			d(strformat("|cFF6600%s|r", GetString(HR_MISSING_ICON)))
+		end
+		-- Version update window.
+		if SW.lastIconsVersion ~= HR.version then
+			SW.lastIconsVersion = HR.version
+			PlaySound(SOUNDS.BOOK_COLLECTION_COMPLETED)
+			HodorReflexes_Updated:SetHidden(false)
+		end
+	end, 1000)
+
 	-- Set default values for custom name and color.
-	local userId = GetUnitDisplayName('player')
 	if not IsValidString(SW.myIconPathFull) then
-		SW.myIconPathFull = player.GetIconForUserId(userId) or 'HodorReflexes/esologo.dds'
+		SW.myIconPathFull = userIcon or 'HodorReflexes/esologo.dds'
 	end
 	if not IsValidString(SW.myIconNameRaw) then
 		SW.myIconNameRaw = player.GetAliasForUserId(userId)
@@ -850,8 +870,6 @@ do
 			end
 		else
 			EM:UnregisterForUpdate(eventNameTick)
-			HodorReflexes_Share_Ultimates_Title:SetColor(1, 1, 1)
-			HodorReflexes_Share_Ultimates_Duration:SetText('')
 		end
 
 	end
@@ -862,21 +880,24 @@ do
 		local forceRemain = forceEnd - t
 		local hornRemain = hornEnd - t
 		hornActive = hornRemain >= 0
-		forceActive = hornActive and forceRemain >= 0
+		forceActive = forceRemain >= 0
 
 		if hornActive then
-			if forceActive then
-				HodorReflexes_Share_Ultimates_Title:SetColor(1, 0, 0)
-			else
-				HodorReflexes_Share_Ultimates_Title:SetColor(1, 1, 0)
-			end
-			HodorReflexes_Share_Ultimates_Title:SetText(strformat('%s:', forceActive and GetString(HR_MAJOR_FORCE) or GetString(HR_HORN)))
-			HodorReflexes_Share_Ultimates_Duration:SetText(forceActive and strformat('|cFFFF00%0.1f|r', forceRemain) or strformat('|cFFFACD%0.1f|r', hornRemain))
+			HodorReflexes_Share_Ultimates_HornDuration:SetText(strformat('%5.1f', hornRemain > 0 and hornRemain or 0))
 		else
-			EM:UnregisterForUpdate(eventNameTick)
-			HodorReflexes_Share_Ultimates_Title:SetColor(1, 1, 1)
-			HodorReflexes_Share_Ultimates_Duration:SetText('')
+			HodorReflexes_Share_Ultimates_HornDuration:SetText('  0.0')
 		end
+
+		if forceActive then
+			HodorReflexes_Share_Ultimates_ForceDuration:SetText(strformat('%5.1f', forceRemain > 0 and forceRemain or 0))
+		else
+			HodorReflexes_Share_Ultimates_ForceDuration:SetText('  0.0')
+		end
+		
+		if not hornActive and not forceActive then
+			EM:UnregisterForUpdate(eventNameTick)
+		end
+
 		HNT_FRAGMENT:Refresh()
 	end
 
@@ -907,11 +928,9 @@ do
 		local t = time()
 		if mvEnd < t then
 			EM:UnregisterForUpdate(eventNameTick)
-			HodorReflexes_Share_Colos_Title:SetColor(1, 1, 1)
-			HodorReflexes_Share_Colos_Duration:SetText('')
+			HodorReflexes_Share_Colos_Duration:SetText('  0.0')
 		else
-			HodorReflexes_Share_Colos_Title:SetColor(1, 0, 0)
-			HodorReflexes_Share_Colos_Duration:SetText(strformat('|cFFFF00%0.1f|r', (mvEnd - t) / 1000))
+			HodorReflexes_Share_Colos_Duration:SetText(strformat('%5.1f', (mvEnd - t) / 1000))
 		end
 		CNT_FRAGMENT:Refresh()
 	end
@@ -1023,22 +1042,35 @@ end
 
 function M.GetHornPercent()
 
-	return zo_min(200, zo_floor(100 * GetUnitPower("player", POWERTYPE_ULTIMATE) / ABILITY_COST_HORN))
+	local ult = GetUnitPower("player", POWERTYPE_ULTIMATE)
+	if ult <= ABILITY_COST_HORN then
+		-- When ult is not ready, we show real %
+		return zo_floor(100 * ult / ABILITY_COST_HORN)
+	else
+		-- If ult is ready, then adjust % to show 200% only at 500 points
+		return zo_min(200, 100 + zo_floor(100 * (ult - ABILITY_COST_HORN) / (500 - ABILITY_COST_HORN)))
+	end
 
 end
 
 function M.GetColosPercent(raw)
 
-	local p = zo_floor(100 * GetUnitPower("player", POWERTYPE_ULTIMATE) / ABILITY_COST_COLOS)
-	if p < 100 or raw then
-		return p
+	local ult = GetUnitPower("player", POWERTYPE_ULTIMATE)
+	if raw or ult < ABILITY_COST_COLOS then
+		-- When ult is not ready, we show real %
+		return zo_floor(100 * ult / ABILITY_COST_COLOS)
 	else
 		if SV.colosPriority == 'always' or SV.colosPriority == 'tank' and GetSelectedLFGRole() == LFG_ROLE_TANK then
 			return 201
 		elseif SV.colosPriority == 'never' then
 			return 99
+		elseif ult * 0.85 < ABILITY_COST_HORN then
+			-- Use the normal formula until horn is ready, because its % is calculated relative to colossus when both ultimates are shared.
+			-- We use 0.85 instead of 0.9 multipler, because the formula below is "slower" than this one (it's just a rough number, nothing precisely calculated).
+			return zo_floor(100 * ult / ABILITY_COST_COLOS)
 		else
-			return zo_min(200, p)
+			-- If ult is ready, then adjust % to show 200% only at 500 points
+			return zo_min(200, 100 + zo_floor(100 * (ult - ABILITY_COST_COLOS) / (500 - ABILITY_COST_COLOS)))
 		end
 	end
 
@@ -1559,15 +1591,16 @@ function M.RestorePosition()
 	end
 	HodorReflexes_Share_HornIcon:SetScale(SV.hornIconScale)
 
-	HodorReflexes_Share_Ultimates_Title:SetText(strformat('%s:', GetString(HR_HORN)))
-	HodorReflexes_Share_Colos_Title:SetText(strformat('%s:', GetString(HR_COLOS)))
-
 end
 
 function M.RestoreColors()
 
 	HodorReflexes_Share_HornCountdown_Label:SetColor(unpack(SV.hornCountdownColor))
 	HodorReflexes_Share_ColosCountdown_Label:SetColor(unpack(SV.colosCountdownColor))
+
+	HodorReflexes_Share_Ultimates_HornDuration:SetColor(unpack(SW.styleHornColor))
+	HodorReflexes_Share_Ultimates_ForceDuration:SetColor(unpack(SW.styleForceColor))
+	HodorReflexes_Share_Colos_Duration:SetColor(unpack(SW.styleColosColor))
 
 end
 

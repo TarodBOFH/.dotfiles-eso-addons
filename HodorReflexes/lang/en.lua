@@ -93,16 +93,19 @@ local strings = {
 	HR_MENU_STYLE_PINS = "Show map pings",
 	HR_MENU_STYLE_PINS_TT = "Show players' pings on the world map and compass.",
 	HR_MENU_STYLE_DPS = "Damage list",
-	HR_MENU_STYLE_DPS_FONT = "Numbers font:",
+	HR_MENU_STYLE_DPS_FONT = "Numbers font",
 	HR_MENU_STYLE_DPS_FONT_DEFAULT = "Default",
 	HR_MENU_STYLE_DPS_FONT_GAMEPAD = "Gamepad",
-	HR_MENU_STYLE_DPS_BOSS_COLOR = "Boss damage color:",
-	HR_MENU_STYLE_DPS_TOTAL_COLOR = "Total damage color:",
-	HR_MENU_STYLE_DPS_HEADER_OPACITY = "Header opacity:",
-	HR_MENU_STYLE_DPS_EVEN_OPACITY = "Even row opacity:",
-	HR_MENU_STYLE_DPS_ODD_OPACITY = "Odd row opacity:",
-	HR_MENU_STYLE_DPS_HIGHLIGHT = "Highlight color:",
+	HR_MENU_STYLE_DPS_BOSS_COLOR = "Boss damage color",
+	HR_MENU_STYLE_DPS_TOTAL_COLOR = "Total damage color",
+	HR_MENU_STYLE_DPS_HEADER_OPACITY = "Header opacity",
+	HR_MENU_STYLE_DPS_EVEN_OPACITY = "Even row opacity",
+	HR_MENU_STYLE_DPS_ODD_OPACITY = "Odd row opacity",
+	HR_MENU_STYLE_DPS_HIGHLIGHT = "Highlight color",
 	HR_MENU_STYLE_DPS_HIGHLIGHT_TT = "Highlight your name in the damage list with the selected color. If you don't want to highlight your name, then set Opacity to 0. Only you see the highlighted name.",
+	HR_MENU_STYLE_HORN_COLOR = "War Horn duration color",
+	HR_MENU_STYLE_FORCE_COLOR = "Major Force duration color",
+	HR_MENU_STYLE_COLOS_COLOR = "Colossus duration color",
 
 	HR_MENU_ANIMATIONS = "Animated messages",
 	HR_MENU_ANIMATIONS_TT = "Animate colossus and horn countdowns to make them more noticeable.",
@@ -219,6 +222,8 @@ local strings = {
 
 	HR_UPDATED_TEXT = "Hodor Reflexes has been successfully updated, or maybe not? Unfortunately, when updating via Minion, there is a moderate chance for some files to vanish. Usually they are just icons, usually... So here is a little test of five images from different addon folders. If you don't see all of them, then you should close the game and reinstall the addon. Otherwise, just ignore this message, it won't appear again.",
 	HR_UPDATED_DISMISS = "I see five icons!",
+
+	HR_MISSING_ICON = "Couldn't load your Hodor Reflexes icon. Reinstall the addon or download it manually from esoui.com and restart the game.",
 
 }
 

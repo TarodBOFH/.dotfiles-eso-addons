@@ -225,6 +225,9 @@ function AutoCategory.HookGamepadInventory()
 		return true
 	end)
 
+	if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true then return end
+	-- The following code related only to Extendes Supplies category
+
 	-- Allow to equip items from Supplies category
 	ZO_PreHook(GAMEPAD_INVENTORY, "TryEquipItem", function (self, inventorySlot)
 		local sourceBag, sourceSlot = ZO_Inventory_GetBagAndIndex(inventorySlot)
@@ -242,28 +245,159 @@ function AutoCategory.HookGamepadInventory()
 		return true
 	end)
 
-	-- Show change compare mode button in Supplies
+	-- Show change compare mode and quickslot buttons in Supplies
 	SecurePostHook(GAMEPAD_INVENTORY, "InitializeKeybindStrip", function (self)
-		local oldVisible = self.toggleCompareModeKeybindStripDescriptor.visible
-		self.toggleCompareModeKeybindStripDescriptor.visible = function ()
+		local function CanQuickSlotTargetItem()
+			local targetData = self.itemList:GetTargetData()
+			if targetData and ZO_InventorySlot_CanQuickslotItem(targetData) then
+				return true
+			end
+		end
+
+		local function IsQuickSlotEnabled()
 			local targetCategoryData = self.categoryList:GetTargetData()
 			if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
-				local selectedItemData = self.currentlySelectedData
-				local equipSlot = ZO_Character_GetEquipSlotForEquipType(selectedItemData.equipType)
+				return CanQuickSlotTargetItem()
+			else
+				return self.selectedItemFilterType == ITEMFILTERTYPE_QUICKSLOT or self.selectedItemFilterType == ITEMFILTERTYPE_QUEST
+			end
+		end
+	
+		local function CanCompareTargetItem()
+			local targetData = self.itemList:GetTargetData()
+			if targetData then
+				local equipSlot = ZO_Character_GetEquipSlotForEquipType(targetData.equipType)
 				if equipSlot then
 					return true
-				else
-					return false
 				end
 			end
-			return oldVisible()
 		end
+
+		local function IsCompareModeEnabled()
+			local targetCategoryData = self.categoryList:GetTargetData()
+			if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
+				return CanCompareTargetItem()
+			else
+				return self.selectedItemFilterType == ITEMFILTERTYPE_JEWELRY or self.selectedItemFilterType == ITEMFILTERTYPE_ARMOR or self.selectedItemFilterType == ITEMFILTERTYPE_WEAPONS
+			end
+		end
+
+		local multiactionKeybind = {
+            alignment = function()
+                if IsQuickSlotEnabled() then
+                    return KEYBIND_STRIP_ALIGN_RIGHT
+                elseif IsCompareModeEnabled() then
+                    return KEYBIND_STRIP_ALIGN_LEFT
+                end
+            end,
+            name = function()
+                if IsQuickSlotEnabled() then
+                    return GetString(SI_GAMEPAD_ITEM_ACTION_QUICKSLOT_ASSIGN)
+                elseif IsCompareModeEnabled() then
+                    return GetString(SI_GAMEPAD_INVENTORY_TOGGLE_ITEM_COMPARE_MODE)
+                end
+            end,
+            keybind = "UI_SHORTCUT_SECONDARY",
+            order = function()
+                if IsQuickSlotEnabled() then
+                    return -500
+                end
+            end,
+            visible = function()
+				local targetCategoryData = self.categoryList:GetTargetData()
+				if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
+					return CanQuickSlotTargetItem() or CanCompareTargetItem()
+				else
+					if IsQuickSlotEnabled() then
+						return CanQuickSlotTargetItem()
+					elseif IsCompareModeEnabled() then
+						if targetCategoryData then
+							local equipSlotHasItem = select(2, GetEquippedItemInfo(targetCategoryData.equipSlot))
+							return equipSlotHasItem
+						end
+					end
+				end
+            end,
+            callback = function()
+                if IsQuickSlotEnabled() then
+					self:ShowQuickslot()
+                elseif IsCompareModeEnabled() then
+                    self.savedVars.useStatComparisonTooltip = not self.savedVars.useStatComparisonTooltip
+                    self:UpdateRightTooltip()
+                end
+            end,
+        }
+
+		self.itemFilterKeybindStripDescriptor[1] = multiactionKeybind
+	end)
+
+	local QUICKSLOT_ASSIGNMENT_TYPE_ITEM = 1
+	local QUICKSLOT_ASSIGNMENT_TYPE_COLLECTIBLE = 2
+	local QUICKSLOT_ASSIGNMENT_TYPE_QUEST_ITEM = 3
+
+	ZO_PreHook(GAMEPAD_QUICKSLOT, "TryAssignItemToSlot", function (self)
+		local selectedData = self.radialMenu.selectedEntry
+		if selectedData then
+			if self.assignmentType == QUICKSLOT_ASSIGNMENT_TYPE_COLLECTIBLE then
+				if self.collectibleToSlotId then
+					CallSecureProtected("SelectSlotSimpleAction", ACTION_TYPE_COLLECTIBLE, self.collectibleToSlotId, selectedData.data)
+					self.collectibleToSlotId = nil
+				end
+			elseif self.assignmentType == QUICKSLOT_ASSIGNMENT_TYPE_ITEM then
+				if self.itemToSlotId and self.itemToSlotIndex then
+					CallSecureProtected("SelectSlotItem", self.itemToSlotId, self.itemToSlotIndex, selectedData.data)
+					self.itemToSlotId = nil
+					self.itemToSlotIndex = nil
+				end
+			elseif self.assignmentType == QUICKSLOT_ASSIGNMENT_TYPE_QUEST_ITEM then
+				if self.questItemToSlotId then
+					CallSecureProtected("SelectSlotSimpleAction", ACTION_TYPE_QUEST_ITEM, self.questItemToSlotId, selectedData.data)
+					self.questItemToSlotId = nil
+				end
+			end
+
+			self.radialMenu.activeIcon:SetHidden(true)
+			self.activeIcon = nil
+			self.slotIndexForAnim = selectedData.data
+		end
+		self.enteringMenuUnslottedItem = false  --in case the player tries to assign the slotted item that is currently being unassigned so that the scene will properly hide
+		return true
+	end)
+
+	ZO_PreHook(GAMEPAD_QUICKSLOT, "ShowQuickslotMenu", function (self)
+		self.radialMenu:Clear()
+		self:PopulateMenu()
+		self.radialMenu:Show()
+
+		--special entrance case, unslot selected item
+		local slotNum
+		if self.assignmentType == QUICKSLOT_ASSIGNMENT_TYPE_ITEM then
+			if self.itemToSlotId and self.itemToSlotIndex then
+				slotNum = FindActionSlotMatchingItem(self.itemToSlotId, self.itemToSlotIndex)
+			end
+		elseif self.assignmentType == QUICKSLOT_ASSIGNMENT_TYPE_COLLECTIBLE then
+			if self.collectibleToSlotId then
+				slotNum = FindActionSlotMatchingSimpleAction(ACTION_TYPE_COLLECTIBLE, self.collectibleToSlotId)
+			end
+		elseif self.assignmentType == QUICKSLOT_ASSIGNMENT_TYPE_QUEST_ITEM then
+			if self.questItemToSlotId then
+				slotNum = FindActionSlotMatchingSimpleAction(ACTION_TYPE_QUEST_ITEM, self.questItemToSlotId)
+			end
+		end
+
+		if slotNum then
+			self.enteringMenuUnslottedItem = true
+			CallSecureProtected("ClearSlot", slotNum)
+			self.slotIndexForAnim = slotNum
+			self.radialMenu.activeIcon:SetHidden(true)
+		end
+		return true
 	end)
 
 	-- Show right tooltip for equipable items in Supplies
 	ZO_PreHook(GAMEPAD_INVENTORY, "UpdateRightTooltip", function (self)
 		local targetCategoryData = self.categoryList:GetTargetData()
-		if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData)then
+		if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
 			local selectedItemData = self.currentlySelectedData
 			local equipSlot = ZO_Character_GetEquipSlotForEquipType(selectedItemData.equipType)
 			if not equipSlot then
@@ -280,25 +414,6 @@ function AutoCategory.HookGamepadInventory()
 			return true
 		end
 		return false
-	end)
-
-	-- Allow to quickslot items from Supplies category
-	SecurePostHook(GAMEPAD_INVENTORY, "SetCurrentList", function (self, list)
-		if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true then return end
-		if list == self.itemList and IsSuppliesCategory(self.categoryList:GetTargetData()) then
-			KEYBIND_STRIP:AddKeybindButton(self.quickslotAssignKeybindStripDescriptor)
-			KEYBIND_STRIP:AddKeybindButton(self.toggleCompareModeKeybindStripDescriptor)
-			self:RefreshItemActions()
-			self:RefreshActiveKeybinds()
-		end
-	end)
-
-	-- Fix an issue, when set to quickslot action does not hide after selecting item that cannot be quickslotted
-	SecurePostHook(GAMEPAD_INVENTORY, "RefreshActiveKeybinds", function (self)
-		if self:GetCurrentList() == self.itemList and IsSuppliesCategory(self.categoryList:GetTargetData()) then
-			KEYBIND_STRIP:UpdateKeybindButton(self.quickslotAssignKeybindStripDescriptor)
-		    KEYBIND_STRIP:UpdateKeybindButton(self.toggleCompareModeKeybindStripDescriptor)
-		end
 	end)
 end
 
@@ -413,7 +528,8 @@ function AutoCategory.HookGamepadMode()
   	AutoCategory.HookGamepadInventory()
   	AutoCategory.HookGamepadCraftStation()
   	AutoCategory.HookGamepadStore(STORE_WINDOW_GAMEPAD.components[ZO_MODE_STORE_SELL].list)
-  	AutoCategory.HookGamepadStore(STORE_WINDOW_GAMEPAD.components[ZO_MODE_STORE_BUY_BACK].list)
+	AutoCategory.HookGamepadStore(STORE_WINDOW_GAMEPAD.components[ZO_MODE_STORE_SELL_STOLEN].list)
+	AutoCategory.HookGamepadStore(STORE_WINDOW_GAMEPAD.components[ZO_MODE_STORE_LAUNDER].list)
   	AutoCategory.HookGamepadTradeInventory()
 	AutoCategory.HookGamepadBanking()
 end

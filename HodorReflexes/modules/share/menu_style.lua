@@ -119,6 +119,44 @@ function M.BuildStyleMenu()
 				M.sw.damageRowColor = {r, g, b, o}
 			end,
 		},
+		{
+			type = "header",
+			name = string.format("|cFFFACD%s|r", GetString(HR_MENU_HORN))
+		},
+		{
+			type = "colorpicker",
+			name = GetString(HR_MENU_STYLE_HORN_COLOR),
+			tooltip = "",
+			getFunc = function() return unpack(M.sw.styleHornColor) end,
+			setFunc = function(r, g, b)
+				M.sw.styleHornColor = {r, g, b}
+				HodorReflexes_Share_Ultimates_HornDuration:SetColor(unpack(M.sw.styleHornColor))
+			end,
+		},
+		{
+			type = "colorpicker",
+			name = GetString(HR_MENU_STYLE_FORCE_COLOR),
+			tooltip = "",
+			getFunc = function() return unpack(M.sw.styleForceColor) end,
+			setFunc = function(r, g, b)
+				M.sw.styleForceColor = {r, g, b}
+				HodorReflexes_Share_Ultimates_ForceDuration:SetColor(unpack(M.sw.styleForceColor))
+			end,
+		},
+		{
+			type = "header",
+			name = string.format("|cFFFACD%s|r", GetString(HR_MENU_COLOS)),
+		},
+		{
+			type = "colorpicker",
+			name = GetString(HR_MENU_STYLE_COLOS_COLOR),
+			tooltip = "",
+			getFunc = function() return unpack(M.sw.styleColosColor) end,
+			setFunc = function(r, g, b)
+				M.sw.styleColosColor = {r, g, b}
+				HodorReflexes_Share_Colos_Duration:SetColor(unpack(M.sw.styleColosColor))
+			end,
+		},
 	}
 
     LibAddonMenu2:RegisterAddonPanel(M.name .. "StyleMenu", panel)

@@ -2075,6 +2075,26 @@ local function updateFightStatsPanelRight(panel)
 
 			end
 
+			if i == 4 then	-- Add a hint for backstabber
+
+				rowcontrol.tooltip = nil
+
+				local CP = data.CP
+
+				if powerType ~= POWERTYPE_HEALTH and CP and CP.version ~= nil and CP.version >= 2 then
+
+					local backstabber = CP[1] and CP[1].stars and CP[1].stars[31] -- Backstabber CP
+
+					if backstabber and backstabber[1] >= 10 and backstabber[2] == LIBCOMBAT_CPTYPE_SLOTTED then
+
+						text = ZO_CachedStrFormat("<<1>>*:", GetString(stringKey, i))
+
+						rowcontrol.tooltip = {GetString(SI_COMBAT_METRICS_BACKSTABBER_TT)}
+
+					end
+				end
+			end
+
 			rowcontrol:GetNamedChild("Label"):SetText(text)
 			rowcontrol:GetNamedChild("Value"):SetText(avgvalue)
 			rowcontrol:GetNamedChild("Value2"):SetText(maxvalue)
@@ -2151,13 +2171,13 @@ local function updateFightStatsPanelRight(panel)
 		row5:SetHidden(false)
 		row6:SetHidden(false)
 
-		local text5 = GetString(stringKey, 5)
+		local text5 = ZO_CachedStrFormat("<<1>>:", GetString(stringKey, 5))
 
 		row5:GetNamedChild("Label"):SetText(text5)
 		row5:GetNamedChild("Value"):SetText(averagePenetration)
 		row5:GetNamedChild("Value2"):SetText(maxvalue)
 
-		local text6 = GetString(stringKey, 6)
+		local text6 = ZO_CachedStrFormat("<<1>>:", GetString(stringKey, 6))
 
 		row6:GetNamedChild("Label"):SetText(text6)
 		row6:GetNamedChild("Value"):SetText(overPenetrationRatio)
@@ -3853,9 +3873,9 @@ end
 
 local powerTypeKeyTable = {
 
-	[POWERTYPE_HEALTH] = "maxmaxhealth",
-	[POWERTYPE_MAGICKA] = "maxmaxmagicka",
-	[POWERTYPE_STAMINA] = "maxmaxstamina",
+	[POWERTYPE_HEALTH] = LIBCOMBAT_STAT_MAXHEALTH,
+	[POWERTYPE_MAGICKA] = LIBCOMBAT_STAT_MAXMAGICKA,
+	[POWERTYPE_STAMINA] = LIBCOMBAT_STAT_MAXSTAMINA,
 
 }
 
@@ -3922,7 +3942,7 @@ local function ResourceAbsolute(powerType)
 
 	local key = powerTypeKeyTable[powerType]
 
-	local maxValue = powerType == POWERTYPE_ULTIMATE and 500 or fightData.stats[key]
+	local maxValue = powerType == POWERTYPE_ULTIMATE and 500 or fightData.calculated.stats[key].max
 
 	for i, xyData in ipairs(XYData) do
 
@@ -6234,8 +6254,8 @@ local function GetSelectionDamage(data, selection)	-- Gets highest Single Target
 
 			units = units + 1
 			damage = damage + totalUnitDamage
-			starttime = math.min(starttime or unit.dpsstart or 0, unit.dpsstart or 0)
-			endtime = math.max(endtime or unit.dpsend or 0, unit.dpsend or 0)
+			starttime = unit.dpsstart and math.min(starttime or unit.dpsstart, unit.dpsstart) or starttime
+			endtime = unit.dpsend and math.max(endtime or unit.dpsend, unit.dpsend) or endtime
 
 			if totalUnitDamage > bossDamage then
 
@@ -6247,7 +6267,7 @@ local function GetSelectionDamage(data, selection)	-- Gets highest Single Target
 		end
 	end
 
-	local damageTime = (endtime - starttime)/1000
+	local damageTime = starttime and endtime and (endtime - starttime)/1000 or 0
 	damageTime = damageTime > 0 and damageTime or data.dpstime
 
 	return units, damage, bossName, damageTime

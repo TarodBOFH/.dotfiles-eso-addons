@@ -2,7 +2,7 @@ AG = {}
 
 AG.name = 'AlphaGear'
 AG.displayname = 'AlphaGear 2'
-AG.version = 'v6.12.0'
+AG.version = 'v6.12.1'
 AG.author = 'mesota'
 AG.init = false
 AG.pendingSet = -1
@@ -1614,7 +1614,7 @@ function AG.LoadOutfit(outfitid)
     elseif outfitid == AG.OUTFIT_KEEP then
         -- Just do nothing
     else
-        OFMGR:EquipOutfit(outfitid)
+        OFMGR:EquipOutfit(GAMEPLAY_ACTOR_CATEGORY_PLAYER, outfitid)
     end
 end
 
@@ -4068,7 +4068,9 @@ function AG.OnAddOnLoaded(event, addonName)
   if addonName ~= AG.name then return end
 
   EM:UnregisterForEvent('AG4',EVENT_ADD_ON_LOADED)
-  
+
+    AreActionBarsLocked = ZO_ActionBar_AreActionBarsLocked
+
   AG:Initialize()
 end
 

@@ -94,16 +94,19 @@ local strings = {
 	HR_MENU_STYLE_PINS = "Показывать метки на карте",
 	HR_MENU_STYLE_PINS_TT = "Показывать метки игроков на карте мира и компасе.",
 	HR_MENU_STYLE_DPS = "Список урона",
-	HR_MENU_STYLE_DPS_FONT = "Шрифт чисел:",
+	HR_MENU_STYLE_DPS_FONT = "Шрифт чисел",
 	HR_MENU_STYLE_DPS_FONT_DEFAULT = "Стандартный",
 	HR_MENU_STYLE_DPS_FONT_GAMEPAD = "Геймпад",
-	HR_MENU_STYLE_DPS_BOSS_COLOR = "Цвет урона по боссу:",
-	HR_MENU_STYLE_DPS_TOTAL_COLOR = "Цвет общего урона:",
-	HR_MENU_STYLE_DPS_HEADER_OPACITY = "Прозрачность заголовка:",
-	HR_MENU_STYLE_DPS_EVEN_OPACITY = "Прозрачность чётных строк:",
-	HR_MENU_STYLE_DPS_ODD_OPACITY = "Прозрачность нечётных строк:",
-	HR_MENU_STYLE_DPS_HIGHLIGHT = "Цвет подсветки:",
+	HR_MENU_STYLE_DPS_BOSS_COLOR = "Цвет урона по боссу",
+	HR_MENU_STYLE_DPS_TOTAL_COLOR = "Цвет общего урона",
+	HR_MENU_STYLE_DPS_HEADER_OPACITY = "Прозрачность заголовка",
+	HR_MENU_STYLE_DPS_EVEN_OPACITY = "Прозрачность чётных строк",
+	HR_MENU_STYLE_DPS_ODD_OPACITY = "Прозрачность нечётных строк",
+	HR_MENU_STYLE_DPS_HIGHLIGHT = "Цвет подсветки",
 	HR_MENU_STYLE_DPS_HIGHLIGHT_TT = "Подсветка своего имени в списке. Чтобы убрать, установите видимость равной нулю. Только вы видите подсветку своего имени.",
+	HR_MENU_STYLE_HORN_COLOR = "Цвет длительности горна",
+	HR_MENU_STYLE_FORCE_COLOR = "Цвет длительности силы",
+	HR_MENU_STYLE_COLOS_COLOR = "Цвет длительности колосса",
 
 	HR_MENU_ANIMATIONS = "Анимация сообщений",
 	HR_MENU_ANIMATIONS_TT = "Более заметный анимированныый обратный отсчёт горна и колосса.",
@@ -219,6 +222,8 @@ local strings = {
 
 	HR_UPDATED_TEXT = "Hodor Reflexes был успешно обновлён, или нет? К сожалению, при обновлении через Minion есть шанс, что некоторые файлы аддона не скачаются. Обычно это только иконки, но не всегда. Под этим сообщением есть пять картинок из разных директорий аддона. Если вы не видите одну из них, то закройте игру и переустановите аддон. В противном случае просто закройте это окно.",
 	HR_UPDATED_DISMISS = "Я вижу пять иконок!",
+
+	HR_MISSING_ICON = "Не удалось загрузить вашу иконку Hodor Reflexes. Переустановите аддон или скачайте его вручную с сайта esoui.com и перезапустите игру.",
 
 }
 

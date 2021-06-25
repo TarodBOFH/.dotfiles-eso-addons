@@ -1,6 +1,6 @@
-## Title: |cFFAA33AlphaStyle|r v0.0.5
-## APIVersion: 100028 100029
-## Version: 0.0.5
+## Title: |cFFAA33AlphaStyle|r v0.0.6
+## APIVersion: 100035 100036
+## Version: 0.0.6
 ## SavedVariables: AlphaStyle_Settings
 ## SavedVariables: AlphaStyle_Styles
 ## Author: mesota
