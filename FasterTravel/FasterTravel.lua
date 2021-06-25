@@ -1,58 +1,20 @@
-FasterTravel = {}
+FasterTravel = FasterTravel or {}
 
-ADDON_NAME = "FasterTravel"
-ADDON_VERSION = "2.4.3"
+local addon = {
+    name = "FasterTravel",
+    displayName = zo_strformat("|c40FF40Faster|r Travel"),
+    author = "XanDDemoX, upyachka, Valandil, SimonIllyan",
+    version = "2.5.10",
+    website = "https://www.esoui.com/downloads/info1089-FasterTravelWayshrinesmenuTeleporter.html",
+}
+FasterTravel.addon = addon
+FasterTravel.prefix = string.format("[%s]: ", addon.name)
 
 local CALLBACK_ID_ON_WORLDMAP_CHANGED = "OnWorldMapChanged"
 local CALLBACK_ID_ON_QUEST_TRACKER_TRACKING_STATE_CHANGED = "QuestTrackerTrackingStateChanged"
 local _events = {}
 local GROUP_ALIAS = "group"
-FasterTravel.prefix = string.format("[%s]: ", ADDON_NAME)
-FasterTravel.verbosity = 1
-
-local predefined_aliases = {
-	["al"] = "Alik'r Desert",
-	["ar"] = "Artaeum",
-	["au"] = "Auridon",
-	["bf"] = "The Brass Fortress",
-	["br"] = "The Brass Fortress",
-	["bk"] = "Bangkorai",
-	["cr"] = "Craglorn",
-	["ch"] = "Coldharbour",
-	["co"] = "Coldharbour",
-	["cc"] = "Clockwork City",
-	["cl"] = "Clockwork City",
-	["cwc"] = "Clockwork City",
-	["de"] = "Deshaan",
-	["ea"] = "Eastmarch",
-	["em"] = "Eastmarch",
-	["ne"] = "Northern Elsweyr",
-	["gl"] = "Glenumbra",
-	["gc"] = "Gold Coast",
-	["go"] = "Gold Coast",
-	["gra"] = "Grahtwood",
-	["gw"] = "Grahtwood",
-	["gs"] = "Greenshade",
-	["he"] = "Hew's Bane",
-	["hb"] = "Hew's Bane",
-	["ma"] = "Malabal Tor",
-	["mt"] = "Malabal Tor",
-	["mm"] = "Murkmire",
-	["mu"] = "Murkmire",
-	["re"] = "Reaper's March",
-	["rm"] = "Reaper's March",
-	["rif"] = "The Rift",
-	["tr"] = "The Rift",
-	["riv"] = "Rivenspire",
-	["rs"] = "Rivenspire",
-	["se"] = "Southern Elsweyr",
-	["sf"] = "Stonefalls",
-	["sh"] = "Stormhaven",
-	["sm"] = "Stros M'Kai",
-	["ss"] = "Summerset",
-	["su"] = "Summerset",
-	["ws"] = "Western Skyrim",
-}
+local active = false
 
 local function GetUniqueEventId(id)
     local count = _events[id] or 0
@@ -62,7 +24,7 @@ local function GetUniqueEventId(id)
 end
 
 local function GetEventName(id)
-    return table.concat({ ADDON_NAME, tostring(id), tostring(GetUniqueEventId(id)) }, "_")
+    return table.concat({ addon.name, tostring(id), tostring(GetUniqueEventId(id)) }, "_")
 end
 
 local function addEvent(id, func)
@@ -109,32 +71,11 @@ local function Setup()
     local Location = FasterTravel.Location
     local DropDown = FasterTravel.DropDown
     local Teleport = FasterTravel.Teleport
+    local Options = FasterTravel.Options
     local Utils = FasterTravel.Utils
 
-    local _locations
-    local _locationsLookup
-
-    local _settings = {
-		recent = {},
-		locationOrder = Location.Data.LocationOrder.ZONE_NAME,
-		locationDirection = Location.Data.LocationDirection.ASCENDING,
-		ws_order = Location.Data.AllWSOrder.NAME,
-	}
-
-    local _account_settings = {
-		favourites = {},
-		aliases = predefined_aliases,
-		WfDpatchEnabled = true,
-		verbosity = 1,
-		listlen = 25
-	}
-
-    local _settingsVersion = "10"
-	_settings = ZO_SavedVars:New("FasterTravel_SavedVariables", _settingsVersion, "", _settings, nil)
-    _account_settings = ZO_SavedVars:NewAccountWide("FasterTravel_SavedVariables", _settingsVersion, "", _account_settings, nil)
-	FasterTravel.verbosity = _account_settings.verbosity
-    _settings.locations = nil -- cleanup old saved vars
-    if not _account_settings.aliases then _account_settings.aliases = {} end
+    local _locations, _locationsLookup
+	local recentTable, favouritesTable, recentList, favouritesList 
 
 	-- these come from xml files
     local wayshrineControl = FasterTravel_WorldMapWayshrines
@@ -147,14 +88,8 @@ local function Setup()
     local currentFaction
     local locationsDirty = true
 
-	local recentTable = Utils.map(_settings.recent, function(v) return { name = v.name, nodeIndex = v.nodeIndex } end)
-    local favouritesTable = Utils.map(_account_settings.favourites, function(v) return { name = v.name, nodeIndex = v.nodeIndex } end)
-
-    local recentList = FasterTravel.List(recentTable, "nodeIndex", _account_settings.listlen)
-    local favouritesList = FasterTravel.List(favouritesTable, "nodeIndex", _account_settings.listlen)
-
-	FasterTravel.IsWfDpatchEnabled = function()
-		return _account_settings.WfDpatchEnabled
+	local function getNameAndNodeIndex(v)
+		return { name = v.name, nodeIndex = v.nodeIndex }
 	end
 
     local function GetZoneLocation(...)
@@ -172,13 +107,13 @@ local function Setup()
     local function UpdateFavouritesSavedVar()
 		local favourites = {}
 		UpdateSavedVarTable(favourites, favouritesList, function(v) return { nodeIndex = v.nodeIndex } end)
-		_account_settings.favourites = favourites
+		FasterTravel.settings.favourites = favourites
     end
 
     local function UpdateRecentSavedVar()
 		local recent = {}
 		UpdateSavedVarTable(recent, recentList, function(v) return { nodeIndex = v.nodeIndex } end)
-		_settings.recent = recent
+		FasterTravel.settings.recent = recent
     end
 
     local function PushRecent(nodeIndex)
@@ -192,7 +127,7 @@ local function Setup()
 
     local function RefreshLocationsIfRequired()
 		if wayshrinesTab ~= nil and locationsDirty and wayshrinesTab:IsDirty() then
-			Location.Data.UpdateLocationOrder(_locations, _settings.locationOrder, currentFaction)
+			Location.Data.UpdateLocationOrder(_locations, FasterTravel.settings.locationOrder, currentFaction)
 			locationsDirty = false
 		end
     end
@@ -270,16 +205,16 @@ local function Setup()
     end
 
     local function SetLocationOrder(order)
-		if _settings.locationOrder ~= order then
-			_settings.locationOrder = order
+		if FasterTravel.settings.locationOrder ~= order then
+			FasterTravel.settings.locationOrder = order
 			return true
 		end
 		return false
     end
 
     local function SetAllWSOrder(order)
-		if _settings.ws_order ~= order then
-			_settings.ws_order = order
+		if FasterTravel.settings.ws_order ~= order then
+			FasterTravel.settings.ws_order = order
 			wayshrinesTab:SetAllWSOrder(order)
 			return true
 		end
@@ -299,7 +234,7 @@ local function Setup()
 
     local function RefreshOrderDropDown(order)
 		local sortOrderDropDown = wayshrineControl.sortOrderDropDown
-		local sortOrders = Location.Data.GetSortOrders()
+		local sortOrders = FasterTravel.Options._sortOrders
 		DropDown.Refresh(sortOrderDropDown, sortOrders,
 			function(control, text, data)
 				if data and data.item and data.item.id then
@@ -313,7 +248,7 @@ local function Setup()
 
     local function RefreshAllWSDropDown(ws_order)
 		local sortAllOrderDropDown = wayshrineControl.sortAllOrderDropDown
-		local sortOrders = Location.Data.GetSortAllWSOrders()
+		local sortOrders = FasterTravel.Options._sortAllWSOrders
 		DropDown.Refresh(sortAllOrderDropDown, sortOrders,
 			function(control, text, data)
 				if data and data.item and data.item.id then
@@ -327,12 +262,69 @@ local function Setup()
 
     local function RefreshWayshrineDropDowns(args)
 		args = args or {}
-		local order = args.order or _settings.locationOrder
-		local ws_order = args.ws_order or _settings.ws_order
+		local order = args.order or FasterTravel.settings.locationOrder
+		local ws_order = args.ws_order or FasterTravel.settings.ws_order
 		RefreshOrderDropDown(order)
 		RefreshAllWSDropDown(ws_order)
     end
 
+	local function RefreshAfterSettingsChange()
+		SetWayshrinesDirty()
+		SetLocationsDirty()
+		RefreshWayshrineDropDowns()
+		wayshrinesTab:SetAllWSOrder(FasterTravel.settings.ws_order)		
+		wayshrinesTab:Refresh()
+		wayshrinesTab:HideAllZoneCategories()
+	end
+
+	Options.Initialize(addon, RefreshAfterSettingsChange)
+
+	recentTable = Utils.map(FasterTravel.settings.recent, getNameAndNodeIndex )
+    favouritesTable = Utils.map(FasterTravel.settings.favourites, getNameAndNodeIndex )
+    recentList = FasterTravel.List(recentTable, "nodeIndex", FasterTravel.settings.listlen)
+    favouritesList = FasterTravel.List(favouritesTable, "nodeIndex", 100)
+
+	-- register the "Jump Elsewhere?" dialog
+	local dialogName1 = Utils.UniqueDialogName("RandomJumpConfirmation")
+	ZO_Dialogs_RegisterCustomDialog(dialogName1, {
+        canQueue = true,
+        uniqueIdentifier = dialogName1,
+        title = {
+            text = GetString(FASTER_TRAVEL_DIALOG_JUMPRANDOM_TITLE),
+			align = TEXT_ALIGN_CENTER
+        },
+        mainText = {
+            text = GetString(FASTER_TRAVEL_DIALOG_JUMPRANDOM_TEXT),
+			align = TEXT_ALIGN_CENTER
+        },
+        warning = {
+            text = GetString(FASTER_TRAVEL_DIALOG_JUMPRANDOM_WARNING),
+			align = TEXT_ALIGN_CENTER
+        },
+        buttons = {
+            [1] = {
+                text = SI_DIALOG_CONFIRM,
+                callback =
+					function ()	-- callbackYes
+						--[[
+						local zoneIndex = GetCurrentMapZoneIndex()
+						local zoneName = Utils.FormatStringCurrentLanguage(GetZoneNameByIndex(zoneIndex))
+						local parent = Teleport.GetParentZone(zoneName)
+						]]--
+						Teleport.TeleportToZone()
+					end,
+            },
+            [2] = {
+                text = SI_DIALOG_CANCEL,
+                callback =
+					function ()	-- callbackNo
+						Utils.chat(3, "Random jump not confirmed")
+					end,
+            }
+        },
+        setup = function(dialog, data) end,
+    })
+ 
     local function AddFavourite(nodeIndex)
 		favouritesList:add("nodeIndex", { nodeIndex = nodeIndex })
 		SetQuestsDirty()
@@ -355,6 +347,13 @@ local function Setup()
     FasterTravel.Campaign.RefreshIfRequired()
 
     addEvent(EVENT_PLAYER_ACTIVATED, function(eventCode)
+		if not active then
+			-- needs to be done at first player activation
+			Utils.chat(1, "%s %s initialized.",	addon.name, addon.version )
+			active = true
+			return
+		end
+		
 		local func = 	function()
 							SetCurrentZoneMapIndexes(GetCurrentMapZoneIndex())
 							currentWayshrineArgs = nil
@@ -473,67 +472,100 @@ local function Setup()
 		RefreshQuestsIfMapVisible()
     end)
 
-	FasterTravel.WfDpatch = function(enabled)
-		-- the patch from WfD to fix F5 house preview problem
-		FasterTravel.__old_ZO_Dialogs_ShowPlatformDialog = ZO_Dialogs_ShowPlatformDialog
+	-- hack for updating Recents on clicking a wayshrine ON THE MAP
 
-		FasterTravel.__new_ZO_Dialogs_ShowPlatformDialog = function(name, node, params, ...)
-			if name ~= "RECALL_CONFIRM" and name ~= "FAST_TRAVEL_CONFIRM" then return end
-
-			FasterTravel.__old_ZO_Dialogs_ShowPlatformDialog(name, node, params, ...)
-
-			-- hack to get fast travel node for recent list from the map
-			local nodeIndex = node.nodeIndex
-
-			local dialog = ZO_Dialogs_FindDialog(name)
-			local acceptButton = dialog.buttonControls[1]
-			local cancelButton = dialog.buttonControls[2]
-
-			local acceptButton_m_callback = acceptButton.m_callback
-			local cancelButton_m_callback = cancelButton.m_callback
-
-			--get accept and cancel buttons
-			acceptButton.m_callback = function(...)
-				if acceptButton_m_callback ~= nil then acceptButton_m_callback(...) end
-				PushRecent(nodeIndex)
-				acceptButton.m_callback = acceptButton_m_callback
-				cancelButton.m_callback = cancelButton_m_callback
+	local travelDialogs = {
+		FAST_TRAVEL_CONFIRM = {},
+		TRAVEL_TO_HOUSE_CONFIRM = {},
+		RECALL_CONFIRM = {}
+	}
+	-- replacement callbacks factory
+	local function MyCallbackFactory(name)
+		return function(dialog)
+			Utils.chat(4, "Callback %s", name)
+			local node = dialog.data
+			if node.nodeIndex then -- is nil when travelling to house since U29
+				PushRecent(node.nodeIndex)
 			end
-
-			cancelButton.m_callback = function(...)
-				if cancelButton_m_callback ~= nil then cancelButton_m_callback(...) end
-				acceptButton.m_callback = acceptButton_m_callback
-				cancelButton.m_callback = cancelButton_m_callback
-			end
-		end
-
-		if enabled then
-
-			FasterTravel.__Fast_Travel_Hook_Checker = function(name, ...)
-				if name ~= "RECALL_CONFIRM" and name ~= "FAST_TRAVEL_CONFIRM" then
-					if ZO_Dialogs_ShowPlatformDialog ~= FasterTravel.__old_ZO_Dialogs_ShowPlatformDialog then
-						ZO_Dialogs_ShowPlatformDialog = FasterTravel.__old_ZO_Dialogs_ShowPlatformDialog
-						if name ~= "HOUSE_PREVIEW_PURCHASE" then
-							FasterTravel.__new_ZO_Dialogs_ShowPlatformDialog(name, ...)
-						end
-					end
-				elseif ZO_Dialogs_ShowPlatformDialog ~= FasterTravel.__new_ZO_Dialogs_ShowPlatformDialog then
-					ZO_Dialogs_ShowPlatformDialog = FasterTravel.__new_ZO_Dialogs_ShowPlatformDialog
-					FasterTravel.__new_ZO_Dialogs_ShowPlatformDialog(name, ...)
-				end
-				ZO_PreHook("ZO_Dialogs_ShowPlatformDialog", FasterTravel.__Fast_Travel_Hook_Checker)
-			end
-
-			ZO_PreHook("ZO_Dialogs_ShowPlatformDialog", FasterTravel.__Fast_Travel_Hook_Checker)
-
-		else -- not enabled
-			if ZO_Dialogs_ShowPlatformDialog ~= FasterTravel.__old_ZO_Dialogs_ShowPlatformDialog then
-				ZO_Dialogs_ShowPlatformDialog = FasterTravel.__old_ZO_Dialogs_ShowPlatformDialog
+			if travelDialogs[name].saved_callback then -- call the original callback if not nil
+				travelDialogs[name].saved_callback(dialog)
 			end
 		end
 	end
+	-- find the original dialogs for RECALL_CONFIRM and FAST_TRAVEL_CONFIRM
+	for name, data in pairs(travelDialogs) do
+		-- extract "Confirm" callbacks if any and save them
+		if 	ESO_Dialogs[name] and 
+			ESO_Dialogs[name].buttons and
+			ESO_Dialogs[name].buttons[1] then 
+				data.saved_callback = ESO_Dialogs[name].buttons[1].callback -- may be nil
+		end
+		-- create new callbacks
+		data.my_callback = MyCallbackFactory(name)
+	end
+	-- PreHook function
+	FasterTravel.__Hook_Checker = function(name, node, params, ...)
+		Utils.chat(4, "HookChecker: %s", name)
+		if travelDialogs[name] then
+			Utils.chat(4, "Hook checkpoint TRAVEL")
+			-- replace callbacks
+			for name, data in pairs(travelDialogs) do
+				if 	ESO_Dialogs[name] and 
+					ESO_Dialogs[name].buttons and
+					ESO_Dialogs[name].buttons[1] then 
+						if ESO_Dialogs[name].buttons[1].callback ~= data.my_callback then
+							if ESO_Dialogs[name].buttons[1].callback == data.saved_callback then
+								ESO_Dialogs[name].buttons[1].callback = data.my_callback
+							else
+								Utils.chat(0,
+									"Something nasty going on - who else modifies %s dialog?!",
+									name
+								)
+							end
+						end
+				else --[[
+					Bandits UI has an option to turn off fast travel confirmations
+					which sets ESO_Dialogs[name].buttons to nil 
+					but if it is in use, all travels are autoconfirmed!
+					so we can add the wayshrine to Recents without further consideration
+					]]--
+					if node.nodeIndex then 
+						PushRecent(node.nodeIndex)
+					end
+				end
+			end
+		else
+			Utils.chat(4, "Hook checkpoint NON-TRAVEL")
+			-- restore original callbacks
+			for name, data in pairs(travelDialogs) do
+				if 	ESO_Dialogs[name] and 
+					ESO_Dialogs[name].buttons and
+					ESO_Dialogs[name].buttons[1] then 
+						if ESO_Dialogs[name].buttons[1].callback ~= data.saved_callback then
+							if ESO_Dialogs[name].buttons[1].callback == data.my_callback then
+								ESO_Dialogs[name].buttons[1].callback = data.saved_callback
+							else
+								Utils.chat(0,
+									"Something nasty going on - who else modifies %s dialog?!",
+									name
+								)
+							end
+						end
+				end
+			end
+		end
+		return false -- true == I've done everything, don't call ZO_Dialogs_ShowPlatformDialog
+	end
 
-	FasterTravel.WfDpatch(_account_settings.WfDpatchEnabled)
+	local function EnableRecents(enabled)
+		if enabled then
+			ZO_PreHook("ZO_Dialogs_ShowPlatformDialog", FasterTravel.__Hook_Checker)
+		else
+			ZO_PreHook("ZO_Dialogs_ShowPlatformDialog", function() return false end)
+		end
+	end
+
+	EnableRecents(FasterTravel.settings.recentsEnabled)
 
     ZO_WorldMap.SetHidden = hook(ZO_WorldMap.SetHidden, function(base, self, value)
 		base(self, value)
@@ -566,16 +598,16 @@ local function Setup()
     playersTab = FasterTravel.MapTabPlayers(playersControl)
     questTracker = FasterTravel.QuestTracker(_locations, _locationsLookup, wayshrinesTab)
 
-	wayshrinesTab:SetAllWSOrder(_settings.ws_order)
+	wayshrinesTab:SetAllWSOrder(FasterTravel.settings.ws_order)
     RefreshWayshrineDropDowns()
-
+	
 	-- add the "Jump to this zone" keybind strip button…
 	local ButtonGroup = {
 		{
 			name = GetString(SI_BINDING_NAME_FASTER_TRAVEL_REJUMP),
 			keybind = "FASTER_TRAVEL_REJUMP",
 			order = 10,
-			visible = 	function()				
+			visible = 	function()
 							local maptype = GetMapType()
 							return maptype == MAPTYPE_ZONE or maptype == MAPTYPE_SUBZONE
 						end,
@@ -593,11 +625,11 @@ local function Setup()
 			end
 		end)
 --[[
-	FasterTravel.UpdateButtonGroup = function() 
+	FasterTravel.UpdateButtonGroup = function()
 		KEYBIND_STRIP:UpdateKeybindButtonGroup(ButtonGroup)
 	end
 ]]--
-	
+
     -- finally add the controls
     local normal, highlight, pressed = GetPaths("/esoui/art/treeicons/achievements_indexicon_alliancewar_", "up.dds", "over.dds", "down.dds")
 
@@ -646,44 +678,38 @@ local function Setup()
     local function processTeleport(destination)
 		-- fix for teleport bug during interactions
 		EndCurrentInteraction()
-
 		local result, name
-		if GROUP_ALIAS == destination then
+		if destination == GROUP_ALIAS then
 			result, name = Teleport.TeleportToGroup()
 		else
 			result, name = Teleport.TeleportToPlayer(destination)
+			Utils.chat(3, "No player named %s", destination)
 			if not result then
-				result, name = Teleport.TeleportToZone(destination)
+				Teleport.TeleportToZone(destination)
 			end
-		end
-
-		if result then
-			if name ~= destination then
-				Utils.chat(2, "%s %s expanded to %s", Utils.bold(destination), Utils.bold(name))
-			end
-			Utils.chat(1, "%s Teleporting to %s", Utils.bold(name))
-		elseif name ~= nil then
-			Utils.chat(0, "%s Invalid teleport target %s", Utils.bold(name))
 		end
     end
 
 	local function slashGoto(args)
 		args = Utils.stringTrim(args)
 		if Utils.stringIsEmpty(args) then return end
-		local aliasValue = _account_settings.aliases[args]
+		local aliasValue = FasterTravel.settings.aliases[args]
 		if aliasValue then
-			Utils.chat(2, "%s Alias %s for %s used.", Utils.bold(args), Utils.bold(aliasValue))
+			Utils.chat(2, "Alias %s for %s used.", Utils.bold(args), Utils.bold(aliasValue))
 			args = aliasValue
 		end
 		if args == "zone" then
 			-- the zone being displayed on the map or the current zone if no map shown
 			args = GetZoneNameByIndex(GetCurrentMapZoneIndex())
+			if args == '' then 
+				args = GetZoneNameByIndex(GetUnitZoneIndex("player"))
+			end
 		end
 		processTeleport(args)
     end
 
 	FasterTravel.slashGoto = slashGoto
-	
+
 	SLASH_COMMANDS["/goto"] = slashGoto
 
     SLASH_COMMANDS["/ft"] = function(args)
@@ -702,85 +728,84 @@ local function Setup()
 			end
 			if n == 0 then
 			    -- not a subcommand
-				-- Utils.chat(1, "%s Invalid subcommand %s", command or "nil")
+				-- Utils.chat(1, "Invalid subcommand %s", command or "nil")
 				slashGoto(args)
 			elseif command == "verbosity" then
 				if Utils.stringIsEmpty(arg) then
-					Utils.chat(0, "%s verbosity is %d", FasterTravel.verbosity)
+					Utils.chat(0, "verbosity is %s", FasterTravel.settings.verbosity)
 				else
 					local v = tonumber(arg)
 					if v == nil or v < 0 then
-						Utils.chat(1, "%s Wrong argument %s", arg)
+						Utils.chat(1, "Wrong argument %s", arg)
 					else
-						FasterTravel.verbosity = v
-						_account_settings.verbosity = v
-						Utils.chat(0, "%s verbosity set to %s", v)
+						FasterTravel.settings.verbosity = v
+						Utils.chat(0, "verbosity set to %s", v)
 					end
 				end
 			elseif command == "alias" then
 				local key, value = parseAlias(arg)
 				if Utils.stringIsEmpty(key) then
-					Utils.chat(0, Utils.bold("%s Aliases:"))
-					for key, value in Utils.pairsByKeys(_account_settings.aliases) do
-						Utils.chat(0, "%s	 %s -> %s", Utils.bold(key), Utils.bold(value))
+					Utils.chat(0, Utils.bold("Aliases:"))
+					for key, value in Utils.pairsByKeys(FasterTravel.settings.aliases) do
+						Utils.chat(0, "%s -> %s", Utils.bold(key), Utils.bold(value))
 					end
 				elseif Utils.stringIsEmpty(value) then
-					if _account_settings.aliases[key] then
-						Utils.chat(0, "%s GOTO alias %s for %s deleted", Utils.bold(_account_settings.aliases[key]), Utils.bold(key))
-						_account_settings.aliases[key] = nil
+					if FasterTravel.settings.aliases[key] then
+						Utils.chat(0, "GOTO alias %s for %s deleted", Utils.bold(FasterTravel.settings.aliases[key]), Utils.bold(key))
+						FasterTravel.settings.aliases[key] = nil
 					end
 				else
-					_account_settings.aliases[key] = value
-					Utils.chat(0, "%s GOTO alias saved: %s -> %s", Utils.bold(key), Utils.bold(value))
+					FasterTravel.settings.aliases[key] = value
+					Utils.chat(0, "GOTO alias saved: %s -> %s", Utils.bold(key), Utils.bold(value))
 				end
 			elseif command == "listlen" then
 				if Utils.stringIsEmpty(arg) then
-					Utils.chat(0, "%s listlen is %d", _account_settings.listlen)
+					Utils.chat(0, "listlen is %s", FasterTravel.settings.listlen)
 				else
 					local v = tonumber(arg)
 					if v == nil or v <= 0 or v>=100 then
-						Utils.chat(1, "%s Wrong argument %s", arg)
+						Utils.chat(1, "Wrong argument %s", arg)
 					else
-						_account_settings.listlen = v
-						Utils.chat(0, "%s listlen set to %s", v)
+						FasterTravel.settings.listlen = v
+						Utils.chat(0, "listlen set to %s", v)
 					end
 				end
 			elseif command == "recents" then
 				if Utils.stringIsEmpty(arg) then
-					Utils.chat(0, "%s WfD's patch is %s", 
-						Utils.bold(_account_settings.WfDpatchEnabled and "enabled" or "disabled"))
+					Utils.chat(0, "recent list is %s",
+						Utils.bold(FasterTravel.settings.recentsEnabled and "enabled" or "disabled"))
 				else
 					arg = Utils.stringTrim(arg)
 					if arg == "on" then
-						_account_settings.WfDpatchEnabled = true
+						FasterTravel.settings.recentsEnabled = true
 					elseif arg == "off" then
-						_account_settings.WfDpatchEnabled = false
+						FasterTravel.settings.recentsEnabled = false
 					else
-						Utils.chat("%s Sorry, I understand only %s or %s", Utils.bold("on"), Utils.bold("off"))
+						Utils.chat(0, "Sorry, I understand only %s or %s", Utils.bold("on"), Utils.bold("off"))
 						return
 					end
-					FasterTravel.WfDpatch(_account_settings.WfDpatchEnabled)
-					Utils.chat(1, "%s WfD's patch %s; reloading UI", 
-							Utils.bold(_account_settings.WfDpatchEnabled and "enabled" or "disabled"))
+					EnableRecents(FasterTravel.settings.recentsEnabled)
+					Utils.chat(1, "Recents %s; reloading UI",
+						Utils.bold(FasterTravel.settings.recentsEnabled and "enabled" or "disabled"))
 					ReloadUI("ingame")
 				end
 			else
-				Utils.chat(3, "%s WTF?! %s", command or "nil")
+				Utils.chat(3, "WTF?! %s", command)
 			end
 		end
 	end
 
 	FasterTravel.SurveyTheWorld.OnAddOnLoaded()
-	Utils.chat(1, "%s%s %s initialized.",	ADDON_NAME, ADDON_VERSION )
-			
+
 end -- Setup
 
 local function init(func, ...)
     local arg = { ... }
-    addEvent(EVENT_ADD_ON_LOADED,
+	addEvent(EVENT_ADD_ON_LOADED,
 		function(eventCode, addOnName)
-			if (addOnName == ADDON_NAME) then func(unpack(arg)) else return end
+			if (addOnName == addon.name) then func(unpack(arg)) else return end
 		end)
 end
 
+-- entry point
 init(Setup)

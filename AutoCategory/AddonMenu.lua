@@ -121,6 +121,24 @@ local function checkKeywords(str)
    return result
 end
 
+--[[
+function AutoCategory.CompileRule(rule)
+  if rule == nil then return end
+  
+	local rulestr = "return("..rule.rule..")"
+	local compiledfunc,err = zo_loadstring(rulestr)
+    if not compiledfunc then
+		rule.damaged = true
+		logger:Error("Failure to compile rule "..rulestr..". ERROR: "..err)
+		logger:SetEnabled(false)
+      return err
+    end
+	logger:SetEnabled(false)
+    AC.compiledRules[rule.name] = compiledfunc
+    return ""
+end
+
+--]]
 local function checkCurrentRule()
     ruleCheckStatus.err = nil
     ruleCheckStatus.good = nil
@@ -1168,9 +1186,7 @@ function AutoCategory.AddonMenuInit()
                     name = SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE,
                     tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE_TOOLTIP,
                     getFunc = function() return saved.general["SHOW_MESSAGE_WHEN_TOGGLE"] end,
-                    setFunc = function(value) saved.general["SHOW_MESSAGE_WHEN_TOGGLE"] = value
-                        
-                    end,
+                    setFunc = function(value) saved.general["SHOW_MESSAGE_WHEN_TOGGLE"] = value end,
                 },
                 -- Show category item count
                 {
@@ -1178,19 +1194,27 @@ function AutoCategory.AddonMenuInit()
                     name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT,
                     tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP,
                     getFunc = function() return saved.general["SHOW_CATEGORY_ITEM_COUNT"] end,
-                    setFunc = function(value) saved.general["SHOW_CATEGORY_ITEM_COUNT"] = value
-                        
-                    end,
+                    setFunc = function(value) saved.general["SHOW_CATEGORY_ITEM_COUNT"] = value end,
                 },
+                -- Show category collapse icon
+                {
+                    type = "checkbox",
+                    name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_COLLAPSE_ICON,
+                    tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_COLLAPSE_ICON_TOOLTIP,
+                    getFunc = function() return saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] end,
+                    setFunc = function(value) 
+                    	saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] = value 
+                    	AutoCategory.RefreshAllLists()
+                    end,
+                },                
                 -- Save category collapse status
                 {
                     type = "checkbox",
                     name = SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS,
                     tooltip = SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS_TOOLTIP,
                     getFunc = function() return saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] end,
-                    setFunc = function(value) saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] = value
-                        
-                    end,
+                    setFunc = function(value) saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] = value end,
+                    disabled = function() return saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] == false end,
                 },
             }
         },
@@ -1304,6 +1328,38 @@ function AutoCategory.AddonMenuInit()
                 },
             },
         }, 
+		-- Gamepad settings
+		{
+            type = "submenu",
+            name = SI_AC_MENU_SUBMENU_GAMEPAD_SETTING,
+            reference = "AC_SUBMENU_GAMEPAD_SETTING",
+            controls = { 
+                {
+                    type = "description",
+                    text = L(SI_AC_MENU_GMS_DESCRIPTION_TIP),
+                },
+                {
+                    type = "divider",
+                },
+                {
+                    type = "checkbox",
+                    name = SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD,
+                    tooltip = SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD_TOOLTIP,
+                    requiresReload = true,
+                    getFunc = function() return saved.general["ENABLE_GAMEPAD"] end,
+                    setFunc = function(value) saved.general["ENABLE_GAMEPAD"] = value end,
+                },
+				{
+                    type = "checkbox",
+                    name = SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES,
+                    tooltip = SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES_TOOLTIP,
+                    requiresReload = false,
+                    getFunc = function() return saved.general["EXTENDED_GAMEPAD_SUPPLIES"] end,
+                    setFunc = function(value) saved.general["EXTENDED_GAMEPAD_SUPPLIES"] = value end,
+					disabled = function() return saved.general["ENABLE_GAMEPAD"] == false end,
+                },
+			},
+		},
 	}
     if not LAM then return end
 	LAM:RegisterAddonPanel("AC_CATEGORY_SETTINGS", panelData)

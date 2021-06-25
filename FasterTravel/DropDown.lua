@@ -27,11 +27,9 @@ local function Refresh(control,items,callback,getSelected)
 	return lookup
 end 
 
-local d = DropDown
+DropDown.Refresh = Refresh
 
-d.Refresh = Refresh
-
-FasterTravel.DropDown = d
+FasterTravel.DropDown = DropDown
 
 
 

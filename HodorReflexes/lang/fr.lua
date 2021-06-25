@@ -84,7 +84,7 @@ local strings = {
 	HR_MENU_ICONS_VISIBILITY_ANIM_TT = "Affiche les icônes animées. Note: désactiver cette fonction n'augmentera pas vos FPS.",
 
 	HR_MENU_ICONS_README1 = "Une icône personnalisée doit avoir une extension .dds (fichier au format DirectDraw Surface). La taille préférée est de 32x32 px.",
-	HR_MENU_ICONS_README2 = "Si vous souhaitez que votre icône soit visible à d'autres joueurs, il faut alors aider l'auteur de l'addon |cFFFF00@andy.s|r avec des pièces d'or (les dons d'argent réel sont également appréciés).\nIcône statique: 1M gold, icône animée: 2-3M gold en fonction du nombre de frames. Vous pouvez joindre l'auteur via Discord (|cFFFF00andy.s#2135|r) ou par le site esoui.com .",
+	HR_MENU_ICONS_README2 = "Si vous souhaitez que votre icône soit visible à d'autres joueurs, il faut alors aider l'auteur de l'addon |cFFFF00@andy.s|r avec des pièces d'or (les dons d'argent réel sont également appréciés).\nIcône statique: |cFFFF002M gold|r, icône animée: |cFFFF004M gold|r. Vous pouvez joindre l'auteur via Discord (|cFFFF00andy.s#2135|r) ou par le site esoui.com .",
 	HR_MENU_ICONS_README3 = "You can preview your name and icon below and send the generated LUA code alongside the icon file to |cFFFF00andy.s#2135|r via Discord (you may need to add me to friends first).",
 
 	HR_MENU_STYLE = "Style",
@@ -181,6 +181,11 @@ local strings = {
     HR_MOCK15 = "Tes APM sont trop basses pour ce combat.",
     HR_MOCK16 = "Ne t'inquète pas, nous ajouterons peux-être les succés de ce raid dans la boutique à couronnes.",
     HR_MOCK17 = "La folie c'est de faire toujours la même chose et de s'attendre à un résultat différent.",
+	-- check en.lua to translate new strings
+	HR_MOCK18 = "Tes APM sont trop basses pour ce combat.",
+	HR_MOCK19 = "Imagine mourir avec tous ces addons activés.",
+	HR_MOCK20 = "Vous êtes le maillon faible. Au revoir.",
+
     HR_MOCK_AA1 = "Imagine mourir dans du contenu vieux de six ans.",
     HR_MOCK_EU1 = "Pourquoi joues-tu sur le serveur EU ?",
     HR_MOCK_NORMAL1 = "Ce n'est même pas le mode vétéran...",

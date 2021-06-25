@@ -7,8 +7,11 @@ local Wayshrine = FasterTravel.Wayshrine
 local Transitus = FasterTravel.Transitus
 local Campaign = FasterTravel.Campaign
 local Utils = FasterTravel.Utils
+local Options = FasterTravel.Options
 
+local chat = FasterTravel.Utils.chat
 local empty_prefix = '   '
+local wayshrinesCache
 
 local function ShowWayshrineConfirm(data,isRecall)
 	local nodeIndex,name,refresh,clicked = data.nodeIndex,data.name,data.refresh,data.clicked
@@ -308,19 +311,19 @@ function MapTabWayshrines:init(control,locations,locationsLookup,recentList,favo
 
 	self.SetAllWSOrder = function(self, order)
 		local lookup = {
-			[Location.Data.AllWSOrder.TRADERS] =
+			[Options.AllWSOrder.TRADERS] =
 				function(x,y) -- sort by number of traders at the WS
 					return 	(y.traders_cnt or 0) < (x.traders_cnt or 0) or
 							(y.traders_cnt or 0) == (x.traders_cnt or 0) and
 							(x.barename or x.name) < (y.barename or y.name)
    					end,
-			[Location.Data.AllWSOrder.NAME] = Utils.SortByBareName -- sort alphabetically
+			[Options.AllWSOrder.NAME] = Utils.SortByBareName -- sort alphabetically
 		}
 		self.ws_order_func = lookup[order]
 	end
 	
 	self.Refresh = function(self,nodeIndex,isKeep)
-		_rowLookup.categories ={}
+		_rowLookup.categories = {}
 		_rowLookup.current = {}
 		_rowLookup.favourites = {}
 		_rowLookup.recent = {}
@@ -350,21 +353,14 @@ function MapTabWayshrines:init(control,locations,locationsLookup,recentList,favo
 
 		local curLoc = _locationsLookup[currentZoneIndex] or _locationsLookup["tamriel"]
 
-		local categories = {
-			{
-				name = GetString(FASTER_TRAVEL_WAYSHRINES_CATEGORY_RECENT),
-				data = recent,
-				hidden = not _first and self:IsCategoryHidden(1)
-			},
+		local categories = { 
 			{
 				name = GetString(FASTER_TRAVEL_WAYSHRINES_CATEGORY_FAVOURITES),
 				data = faves,
-				hidden = not _first and self:IsCategoryHidden(2)
 			},
 			{
 				name = string.format("%s (%s)", GetString(FASTER_TRAVEL_WAYSHRINES_CATEGORY_CURRENT), curLoc.name),
 				data = current,
-				hidden = not _first and self:IsCategoryHidden(3),
 				clicked=function(data,control,c)
 					HandleCategoryClicked(self,3,{zoneIndex=currentZoneIndex,mapIndex=currentMapIndex},currentlookup,data,control,c)
 					if self:IsCategoryHidden(3) == false and curLoc.click then
@@ -375,15 +371,27 @@ function MapTabWayshrines:init(control,locations,locationsLookup,recentList,favo
 			},
 			{
 				name = GetString(FASTER_TRAVEL_WAYSHRINES_CATEGORY_ALL),
-				hidden = not _first and self:IsCategoryHidden(4)
 			}
 		}
 
-		PopulateLookup(recentlookup,recent)
+		table.insert(categories, FasterTravel.settings.recentsPosition, -- either 1 or 2
+			{
+				name = GetString(FASTER_TRAVEL_WAYSHRINES_CATEGORY_RECENT),
+				data = recent,
+			}
+		)
 
-		PopulateLookup(favouriteslookup,faves)
-
-		PopulateLookup(currentlookup,current)
+		for i = 1, 4 do 
+			categories[i].hidden = not _first and self:IsCategoryHidden(i)
+		end
+		
+		PopulateLookup(recentlookup, recent)
+		if FasterTravel.settings.sortFav then
+			table.sort(faves, self.ws_order_func)
+		end
+		PopulateLookup(favouriteslookup, faves)
+		table.sort(current, self.ws_order_func)
+		PopulateLookup(currentlookup, current)
 
 		local zoneLookup = _rowLookup.zone
 
@@ -393,13 +401,12 @@ function MapTabWayshrines:init(control,locations,locationsLookup,recentList,favo
 
 		if locations ~= nil then
 			local allshrines = {}
-
 			local lcount = #locations
 
 			for i,item in ipairs(locations) do
 				local id = i + nonZoneCategoriesCount
 				local lookup = {}
-				zoneLookup[item.zoneIndex]=lookup
+				zoneLookup[item.zoneIndex] = lookup
 
 				local data = GetZoneWayshrinesData({
 					nodeIndex = nodeIndex,
@@ -411,20 +418,21 @@ function MapTabWayshrines:init(control,locations,locationsLookup,recentList,favo
 				})
 
 				table.sort(data, self.ws_order_func)
-				PopulateLookup(lookup,data)
+				PopulateLookup(lookup, data)
 				Utils.copy(data, allshrines)
 
 				local category = {
 					name = item.name,
 					hidden = _first or self:IsCategoryHidden(id),
-					data=data,
-					clicked= function(data,control,c)
-						HandleCategoryClicked(self,id,item,lookup,data,control,c)
+					data = data,
+					clicked = function(data,control,c)
+						local ii
+						HandleCategoryClicked(self, id, item, lookup, data, control, c)
 						if item.click then
 							item.click()
 						end
 						if not self:IsCategoryHidden(id) then
-							for ii=nonZoneCategoriesCount+1,lcount do
+							for ii = nonZoneCategoriesCount + 1, lcount do
 								if ii ~= id and self:IsCategoryHidden(ii) == false then
 									self:SetCategoryHidden(ii,true)
 								end
@@ -462,7 +470,7 @@ function MapTabWayshrines:init(control,locations,locationsLookup,recentList,favo
 
 	self.HideAllZoneCategories = function(self)
 		for i, loc in ipairs(locations) do
-			self:SetCategoryHidden(i+nonZoneCategoriesCount,true)
+			self:SetCategoryHidden(i + nonZoneCategoriesCount, true)
 		end
 	end
 
@@ -494,4 +502,47 @@ end
 
 function MapTabWayshrines:RowMouseClicked(...)
 
+end
+
+function MapTabWayshrines:ChangeFilter(listcontrol, editbox)
+	local substring = string.lower(editbox:GetText())
+	local i, itemIndex, item
+	if substring == "" then
+		-- reinstate default text
+		ZO_EditDefaultText_Initialize(editbox, GetString(FASTER_TRAVEL_WAYSHRINES_SEARCH))
+	else
+		-- remove default text
+		ZO_EditDefaultText_Disable(editbox)
+	end
+	local show_all = string.len(substring) < 3
+	-- unhide All unconditionally 
+	ZO_ScrollList_ShowCategory(listcontrol, nonZoneCategoriesCount)
+	-- and Recent, Favourites, Zone only if no search conducted yet
+	for i = 1, nonZoneCategoriesCount - 1 do
+		if show_all then 
+			ZO_ScrollList_ShowCategory(listcontrol, i)
+		else
+			ZO_ScrollList_HideCategory(listcontrol, i)
+		end
+	end
+	wayshrinesCache = wayshrinesCache or
+		ZO_ScrollList_GetDataList(listcontrol)
+	for itemIndex, item in ipairs(wayshrinesCache) do
+		if item.categoryId == nonZoneCategoriesCount then
+			if (item.data.barename and string.find(string.lower(item.data.barename), substring) or
+				item.data.name and string.find(string.lower(item.data.name), substring)) then
+				chat(3, "%s in %s (%s)", substring, item.data.name, itemIndex)
+				ZO_ScrollList_ShowData(listcontrol, itemIndex)
+			else
+				ZO_ScrollList_HideData(listcontrol, itemIndex)
+			end
+		end
+	end
+	ZO_ScrollList_ScrollDataIntoView(listcontrol, 1, nil, true)
+end
+
+function MapTabWayshrines:ResetFilter(editbox)
+	editbox:SetText("")
+	editbox:LoseFocus()
+	ZO_EditDefaultText_Initialize(editbox, GetString(FASTER_TRAVEL_WAYSHRINES_SEARCH))
 end

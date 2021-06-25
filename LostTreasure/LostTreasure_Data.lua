@@ -1,3 +1,5 @@
+local LostTreasure = LostTreasure
+
 --[[
 How to get subZone pins:
 
@@ -8,7 +10,7 @@ Then swap to subZone and use this command
 /script d(string.format("mapId %d, mapName %s, X %.4f, Y %.4f", GetCurrentMapId(), GetMapName(), GetMapPlayerWaypoint()))
 ]]
 
-local LOST_TREASURE_DATA = {
+LostTreasure.LOST_TREASURE_DATA = {
 -- Khenarthi's Roost
 	[258] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
@@ -23,14 +25,14 @@ local LOST_TREASURE_DATA = {
 -- Auridon
 	[143] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.4934, 0.8891, "treasuremap_auridon_01", 43625 }, -- Auridon Treasure Map I
-			{ 0.4850, 0.6411, "treasuremap_auridon_02", 43626 }, -- Auridon Treasure Map II
-			{ 0.4419, 0.5074, "treasuremap_auridon_03", 43627 }, -- Auridon Treasure Map III
+			{ 0.4931, 0.8888, "treasuremap_auridon_01", 43625 }, -- Auridon Treasure Map I
+			{ 0.4822, 0.6403, "treasuremap_auridon_02", 43626 }, -- Auridon Treasure Map II
+			{ 0.4392, 0.5035, "treasuremap_auridon_03", 43627 }, -- Auridon Treasure Map III
 			{ 0.6641, 0.4114, "treasuremap_auridon_04", 43628 }, -- Auridon Treasure Map IV
-			{ 0.5000, 0.2525, "treasuremap_auridon_05", 43629 }, -- Auridon Treasure Map V
+			{ 0.5002, 0.2530, "treasuremap_auridon_05", 43629 }, -- Auridon Treasure Map V
 			{ 0.3360, 0.1280, "treasuremap_auridon_06", 43630 }, -- Auridon Treasure Map VI
 			{ 0.6881, 0.9678, "treasuremap_ce_aldmeri_auridon_02", 44927 }, -- Auridon CE Treasure Map
-			{ 0.2000, 0.2180, "glenmoral_weapon_auridon_map", 153640 }, -- Glenmoril Wyrd Treasure Map: Auridon
+			{ 0.2003, 0.2180, "glenmoral_weapon_auridon_map", 153640 }, -- Glenmoril Wyrd Treasure Map: Auridon
 		},
 		[LOST_TREASURE_PIN_TYPE_SURVEYS] = {
 			{ 0.4085, 0.7007, "auridon_survey_clothier", 57738 }, -- Clothier Survey: Auridon
@@ -56,12 +58,12 @@ local LOST_TREASURE_DATA = {
 -- Grahtwood
 	[9] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.3951, 0.6750, "treasuremap_grahtwood_01", 43631 }, -- Grahtwood Treasure Map I
+			{ 0.3951, 0.6749, "treasuremap_grahtwood_01", 43631 }, -- Grahtwood Treasure Map I
 			{ 0.6496, 0.4778, "treasuremap_grahtwood_02", 43632 }, -- Grahtwood Treasure Map II
-			{ 0.6290, 0.3810, "treasuremap_grahtwood_03", 43633 }, -- Grahtwood Treasure Map III
-			{ 0.4735, 0.3407, "treasuremap_grahtwood_04", 43634 }, -- Grahtwood Treasure Map IV
+			{ 0.6292, 0.3811, "treasuremap_grahtwood_03", 43633 }, -- Grahtwood Treasure Map III
+			{ 0.4734, 0.3406, "treasuremap_grahtwood_04", 43634 }, -- Grahtwood Treasure Map IV
 			{ 0.3550, 0.3562, "treasuremap_grahtwood_05", 43635 }, -- Grahtwood Treasure Map V
-			{ 0.4696, 0.4718, "treasuremap_grahtwood_06", 43636 }, -- Grahtwood Treasure Map VI
+			{ 0.4699, 0.4724, "treasuremap_grahtwood_06", 43636 }, -- Grahtwood Treasure Map VI
 			{ 0.3128, 0.6006, "treasuremap_ce_aldmeri_grahtwood_03", 44937 }, -- Grahtwood CE Treasure Map
 		},
 		[LOST_TREASURE_PIN_TYPE_SURVEYS] = {
@@ -76,7 +78,7 @@ local LOST_TREASURE_DATA = {
 	-- SubPin: Eldenroot
 	[445] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.8820, 0.4106, "treasuremap_grahtwood_02", 43632 }, -- Grahtwood Treasure Map II
+			{ 0.8862, 0.4054, "treasuremap_grahtwood_02", 43632 }, -- Grahtwood Treasure Map II
 		},
 	},
 -- Greenshade
@@ -84,10 +86,10 @@ local LOST_TREASURE_DATA = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
 			{ 0.6543, 0.8344, "treasuremap_greenshade_01", 43637 }, -- Greenshade Treasure Map I
 			{ 0.7222, 0.7418, "treasuremap_greenshade_02", 43638 }, -- Greenshade Treasure Map II
-			{ 0.3632, 0.5050, "treasuremap_greenshade_03", 43639 }, -- Greenshade Treasure Map III
+			{ 0.3636, 0.5055, "treasuremap_greenshade_03", 43639 }, -- Greenshade Treasure Map III
 			{ 0.3405, 0.3237, "treasuremap_greenshade_04", 43640 }, -- Greenshade Treasure Map IV
-			{ 0.2501, 0.1499, "treasuremap_greenshade_05", 43641 }, -- Greenshade Treasure Map V
-			{ 0.5974, 0.3833, "treasuremap_greenshade_06", 43642 }, -- Greenshade Treasure Map VI
+			{ 0.2502, 0.1494, "treasuremap_greenshade_05", 43641 }, -- Greenshade Treasure Map V
+			{ 0.5970, 0.3832, "treasuremap_greenshade_06", 43642 }, -- Greenshade Treasure Map VI
 			{ 0.5931, 0.8112, "treasuremap_ce_aldmeri_greenshade_04", 44938 }, -- Greenshade CE Treasure Map
 		},
 		[LOST_TREASURE_PIN_TYPE_SURVEYS] = {
@@ -102,12 +104,12 @@ local LOST_TREASURE_DATA = {
 -- Malabal Tor
 	[22] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.2028, 0.4993, "treasuremap_malabaltor_01", 43643 }, -- Malabal Tor Treasure Map I
-			{ 0.0549, 0.4775, "treasuremap_malabaltor_02", 43644 }, -- Malabal Tor Treasure Map II
-			{ 0.5015, 0.6819, "treasuremap_malabaltor_03", 43645 }, -- Malabal Tor Treasure Map III
+			{ 0.2029, 0.4994, "treasuremap_malabaltor_01", 43643 }, -- Malabal Tor Treasure Map I
+			{ 0.0537, 0.4782, "treasuremap_malabaltor_02", 43644 }, -- Malabal Tor Treasure Map II
+			{ 0.5015, 0.6817, "treasuremap_malabaltor_03", 43645 }, -- Malabal Tor Treasure Map III
 			{ 0.6534, 0.7034, "treasuremap_malabaltor_04", 43646 }, -- Malabal Tor Treasure Map IV
-			{ 0.8000, 0.2860, "treasuremap_malabaltor_05", 43647 }, -- Malabal Tor Treasure Map V
-			{ 0.6627, 0.2306, "treasuremap_malabaltor_06", 43648 }, -- Malabal Tor Treasure Map VI
+			{ 0.7995, 0.2861, "treasuremap_malabaltor_05", 43647 }, -- Malabal Tor Treasure Map V
+			{ 0.6623, 0.2307, "treasuremap_malabaltor_06", 43648 }, -- Malabal Tor Treasure Map VI
 			{ 0.1238, 0.5252, "treasuremap_ce_aldmeri_malbator_05", 44940 }, -- Malabal Tor CE Treasure Map
 			{ 0.8250, 0.4460, "glenmoral_weapon_malabaltor_map", 153644 }, --Glenmoril Wyrd Treasure Map: Malabal Tor
 		},
@@ -123,19 +125,19 @@ local LOST_TREASURE_DATA = {
 	-- SubPin: Velynharbor
 	[275] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.2089, 0.3581, "treasuremap_malabaltor_02", 43644 }, -- Malabal Tor Treasure Map II
+			{ 0.2078, 0.3602, "treasuremap_malabaltor_02", 43644 }, -- Malabal Tor Treasure Map II
 			{ 0.5132, 0.5649, "treasuremap_ce_aldmeri_malbator_05", 44940 }, -- Malabal Tor CE Treasure Map
 		},
 	},
 -- Reaper’s March
 	[256] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.3781, 0.4313, "treasuremap_reapersmarch_01", 43649 }, -- Reaper's March Treasure Map I
-			{ 0.3344, 0.1270, "treasuremap_reapersmarch_02", 43650 }, -- Reaper's March Treasure Map II
+			{ 0.3786, 0.4317, "treasuremap_reapersmarch_01", 43649 }, -- Reaper's March Treasure Map I
+			{ 0.3343, 0.1275, "treasuremap_reapersmarch_02", 43650 }, -- Reaper's March Treasure Map II
 			{ 0.2705, 0.6514, "treasuremap_reapersmarch_03", 43651 }, -- Reaper's March Treasure Map III
-			{ 0.4414, 0.6923, "treasuremap_reapersmarch_04", 43652 }, -- Reaper's March Treasure Map IV
-			{ 0.5510, 0.4160, "treasuremap_reapersmarch_05", 43653 }, -- Reaper's March Treasure Map V
-			{ 0.6687, 0.2401, "treasuremap_reapersmarch_06", 43654 }, -- Reaper's March Treasure Map VI
+			{ 0.4413, 0.6922, "treasuremap_reapersmarch_04", 43652 }, -- Reaper's March Treasure Map IV
+			{ 0.5507, 0.4163, "treasuremap_reapersmarch_05", 43653 }, -- Reaper's March Treasure Map V
+			{ 0.6686, 0.2402, "treasuremap_reapersmarch_06", 43654 }, -- Reaper's March Treasure Map VI
 			{ 0.4087, 0.5434, "treasuremap_ce_aldmeri_reapersmarch_06", 44941 }, -- Reaper's March CE Treasure Map
 			{ 0.2980, 0.1540, "glenmoral_weapon_reapersmarch_map", 153645 }, -- Glenmoril Wyrd Treasure Map: Reaper's March
 		},
@@ -157,8 +159,8 @@ local LOST_TREASURE_DATA = {
 -- Bleakrock Isle
 	[74] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.4383, 0.4067, "treasuremap_bleakrock_001", 43699 }, -- Bleakrock Treasure Map I
-			{ 0.4264, 0.2201, "treasuremap_bleakrock_002", 43700 }, -- Bleakrock Treasure Map II
+			{ 0.4389, 0.4077, "treasuremap_bleakrock_001", 43699 }, -- Bleakrock Treasure Map I
+			{ 0.4264, 0.2203, "treasuremap_bleakrock_002", 43700 }, -- Bleakrock Treasure Map II
 			{ 0.4630, 0.6490, "treasuremap_ce_ebonheart_bleakrock_01a", 44931 }, -- Bleakrock CE Treasure Map
 		},
 	},
@@ -210,11 +212,11 @@ local LOST_TREASURE_DATA = {
 	[13] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
 			{ 0.2599, 0.5507, "treasuremap_deshaan_001", 43661 }, -- Deshaan Treasure Map I
-			{ 0.1840, 0.4724, "treasuremap_deshaan_002", 43662 }, -- Deshaan Treasure Map II
+			{ 0.1845, 0.4724, "treasuremap_deshaan_002", 43662 }, -- Deshaan Treasure Map II
 			{ 0.4631, 0.4056, "treasuremap_deshaan_003", 43663 }, -- Deshaan Treasure Map III
-			{ 0.7589, 0.5615, "treasuremap_deshaan_004", 43664 }, -- Deshaan Treasure Map IV
+			{ 0.7592, 0.5618, "treasuremap_deshaan_004", 43664 }, -- Deshaan Treasure Map IV
 			{ 0.8996, 0.5498, "treasuremap_deshaan_005", 43665 }, -- Deshaan Treasure Map V
-			{ 0.7929, 0.5094, "treasuremap_deshaan_006", 43666 }, -- Deshaan Treasure Map VI
+			{ 0.7932, 0.5098, "treasuremap_deshaan_006", 43666 }, -- Deshaan Treasure Map VI
 			{ 0.3529, 0.6400, "treasuremap_ce_ebonheart_deshaan_03", 44934 }, -- Deshaan CE Treasure Map
 		},
 		[LOST_TREASURE_PIN_TYPE_SURVEYS] = {
@@ -268,11 +270,11 @@ local LOST_TREASURE_DATA = {
 -- Eastmarch
 	[61] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.4410, 0.3740, "treasuremap_eastmarch_01", 43673 }, -- Eastmarch Treasure Map I
-			{ 0.3134, 0.4589, "treasuremap_eastmarch_02", 43674 }, -- Eastmarch Treasure Map II
+			{ 0.4413, 0.3742, "treasuremap_eastmarch_01", 43673 }, -- Eastmarch Treasure Map I
+			{ 0.3134, 0.4590, "treasuremap_eastmarch_02", 43674 }, -- Eastmarch Treasure Map II
 			{ 0.4300, 0.5918, "treasuremap_eastmarch_03", 43675 }, -- Eastmarch Treasure Map III
-			{ 0.3666, 0.5989, "treasuremap_eastmarch_04", 43676 }, -- Eastmarch Treasure Map IV
-			{ 0.7369, 0.6603, "treasuremap_eastmarch_05", 43677 }, -- Eastmarch Treasure Map V
+			{ 0.3667, 0.5990, "treasuremap_eastmarch_04", 43676 }, -- Eastmarch Treasure Map IV
+			{ 0.7375, 0.6607, "treasuremap_eastmarch_05", 43677 }, -- Eastmarch Treasure Map V
 			{ 0.6059, 0.5391, "treasuremap_eastmarch_06", 43678 }, -- Eastmarch Treasure Map VI
 			{ 0.7136, 0.5833, "treasuremap_ce_ebonheart_eastmarch_05", 44935 }, -- Eastmarch CE Treasure Map
 			{ 0.4310, 0.5870, "glenmoral_weapon_eastmarch_map", 153643 }, -- Glenmoril Wyrd Treasure Map: Eastmarch
@@ -291,10 +293,10 @@ local LOST_TREASURE_DATA = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
 			{ 0.7412, 0.3782, "treasuremap_therift_01", 43679 }, -- The Rift Treasure Map I
 			{ 0.4715, 0.4337, "treasuremap_therift_02", 43680 }, -- The Rift Treasure Map II
-			{ 0.2271, 0.3629, "treasuremap_therift_03", 43681 }, -- The Rift Treasure Map III
-			{ 0.4794, 0.5562, "treasuremap_therift_04", 43682 }, -- The Rift Treasure Map IV
-			{ 0.8386, 0.5718, "treasuremap_therift_05", 43683 }, -- The Rift Treasure Map V
-			{ 0.7511, 0.6392, "treasuremap_therift_06", 43684 }, -- The Rift Treasure Map VI
+			{ 0.2274, 0.3631, "treasuremap_therift_03", 43681 }, -- The Rift Treasure Map III
+			{ 0.4791, 0.5563, "treasuremap_therift_04", 43682 }, -- The Rift Treasure Map IV
+			{ 0.8385, 0.5716, "treasuremap_therift_05", 43683 }, -- The Rift Treasure Map V
+			{ 0.7514, 0.6394, "treasuremap_therift_06", 43684 }, -- The Rift Treasure Map VI
 			{ 0.5813, 0.6096, "treasuremap_ce_ebonheart_rift_06", 44947 }, -- The Rift CE Treasure Map
 		},
 		[LOST_TREASURE_PIN_TYPE_SURVEYS] = {
@@ -315,14 +317,14 @@ local LOST_TREASURE_DATA = {
 	-- SubPin: Nimalten
 	[543] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.4157, 0.3239, "treasuremap_therift_03", 43681 }, -- The Rift Treasure Map III
+			{ 0.4156, 0.3237, "treasuremap_therift_03", 43681 }, -- The Rift Treasure Map III
 		},
 	},
 -- Stros M'Kai
 	[201] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
 			{ 0.5458, 0.6406, "treasuremap_strosmkai_001", 43691 }, -- Stros M'Kai Treasure Map I
-			{ 0.0989, 0.6127, "treasuremap_strosmkai_002", 43692 }, -- Stros M'Kai Treasure Map II
+			{ 0.0980, 0.6130, "treasuremap_strosmkai_002", 43692 }, -- Stros M'Kai Treasure Map II
 			{ 0.7000, 0.3300, "treasuremap_ce_daggerfall_stros_01a", 44946 }, -- Stros M'Kai CE Treasure Map
 		},
 	},
@@ -350,13 +352,13 @@ local LOST_TREASURE_DATA = {
 	[1] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
 			{ 0.5265, 0.7618, "treasuremap_glenumbra_001", 43507 }, -- Glenumbra Treasure Map I
-			{ 0.4920, 0.4542, "treasuremap_glenumbra_002", 43525 }, -- Glenumbra Treasure Map II
+			{ 0.4922, 0.4541, "treasuremap_glenumbra_002", 43525 }, -- Glenumbra Treasure Map II
 			{ 0.6595, 0.2617, "treasuremap_glenumbra_003", 43527 }, -- Glenumbra Treasure Map III
 			{ 0.7337, 0.5285, "treasuremap_glenumbra_004", 43600 }, -- Glenumbra Treasure Map IV
-			{ 0.2752, 0.5285, "treasuremap_glenumbra_005", 43509 }, -- Glenumbra Treasure Map V
-			{ 0.5157, 0.2545, "treasuremap_glenumbra_006", 43526 }, -- Glenumbra Treasure Map VI
+			{ 0.2766, 0.5282, "treasuremap_glenumbra_005", 43509 }, -- Glenumbra Treasure Map V
+			{ 0.5154, 0.2558, "treasuremap_glenumbra_006", 43526 }, -- Glenumbra Treasure Map VI
 			{ 0.7030, 0.4668, "treasuremap_ce_daggerfall_glenumbra_02", 44936 }, -- Glenumbra CE Treasure Map
-			{ 0.6060, 0.2040, "glenmoral_weapon_daggerfall_map", 153642 }, --Glenmoril Wyrd Treasure Map: Daggerfall
+			{ 0.6070, 0.2047, "glenmoral_weapon_daggerfall_map", 153642 }, --Glenmoril Wyrd Treasure Map: Daggerfall
 		},
 		[LOST_TREASURE_PIN_TYPE_SURVEYS] = {
 			{ 0.7158, 0.3056, "glenumbra_survey_enchanter", 57734 }, -- Enchanter Survey: Glenumbra
@@ -370,12 +372,12 @@ local LOST_TREASURE_DATA = {
 -- Stormhaven
 	[12] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.2316, 0.5228, "treasuremap_stormhaven_001", 43601 }, -- Stormhaven Treasure Map I
+			{ 0.2313, 0.5227, "treasuremap_stormhaven_001", 43601 }, -- Stormhaven Treasure Map I
 			{ 0.2569, 0.3466, "treasuremap_stormhaven_002", 43602 }, -- Stormhaven Treasure Map II
-			{ 0.4027, 0.4735, "treasuremap_stormhaven_003", 43603 }, -- Stormhaven Treasure Map III
+			{ 0.4029, 0.4737, "treasuremap_stormhaven_003", 43603 }, -- Stormhaven Treasure Map III
 			{ 0.4194, 0.5927, "treasuremap_stormhaven_004", 43604 }, -- Stormhaven Treasure Map IV
-			{ 0.6903, 0.5011, "treasuremap_stormhaven_005", 43605 }, -- Stormhaven Treasure Map V
-			{ 0.7986, 0.5194, "treasuremap_stormhaven_006", 43606 }, -- Stormhaven Treasure Map VI
+			{ 0.6905, 0.5019, "treasuremap_stormhaven_005", 43605 }, -- Stormhaven Treasure Map V
+			{ 0.7986, 0.5197, "treasuremap_stormhaven_006", 43606 }, -- Stormhaven Treasure Map VI
 			{ 0.4750, 0.4470, "treasuremap_ce_daggerfall_stormhaven_03", 44945 }, -- Stormhaven CE Treasure Map
 		},
 		[LOST_TREASURE_PIN_TYPE_SURVEYS] = {
@@ -420,11 +422,11 @@ local LOST_TREASURE_DATA = {
 			{ 0.3827, 0.6997, "treasuremap_alikr_001", 43613 }, -- Alik'r Treasure Map I
 			{ 0.1135, 0.5218, "treasuremap_alikr_002", 43614 }, -- Alik'r Treasure Map II
 			{ 0.6292, 0.6313, "treasuremap_alikr_003", 43615 }, -- Alik'r Treasure Map III
-			{ 0.5863, 0.2559, "treasuremap_alikr_004", 43616 }, -- Alik'r Treasure Map IV
-			{ 0.7865, 0.5256, "treasuremap_alikr_005", 43617 }, -- Alik'r Treasure Map V
-			{ 0.7176, 0.4692, "treasuremap_alikr_06", 43618 }, -- Alik'r Treasure Map VI
+			{ 0.5867, 0.2562, "treasuremap_alikr_004", 43616 }, -- Alik'r Treasure Map IV
+			{ 0.7881, 0.5260, "treasuremap_alikr_005", 43617 }, -- Alik'r Treasure Map V
+			{ 0.7205, 0.4691, "treasuremap_alikr_06", 43618 }, -- Alik'r Treasure Map VI
 			{ 0.3246, 0.3679, "treasuremap_ce_daggerfall_alikr_05", 44926 }, -- Alik'r CE Treasure Map
-			{ 0.8540, 0.5560, "glenmoral_weapon_alikr_map", 153639 }, -- Glenmoril Wyrd Treasure Map: Alik'r
+			{ 0.8541, 0.5570, "glenmoral_weapon_alikr_map", 153639 }, -- Glenmoril Wyrd Treasure Map: Alik'r
 		},
 		[LOST_TREASURE_PIN_TYPE_SURVEYS] = {
 			{ 0.6176, 0.6096, "alikr_survey_clothier", 57762 }, -- Clothier Survey: Alik'r
@@ -444,7 +446,7 @@ local LOST_TREASURE_DATA = {
 	-- SubPin: Kozanset
 	[538] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.2260, 0.5964, "treasuremap_alikr_06", 43618 }, -- Alik'r Treasure Map VI
+			{ 0.2252, 0.5950, "treasuremap_alikr_06", 43618 }, -- Alik'r Treasure Map VI
 		},
 	},
 -- Bangkorai
@@ -477,11 +479,11 @@ local LOST_TREASURE_DATA = {
 -- Coldharbour
 	[255] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.4069, 0.8320, "treasuremap_coldharbour_01", 43685 }, -- Coldharbour Treasure Map I
-			{ 0.4097, 0.5680, "treasuremap_coldharbour_02", 43686 }, -- Coldharbour Treasure Map II
-			{ 0.6036, 0.6927, "treasuremap_coldharbour_03", 43687 }, -- Coldharbour Treasure Map III
-			{ 0.7559, 0.7761, "treasuremap_coldharbour_04", 43688 }, -- Coldharbour Treasure Map IV
-			{ 0.4326, 0.4551, "treasuremap_coldharbour_05", 43689 }, -- Coldharbour Treasure Map V
+			{ 0.4072, 0.8319, "treasuremap_coldharbour_01", 43685 }, -- Coldharbour Treasure Map I
+			{ 0.4102, 0.5680, "treasuremap_coldharbour_02", 43686 }, -- Coldharbour Treasure Map II
+			{ 0.6037, 0.6923, "treasuremap_coldharbour_03", 43687 }, -- Coldharbour Treasure Map III
+			{ 0.7559, 0.7763, "treasuremap_coldharbour_04", 43688 }, -- Coldharbour Treasure Map IV
+			{ 0.4327, 0.4552, "treasuremap_coldharbour_05", 43689 }, -- Coldharbour Treasure Map V
 			{ 0.4975, 0.3993, "treasuremap_coldharbour_06", 43690 }, -- Coldharbour Treasure Map VI
 			{ 0.5521, 0.4145, "treasuremap_1_coldharbor", 44932 }, -- Coldharbour CE Treasure Map
 		},
@@ -526,12 +528,12 @@ local LOST_TREASURE_DATA = {
 -- Craglorn
 	[1126] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.2866, 0.6212, "treasuremap_craglorn_01", 43721 }, -- Craglorn Treasure Map I
-			{ 0.4188, 0.4750, "treasuremap_craglorn_02", 43722 }, -- Craglorn Treasure Map II
-			{ 0.7054, 0.5591, "treasuremap_craglorn_03", 43723 }, -- Craglorn Treasure Map III
-			{ 0.6555, 0.6712, "treasuremap_craglorn_04", 43724 }, -- Craglorn Treasure Map IV
+			{ 0.2862, 0.6207, "treasuremap_craglorn_01", 43721 }, -- Craglorn Treasure Map I
+			{ 0.4184, 0.4744, "treasuremap_craglorn_02", 43722 }, -- Craglorn Treasure Map II
+			{ 0.7046, 0.5591, "treasuremap_craglorn_03", 43723 }, -- Craglorn Treasure Map III
+			{ 0.6554, 0.6708, "treasuremap_craglorn_04", 43724 }, -- Craglorn Treasure Map IV
 			{ 0.5964, 0.3684, "treasuremap_craglorn_05", 43725 }, -- Craglorn Treasure Map V
-			{ 0.3605, 0.4486, "treasuremap_craglorn_06", 43726 }, -- Craglorn Treasure Map VI
+			{ 0.3603, 0.4482, "treasuremap_craglorn_06", 43726 }, -- Craglorn Treasure Map VI
 		},
 		[LOST_TREASURE_PIN_TYPE_SURVEYS] = {
 			{ 0.6801, 0.3753, "craglorn1_survey_blacksmith", 57798 }, -- Blacksmith Survey: Craglorn I
@@ -600,8 +602,8 @@ local LOST_TREASURE_DATA = {
 -- Hew's Bane
 	[994] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.4140, 0.8445, "treasuremap_thievesguild_01", 43733 }, -- Hew's Bane Treasure Map I
-			{ 0.3865, 0.5805, "treasuremap_thievesguild_02", 43734 }, -- Hew's Bane Treasure Map II
+			{ 0.4142, 0.8445, "treasuremap_thievesguild_01", 43733 }, -- Hew's Bane Treasure Map I
+			{ 0.3840, 0.5771, "treasuremap_thievesguild_02", 43734 }, -- Hew's Bane Treasure Map II
 		},
 	},
 -- Gold Coast
@@ -643,15 +645,15 @@ local LOST_TREASURE_DATA = {
 -- Summerset
 	[1349] = {
 		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
-			{ 0.4870, 0.1970, "treasuremap_summerset_01", 43748 }, -- Summerset Treasure Map I
-			{ 0.7016, 0.6788, "treasuremap_summerset_03", 43749 }, -- Summerset Treasure Map II
-			{ 0.3670, 0.4005, "treasuremap_summerset_04", 43750 }, -- Summerset Treasure Map III
-			{ 0.3568, 0.5687, "treasuremap_summerset_07", 43751 }, -- Summerset Treasure Map IV
-			{ 0.1693, 0.3203, "treasuremap_summerset_09", 43752 }, -- Summerset Treasure Map V
-			{ 0.6721, 0.7827, "treasuremap_summerset_10_gjadilslegacy", 43753 }, -- Summerset Treasure Map VI
-			{ 0.5980, 0.5600, "treasuremap_summerset_02", 139007 }, -- Summerset CE Treasure Map I
-			{ 0.3350, 0.3240, "treasuremap_summerset_05", 139008 }, -- Summerset CE Treasure Map II
-			{ 0.2040, 0.6260, "treasuremap_summerset_06", 139009 }, -- Summerset CE Treasure Map III
+			{ 0.4869, 0.1972, "treasuremap_summerset_01", 43748 }, -- Summerset Treasure Map I
+			{ 0.7016, 0.6787, "treasuremap_summerset_03", 43749 }, -- Summerset Treasure Map II
+			{ 0.3672, 0.4004, "treasuremap_summerset_04", 43750 }, -- Summerset Treasure Map III
+			{ 0.3567, 0.5688, "treasuremap_summerset_07", 43751 }, -- Summerset Treasure Map IV
+			{ 0.1692, 0.3203, "treasuremap_summerset_09", 43752 }, -- Summerset Treasure Map V
+			{ 0.6722, 0.7828, "treasuremap_summerset_10_gjadilslegacy", 43753 }, -- Summerset Treasure Map VI
+			{ 0.5989, 0.5610, "treasuremap_summerset_02", 139007 }, -- Summerset CE Treasure Map I
+			{ 0.3357, 0.3246, "treasuremap_summerset_05", 139008 }, -- Summerset CE Treasure Map II
+			{ 0.2042, 0.6270, "treasuremap_summerset_06", 139009 }, -- Summerset CE Treasure Map III
 		},
 	},
 -- Murkmire
@@ -723,9 +725,43 @@ local LOST_TREASURE_DATA = {
 			{ 0.2240, 0.5868, "treasuremap_skyrim_05", 166039 }, -- Blackreach: Greymoor Caverns Treasure Map II
 		},
 	},
+-- Blackreach: Arkthzand Cavern
+	[1850] = {
+		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
+			{ 0.1572, 0.7236, "treasuremap_markarth_02", 171475 }, -- Blackreach: Arkthzand Cavern Treasure Map
+		},
+	},
+-- The Reach
+	[1814] = {
+		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
+			{ 0.3866, 0.6818, "treasuremap_markarth_01", 171474 }, -- The Reach Treasure Map
+		},
+	},
+-- Blackwood
+	[1887] = {
+		[LOST_TREASURE_PIN_TYPE_TREASURE] = {
+			{ 0.7649, 0.8541, "treasuremap_blackwood_08", 175544 }, -- Blackwood CE Treasure Map I
+			{ 0.6518, 0.4278, "treasuremap_blackwood_09", 175545 }, -- Blackwood CE Treasure Map II
+			{ 0.3182, 0.3547, "treasuremap_blackwood_08", 175546 }, -- Blackwood CE Treasure Map III
+			{ 0.3111, 0.6475, "treasuremap_blackwood_02", 175547 }, -- Blackwood Treasure Map I
+			{ 0.1493, 0.4411, "treasuremap_blackwood_03", 175548 }, -- Blackwood Treasure Map II
+			{ 0.8225, 0.7669, "treasuremap_blackwood_04", 175549 }, -- Blackwood Treasure Map III
+			{ 0.5549, 0.1495, "treasuremap_blackwood_05", 175550 }, -- Blackwood Treasure Map IV
+			{ 0.5276, 0.7004, "treasuremap_blackwood_06", 175551 }, -- Blackwood Treasure Map V
+			{ 0.3893, 0.1024, "treasuremap_blackwood_07", 175552 }, -- Blackwood Treasure Map VI
+		},
+		[LOST_TREASURE_PIN_TYPE_SURVEYS] = {
+			{ 0.5174, 0.6547, "blackwood_survey_blacksmith", 178464 }, -- Blacksmith Survey: Blackwood
+			{ 0.3716, 0.1853, "blackwood_survey_woodworker", 178465 }, -- Woodworker Survey: Blackwood
+			{ 0.7330, 0.5589, "blackwood_survey_jewelrycrafting", 178466 }, -- Jewelry Crafting Survey: Blackwood
+			{ 0.4515, 0.4494, "blackwood_survey_clothier", 178467 }, -- Clothier Survey: Blackwood
+			{ 0.5686, 0.1545, "blackwood_survey_enchanter", 178468 }, -- Enchanter Survey: Blackwood
+			{ 0.7333, 0.8096, "blackwood_survey_alchemist", 178469 }, -- Alchemist Survey: Blackwood
+		},
+	},
 }
 
-local LOST_TREASURE_BOOKID_TO_ITEMID =
+LostTreasure.LOST_TREASURE_BOOKID_TO_ITEMID =
 {
 	[5116] = 139408, -- Jewelry Crafting Survey: Stormhaven
 	[5124] = 139422, -- Jewelry Crafting Survey: Auridon
@@ -753,51 +789,43 @@ local LOST_TREASURE_BOOKID_TO_ITEMID =
 	[5156] = 139444, -- Jewelry Crafting Survey: Vvardenfell
 }
 
-local itemIdCache = { }
 
-local function CreatePinTypeItemIdCache(pinType)
+local itemIdCache = { }
+setmetatable(itemIdCache,{ __mode = "k" })
+
+local function GetPinTypeItemIds(pinType)
+	local itemIds = itemIdCache[pinType]
+	if itemIds then
+		return itemIds
+	end
+
 	itemIdCache[pinType] = { }
 
-	local tempIds = { }
-	for subZoneData, pinTypeData in pairs(LOST_TREASURE_DATA) do
-		for _pinType, pinData in pairs(pinTypeData) do
+	for subZoneData, pinTypeData in pairs(LostTreasure.LOST_TREASURE_DATA) do
+		for _pinType, _pinData in pairs(pinTypeData) do
 			if _pinType == pinType then
-				for _, _pinTypeData in ipairs(pinData) do
-					table.insert(tempIds, _pinTypeData[LOST_TREASURE_DATA_INDEX_ITEMID])
+				for _, _pinTypeData in ipairs(_pinData) do
+					itemIdCache[pinType][_pinTypeData[LOST_TREASURE_DATA_INDEX_ITEMID]] = true
 				end
 			end
 		end
 	end
 
-	-- Add boolean true to each key and clear temp table properly.
-	for i, itemId in ipairs(tempIds) do
-		itemIdCache[pinType][itemId] = true
-		tempIds[i] = nil -- to allow garbage collection
-	end
-end
-
-local function GetPinTypeItemIdCache(pinType)
-	if not itemIdCache[pinType] then
-		CreatePinTypeItemIdCache(pinType)
-	end
 	return itemIdCache[pinType]
 end
 
-
--- API
-------
-function LostTreasure_GetAllData()
-	return LOST_TREASURE_DATA
+function LostTreasure:GetAllData()
+	return self.LOST_TREASURE_DATA
 end
 
-function LostTreasure_GetItemIdsByPinType(pinType)
-	return LOST_TREASURE_PIN_TYPE_DATA[pinType] and GetPinTypeItemIdCache(pinType) or nil
+function LostTreasure:GetPinTypeItemIds(pinType)
+	return LOST_TREASURE_PIN_TYPE_DATA[pinType] and GetPinTypeItemIds(pinType) or nil
 end
 
-function LostTreasure_GetZoneData(mapId)
-	return LOST_TREASURE_DATA[mapId]
+function LostTreasure:GetMapIdData(mapId)
+	return self.LOST_TREASURE_DATA[mapId]
 end
 
-function LostTreasure_GetBookItemId(bookId)
-	return LOST_TREASURE_BOOKID_TO_ITEMID[bookId]
+function LostTreasure:GetBookItemId(bookId)
+	return self.LOST_TREASURE_BOOKID_TO_ITEMID[bookId]
 end

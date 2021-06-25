@@ -663,7 +663,7 @@ local function LLC_CraftSmithingItem(self, patternIndex, materialIndex, material
 			requestTable.pattern = 1
 		end
 	end
-
+	LibLazyCrafting.AddHomeMarker(setIndex, station)
 	table.insert(craftingQueue[self.addonName][station],requestTable)
 
 	--sortCraftQueue()
@@ -881,6 +881,7 @@ local function LLC_SmithingCraftInteraction( station, earliest, addon , position
 				currentCraftAttempt = {}
 				--sortCraftQueue()
 				LibLazyCrafting.craftInteract(nil, station)
+				LibLazyCrafting.DeleteHomeMarker(returnTable.setIndex, station)
 				return
 			end
 			if currentSkill~=maxSkill then
@@ -984,7 +985,7 @@ local function smithingCompleteNewItemHandler(station, bag, slot)
 			currentCraftAttempt.smithingQuantity = currentCraftAttempt.smithingQuantity - 1
 		end
 		if currentCraftAttempt.quality>1 then
-			--d("Improving #".. tostring(currentCraftAttempt.reference))
+			-- d("Improving #".. tostring(currentCraftAttempt.reference))
 
 			if removedRequest.dualEnchantingSmithing then
 				table.insert(removedRequest.equipInfo,
@@ -998,6 +999,8 @@ local function smithingCompleteNewItemHandler(station, bag, slot)
 				InternalImproveSmithingItem({["addonName"]=currentCraftAttempt.Requester}, BAG_BACKPACK, slot, currentCraftAttempt.quality, 
 					currentCraftAttempt.autocraft, currentCraftAttempt.reference, removedRequest)
 				LibLazyCrafting.SendCraftEvent(LLC_INITIAL_CRAFT_SUCCESS, station, currentCraftAttempt.Requester, removedRequest)
+				
+				LibLazyCrafting.DeleteHomeMarker(removedRequest.setIndex, station)
 				return
 			end
 
@@ -1006,6 +1009,8 @@ local function smithingCompleteNewItemHandler(station, bag, slot)
 			local copiedTable = LibLazyCrafting.tableShallowCopy(removedRequest)
 			copiedTable.slot = slot
 			copiedTable.smithingQuantity = 1
+			LibLazyCrafting.DeleteHomeMarker(removedRequest.setIndex, station)
+			LibLazyCrafting.AddHomeMarker(INDEX_NO_SET, station)
 			LibLazyCrafting.SendCraftEvent(LLC_INITIAL_CRAFT_SUCCESS, station, currentCraftAttempt.Requester, copiedTable)
 		else
 			removedRequest.bag = BAG_BACKPACK
@@ -1033,6 +1038,8 @@ local function smithingCompleteNewItemHandler(station, bag, slot)
 			local copiedTable = LibLazyCrafting.tableShallowCopy(removedRequest)
 			copiedTable.slot = slot
 			copiedTable.smithingQuantity = 1
+
+			LibLazyCrafting.DeleteHomeMarker(removedRequest.setIndex, station)
 			LibLazyCrafting.SendCraftEvent(LLC_CRAFT_SUCCESS, station, removedRequest.Requester, copiedTable )
 		end
 	else
@@ -1079,9 +1086,13 @@ local function SmithingCraftCompleteFunction(station)
 						copiedTable.smithingQuantity = 1
 						LibLazyCrafting.SendCraftEvent( LLC_INITIAL_CRAFT_SUCCESS,  station,copiedTable.Requester, copiedTable )
 					end
+
+					LibLazyCrafting.DeleteHomeMarker(returnTable.setIndex, station)
 					return
 				end
 				LibLazyCrafting.SendCraftEvent( LLC_CRAFT_SUCCESS,  station,returnTable.Requester, returnTable )
+
+				LibLazyCrafting.DeleteHomeMarker(returnTable.setIndex, station)
 			else
 				d("Bad request. No addon attached to crafting request")
 			end
@@ -1193,6 +1204,13 @@ local setInfo =
 	{{161451 , 161401, [6] = 161458, [7] =161263 },3,isSwapped=true}, -- 58 Stuhn's Favor
 	{{161825 , 161775, [6] = 161832, [7] =161637 },3,isSwapped=true}, -- 491 Dragon's Appetite
 	{{163287 , 163237, [6] = 163294, [7] =163099 },3,isSwapped=true}, -- 506 Spell Parasite
+	{{168747 , 168767, [6] = 168754, [7] =168782 },9,isSwapped=true}, -- 541 Aetherial Ascension
+	{{168373 , 168393, [6] = 168380, [7] =168408 },6,isSwapped=true}, -- 540 Legacy of Karth
+	{{167999 , 168019, [6] = 168006, [7] =168034 },3,isSwapped=true}, -- 539 Red Eagle's Fury
+	{{172455 , 172475, [6] = 172462, [7] =172490 },3,isSwapped=true}, -- 582 Hist Whisperer's Song
+	{{172829 , 172849, [6] = 172836, [7] =172864 },7,isSwapped=true}, -- 583 Heartland Conquerer
+	{{173203 , 173223, [6] = 173210, [7] =173238 },5,isSwapped=true}, -- 584 Diamond's Victory
+	
 }
 
 SetIndexes = {}
@@ -1454,16 +1472,48 @@ local function populateLookedForIds()
 end
 local varsDefault = {}
 
+local function miniaturizeSetInfo(toMinify)
+	local minifiedTable={} 
+	local numConsecutive,lastPosition = 0,1 
+	for i = 2, #toMinify do 
+		if toMinify[lastPosition]+numConsecutive+1==toMinify[i] then 
+			numConsecutive=numConsecutive+1 
+		else 
+			if numConsecutive>0 then 
+				table.insert(minifiedTable,tostring(toMinify[lastPosition])..","..numConsecutive)
+			else 
+				table.insert(minifiedTable,toMinify[lastPosition]) 
+			end 
+			numConsecutive=0 
+			lastPosition=i 
+		end
+	end 
+	if numConsecutive>0 then 
+		table.insert(minifiedTable,tostring(toMinify[lastPosition])..","..numConsecutive)
+	else
+		table.insert(minifiedTable,toMinify[lastPosition])
+	end
+	return minifiedTable
+end
+
 --- This was created mostly in slash commands. So variable names suck, locals are used rarely due to chat space limitations
 local function internalScrapeSetItemItemIds()
 	local apiVersionDifference = GetAPIVersion() - 100029
 	local estimatedTime = math.floor((20000*apiVersionDifference+200000)/300*25/1000)+3
-	d("LibLazyCrafting: Beginning scrape of set items. Estimated time: "..estimatedTime.."s")
-	local craftedItemIds = {} 
+	zo_callLater(function()
+	CHAT_SYSTEM:AddMessage("LibLazyCrafting: Beginning scrape of set items. Estimated time: "..estimatedTime.."s")
+	CHAT_SYSTEM:AddMessage("This is a (usually) once per major game update scan. Please wait until it it is complete.")end
+	, 25)
+	
+	local craftedItemIds = LibLazyCraftingSavedVars.SetIds or {}
 	for k, setTable in pairs(LibLazyCrafting.GetSetIndexes()) do 
-		craftedItemIds[setTable[4] ] = {} 
+		if craftedItemIds[setTable[4] ] ~= nil then
+			craftedItemIds[setTable[4] ].ignore = true
+		else
+			craftedItemIds[setTable[4] ] = {} 
+		end
 	end 
-	craftedItemIds[0]=nil 
+	craftedItemIds[0]= craftedItemIds[0] or nil
 	local excludedTraits={[9]=true,[19]=true,[20]=true,[10]=true,[24]=true,[27]=true,} 
 	local function isExcludedTrait(a) 
 		local trait=GetItemLinkTraitInfo(a)  
@@ -1485,49 +1535,35 @@ local function internalScrapeSetItemItemIds()
 			end
 			,25)
 		else 
-			local function miniSetfy(toMinify)
-				local minifiedTable={} 
-				local numConsecutive,lastPosition = 0,1 
-				for i = 2, #toMinify do 
-					if toMinify[lastPosition]+numConsecutive+1==toMinify[i] then 
-						numConsecutive=numConsecutive+1 
-					else 
-						if numConsecutive>0 then 
-							table.insert(minifiedTable,tostring(toMinify[lastPosition])..","..numConsecutive)
-						else 
-							table.insert(minifiedTable,toMinify[lastPosition]) 
-						end 
-						numConsecutive=0 
-						lastPosition=i 
-					end
-				end 
-				if numConsecutive>0 then 
-					table.insert(minifiedTable,tostring(toMinify[lastPosition])..","..numConsecutive)
-				else
-					table.insert(minifiedTable,toMinify[lastPosition])
-				end
-				return minifiedTable
-			end
+			
 			LibLazyCraftingSavedVars.SetIds = craftedItemIds
-			for k, v in pairs(LibLazyCraftingSavedVars.SetIds) do 
-				table.sort(v) 
-				LibLazyCraftingSavedVars.SetIds[k] = miniSetfy(v)
+			for k, v in pairs(LibLazyCraftingSavedVars.SetIds) do
+				if v.ignore then
+					v.ignore = nil
+				else
+					table.sort(v)
+					LibLazyCraftingSavedVars.SetIds[k] = miniaturizeSetInfo(v)
+				end
 			end
 			LibLazyCraftingSavedVars.SetIds[0] = itemSetIds[0]
 			LibLazyCraftingSavedVars.lastScrapedAPIVersion = GetAPIVersion()
 			d("LibLazyCrafting: Item Scrape complete")
 		end
 	end
-	
-	loopSpacer(1,200000+20000*apiVersionDifference,
+	local lowerEnd = 1
+	if LibLazyCraftingSavedVars.SetIds and LibLazyCraftingSavedVars.SetIds[506]~= nil then
+		lowerEnd = 163057
+	end
+
+	loopSpacer(lowerEnd,170000+12000*apiVersionDifference,
 		function(id)
 			local link="|H1:item:"..id..":0:50:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0|h|h" 
 			local itemType,specializedType=GetItemLinkItemType(link)
 			if itemType<3 and itemType>0 then
 				if (specializedType==300 or specializedType==0 or specializedType==250)and not isExcludedTrait(link) and GetItemLinkFlavorText(link)==""  then 
 					local isSet,_,_,_,_,setId=GetItemLinkSetInfo(link)
-					if craftedItemIds[setId] and isSet then
-						table.insert(craftedItemIds[setId],id) 
+					if craftedItemIds[setId] and not craftedItemIds[setId].ignore and isSet then
+						table.insert(craftedItemIds[setId],id)
 					end 
 				end 
 			end
@@ -1847,7 +1883,11 @@ local function initializeSetInfo()
 		LibLazyCraftingSavedVars = {}
 	end
 	local vars = LibLazyCraftingSavedVars
-	if not vars.SetIds or not vars.lastScrapedAPIVersion or vars.lastScrapedAPIVersion<GetAPIVersion() then
+	-- Last condition is bc I forgot to actually add them before the patch increase :(
+	if not vars.SetIds or not vars.lastScrapedAPIVersion or vars.lastScrapedAPIVersion<GetAPIVersion() or LibLazyCraftingSavedVars.SetIds[584] == nil then
+		if LibLazyCraftingSavedVars.SetIds and LibLazyCraftingSavedVars.SetIds[584] == nil then
+			d("LibLazyCrafting: Usually this scraping only runs once per major game patch, but this re-run is required to add the new sets from Blackwood.")
+		end
 		internalScrapeSetItemItemIds()
 	end
 end

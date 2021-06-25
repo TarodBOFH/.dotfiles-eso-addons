@@ -67,15 +67,13 @@ local function GetNodesZoneLookup(locations,func)
 	return lookup
 end
 
+Wayshrine.GetNodes = GetNodes
+Wayshrine.GetNodesByZoneIndex = GetNodesByZoneIndex
+Wayshrine.GetKnownWayshrinesByZoneIndex = GetKnownWayshrinesByZoneIndex
+Wayshrine.GetNodesZoneLookup = GetNodesZoneLookup
 
-local w = Wayshrine
-w.GetNodes = GetNodes
-w.GetNodesByZoneIndex = GetNodesByZoneIndex
-w.GetKnownWayshrinesByZoneIndex = GetKnownWayshrinesByZoneIndex
-w.GetNodesZoneLookup = GetNodesZoneLookup
-
-w.GetKnownNodesZoneLookup = function(locations)
+Wayshrine.GetKnownNodesZoneLookup = function(locations)
 	return GetNodesZoneLookup(locations,GetKnownWayshrinesByZoneIndex)
 end 
 
-FasterTravel.Wayshrine = w
+FasterTravel.Wayshrine = Wayshrine

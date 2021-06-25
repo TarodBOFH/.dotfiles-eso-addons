@@ -18,7 +18,7 @@ ASApp = {}
 -- Meta
 ASApp.name = 'AlphaStyle'
 ASApp.displayname = 'AlphaStyle'
-ASApp.version = 'v0.0.5'
+ASApp.version = 'v0.0.6'
 ASApp.author = 'mesota'
 
 -- Update Event Queue
@@ -269,7 +269,7 @@ function ASUI.UpdateStyleSetDetails()
 	
 	-- Update Outfit
 	local outfitName = "<No Outfit>"
-	local outfitManipulator = OFMGR:GetOutfitManipulator(style.OutfitId)
+	local outfitManipulator = OFMGR:GetOutfitManipulator(GAMEPLAY_ACTOR_CATEGORY_PLAYER, style.OutfitId)
 	
 	if outfitManipulator then
 		outfitName = outfitManipulator:GetOutfitName()

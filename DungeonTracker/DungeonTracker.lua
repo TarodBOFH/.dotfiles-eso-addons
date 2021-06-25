@@ -2,7 +2,7 @@
 -- Dungeon Tracker
 -------------------------------------------------------------------------------
 --[[
--- Copyright (c) 2015-2020 James A. Keene (Phinix) All rights reserved.
+-- Copyright (c) 2015-2021 James A. Keene (Phinix) All rights reserved.
 --
 -- Permission is hereby granted, free of charge, to any person obtaining
 -- a copy of this software and associated documentation (the "Software"),
@@ -36,7 +36,7 @@
 
 local DTAddon = _G['DTAddon']
 local L = DTAddon.Strings
-local version = '1.27'
+local version = '1.30'
 
 -- global functions:
 local pLF	= LibPhinixFunctions.LangFormat
@@ -421,7 +421,7 @@ local function ToggleActivityTooltip(control, op)
 			local desc = data.description
 			local lfgIndex = data.id
 			--Un-comment for new dungeon activity ID
-			--d(lfgIndex)
+		--	d(lfgIndex)
 
 			local levelMin = data.levelMin
 			local trackChar = DTAddon.SV.trackChar
@@ -527,7 +527,7 @@ local function HookDungeonTooltips()
 		local nIndex = pin:GetFastTravelNodeIndex()
 		local inode = CheckDungeons(nIndex)
 		--Un-comment for new dungeon node ID debug
-		--d("nIndex: "..nIndex)
+	--	d("nIndex: "..nIndex)
 
 		if inode ~= 0 then -- Add group dungeon tooltip info.
 			ModifyDungeonTooltip(pin, 1, inode)
@@ -1028,6 +1028,20 @@ local function InitValues()
 	stringOpts[1] = L.DTAddon_CTOPT1
 	stringOpts[2] = L.DTAddon_CTOPT2
 	stringOpts[3] = L.DTAddon_CTOPT3
+
+	local compDB = DTAddon.ASV.compDB
+	for i = 1, DTAddon.GDTotal do
+		if not compDB[i] then compDB[i] = {complete = {}, incomplete = {}} end
+	end
+	for i = 101, DTAddon.GDTotal + 100 do
+		if not compDB[i] then compDB[i] = {complete = {}, incomplete = {}, hmode = {}, timed = {}, ndeath = {}} end
+	end
+	for i = 201, DTAddon.PDTotal  + 200 do
+		if not compDB[i] then compDB[i] = {complete = {}, incomplete = {}} end
+	end
+	for i = 301, DTAddon.PDTotal  + 300 do
+		if not compDB[i] then compDB[i] = {complete = {}, incomplete = {}} end
+	end
 end
 
 local function OnAddonLoaded(event, addonName)

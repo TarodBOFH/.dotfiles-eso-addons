@@ -1,17 +1,18 @@
-## Title: Faster Travel
-## Author: XanDDemoX (Updated by SimonIllyan, upyachka, Valandil)
-## Version 2.4.3
-## APIVersion: 100032 100033
-## SavedVariables: FasterTravel_SavedVariables
-## DependsOn: LibWorldMapInfoTab
-## OptionalDependsOn: tom
-## OptionalDependsOn: pChat
+## Title: |c40FF40Faster|r Travel
+## Author: SimonIllyan, XanDDemoX, upyachka, Valandil
+## Version 2.5.10
+## APIVersion: 100035
+## Description: Better travel using wayshrines
+## SavedVariables: FasterTravel_Data
+## DependsOn: LibWorldMapInfoTab LibSavedVars>=60004 LibAddonMenu-2.0>=32
+## OptionalDependsOn: pChat tom LibZone>=072
 
 FasterTravel.lua
-ClassBase.lua
-List.lua
 lang/en.lua
 lang/$(language).lua
+Options.lua
+ClassBase.lua
+List.lua
 Utils.lua
 Location.lua
 LocationData.lua

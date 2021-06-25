@@ -59,11 +59,11 @@ function MapTab:AddCategories(data, tab) -- tab = 0 for Players, 1 for Wayshrine
 	local categoryId = 1
 	local parentId
 	
-	local showFirstCategory = (tab == 0) or FasterTravel.IsWfDpatchEnabled() 
+	local hideRecents = (tab == 1) and not FasterTravel.settings.recentsEnabled 
 	local categories = {}
 	
 	for i,item in ipairs(data) do 
-		if showFirstCategory or i>1 then
+		if i ~= FasterTravel.settings.recentsPosition or not hideRecents then
 			categories[i] = self:AddCategory(categoryId,item)
 			if #item.data > 0 then
 				self.control:AddEntries(self.control.list,item.data,1,categoryId)

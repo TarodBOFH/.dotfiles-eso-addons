@@ -1,14 +1,74 @@
 local IDENTIFIER = "Notifications"
 
-local NOTIFICATION_ICON_PATH = 1
-local NOTIFICATION_X = 2
-local NOTIFICATION_Y = 3
-local NOTIFICATION_ZONE = 4
-local NOTIFICATION_MAP_ID = 5
-local NOTIFICATION_ITEM_ID = 6
-local NOTIFICATION_ITEM_NAME = 7
-local NOTIFICATION_TREASURE_MAP = 8
-local NOTIFICATION_ADDON_VERSION = 9
+-- Mining
+------------
+local Mining = ZO_InitializingObject:Subclass()
+
+function Mining:Initialize(savedVars, logger)
+	self.savedVars = savedVars
+	self.logger = logger:Create("Mining")
+
+	local currentVersion = GetAPIVersion()
+	local currentTimeStamp = GetTimeStamp()
+	local differenceTimeStamp = GetDiffBetweenTimeStamps(currentTimeStamp, savedVars.mining.APITimeStamp)
+	local isLessThanHalfAMonth = differenceTimeStamp < ZO_ONE_MONTH_IN_SECONDS / 2
+	local savedAPIVersion = savedVars.mining.APIVersion
+
+	local currentAddOnVersion = LOST_TREASURE.version
+	if savedVars.mining.AddOnVersion == nil then
+		savedVars.mining.AddOnVersion = currentAddOnVersion
+	end
+	local savedAddOnVersion = savedVars.mining.AddOnVersion
+
+	self.isActive = false
+	if currentVersion > savedAPIVersion or currentAddOnVersion > savedAddOnVersion then
+		self.savedVars.mining.APIVersion = currentVersion
+		self.savedVars.mining.APITimeStamp = currentTimeStamp
+		savedVars.mining.AddOnVersion = currentAddOnVersion
+		ZO_ClearTable(self.savedVars.mining.data)
+		self.isActive = true
+	elseif currentVersion == savedAPIVersion and isLessThanHalfAMonth then
+		self.isActive = true
+	end
+
+	self.logger:Info("Mining is %s, isLessThanHalfAMonth: %s, differenceTimeStamp: %d, currentAddOnVersion: %d, savedAddOnVersion: %d", tostring(self.isActive) and "active" or "disabled", tostring(isLessThanHalfAMonth), differenceTimeStamp, currentAddOnVersion, savedAddOnVersion)
+end
+
+function Mining:IsActive()
+	return self.isActive
+end
+
+function Mining:StoreItem(newData)
+	local mapId = newData.mapId
+	local pinType = newData.pinType
+
+	self.savedVars.mining.data[mapId] = self.savedVars.mining.data[mapId] or { }
+	self.savedVars.mining.data[mapId][pinType] = self.savedVars.mining.data[mapId][pinType] or { }
+
+	table.insert(self.savedVars.mining.data[mapId][pinType], { newData.x, newData.y, newData.lastOpenedTreasureMap, newData.itemId })
+
+	self.logger:Debug("Item %s stored", newData.itemId)
+end
+
+function Mining:IsItemStored(newData)
+	local mapId = self.savedVars.mining.data[newData.mapId]
+	if mapId then
+		local pinTypeData = self.savedVars.mining.data[newData.mapId][newData.pinType]
+		if pinTypeData then
+			for _, data in ipairs(pinTypeData) do
+				local storedItemId = data[LOST_TREASURE_DATA_INDEX_ITEMID]
+				local newItemId = newData.itemId
+				if storedItemId == newItemId then
+					self.logger:Debug("Item %d is stored already", newItemId)
+					return true
+				end
+			end
+		end
+	end
+	self.logger:Debug("Item %d is new", newData.itemId)
+	return false
+end
+
 
 -- BugReport
 ------------
@@ -23,9 +83,9 @@ local URL_PATTERN =
 
 local BugReport = ZO_Object:Subclass()
 
-function BugReport:New(bugReportURL, debugLogger)
+function BugReport:New(bugReportURL, logger)
 	local object = ZO_Object.New(self)
-	object.logger = debugLogger:Create("BugReport")
+	object.logger = logger:Create("BugReport")
 	object.url = bugReportURL
 	object.pattern = URL_PATTERN
 	object:ResetOutput()
@@ -44,7 +104,9 @@ function BugReport:ReplaceSpecialCharacters(str)
 end
 
 function BugReport:GenerateURL(data)
-	local x, y, zone, mapId, itemId, itemName, lastOpenedTreasureMap, version = select(2, unpack(data)) -- we have to cut out the iconTexture, because we have no need for
+	local itemId = data.itemId
+	local itemName = data.itemName
+	local version = data.addOnVersion
 
 	-- bugReport stringIds are defined in "en" file only
 	local output = { }
@@ -52,7 +114,7 @@ function BugReport:GenerateURL(data)
 	table.insert(output, self.pattern[URL_PATTERN_TITLE])
 	table.insert(output, string.format(GetString(SI_LOST_TREASURE_BUGREPORT_PICKUP_TITLE), version, itemId, itemName))
 	table.insert(output, self.pattern[URL_PATTERN_MESSAGE])
-	table.insert(output, string.format(GetString(SI_LOST_TREASURE_BUGREPORT_PICKUP_MESSAGE), version, zone, mapId, x, y, lastOpenedTreasureMap, itemId, itemName))
+	table.insert(output, string.format(GetString(SI_LOST_TREASURE_BUGREPORT_PICKUP_MESSAGE), version, version, data.zone, data.mapId, data.x, data.y, data.lastOpenedTreasureMap, itemId, itemName))
 	self.output = self:ReplaceSpecialCharacters(table.concat(output))
 end
 
@@ -68,21 +130,16 @@ end
 
 -- LostTreasure_Notification
 ----------------------------
-LostTreasure_Notification = ZO_Object:Subclass()
+LostTreasure_Notification = ZO_InitializingObject:Subclass()
 
-function LostTreasure_Notification:New(...)
-	local object = ZO_Object.New(self)
-	object:Initialize(...)
-	return object
-end
-
-function LostTreasure_Notification:Initialize(addOnName, addOnDisplayName, savedVars, debugLogger, bugReportURL)
-	self.debugLogger = debugLogger:Create(IDENTIFIER)
+function LostTreasure_Notification:Initialize(addOnName, addOnDisplayName, savedVars, logger, bugReportURL)
+	self.logger = logger:Create(IDENTIFIER)
 
 	self.addOnDisplayName = addOnDisplayName
 	self.savedVars = savedVars
 	self.provider = LibNotifications:CreateProvider()
-	self.bugReport = BugReport:New(bugReportURL, debugLogger)
+	self.bugReport = BugReport:New(bugReportURL, self.logger)
+	self.mining = Mining:New(savedVars, self.logger)
 
 	local function OnPlayerActivated()
 		self:RestoreAllNotifications()
@@ -100,7 +157,7 @@ function LostTreasure_Notification:SaveAllNotifications()
 	local provider = self.provider
 	ZO_ClearTable(savedVars.notifications)
 	for _, layoutData in ipairs(provider.notifications) do
-		table.insert(savedVars.notifications, layoutData)
+		table.insert(savedVars.notifications, layoutData.data)
 	end
 	ZO_ClearTable(provider.notifications)
 end
@@ -108,7 +165,7 @@ end
 function LostTreasure_Notification:RestoreAllNotifications()
 	local savedVars = self.savedVars
 	for _, layoutData in ipairs(savedVars.notifications) do
-		self:NewNotification(unpack(layoutData.data))
+		self:NewNotification(layoutData)
 	end
 	ZO_ClearTable(savedVars.notifications)
 end
@@ -126,18 +183,18 @@ function LostTreasure_Notification:AddNotification(message)
 	local addNotification = true
 	if next(providerNotifications) then
 		for index, layoutData in ipairs(providerNotifications) do
-			if layoutData.data[NOTIFICATION_ITEM_ID] == message.data[NOTIFICATION_ITEM_ID] then
+			if layoutData.data.itemId == message.data.itemId then
 				addNotification = false
 				break
 			end
 		end
-		self.debugLogger:Debug("Notification itemId already exist.")
+		self.logger:Debug("Notification itemId already exist.")
 	end
 
 	if addNotification then
 		table.insert(providerNotifications, message)
 		provider:UpdateNotifications()
-		self.debugLogger:Debug("Added new notification: %s", table.concat(message.data, ", "))
+		self.logger:Debug("Added new notification: %s", table.concat(message.data, ", "))
 	end
 end
 
@@ -151,33 +208,27 @@ function LostTreasure_Notification:Decline(data)
 	self:RemoveNotification(data)
 end
 
-function LostTreasure_Notification:NewNotification(notificationIconPath, x, y, zone, mapId, itemId, itemName, lastOpenedTreasureMap, addOnVersion)
-	local message =
-	{
-		dataType = NOTIFICATIONS_REQUEST_DATA,
-		secsSinceRequest = ZO_NormalizeSecondsSince(0),
-		note = GetString(SI_LOST_TREASURE_NOTIFICATION_NOTE),
-		message = GetString(SI_LOST_TREASURE_NOTIFICATION_MESSAGE),
-		heading = self.addOnDisplayName,
-		texture = notificationIconPath,
-		shortDisplayText = self.addOnDisplayName,
-		controlsOwnSounds = false,
-		keyboardAcceptCallback = function(data) self:Accept(data) end,
-		keyboardDeclineCallback = function(data) self:Decline(data) end,
-		gamepadAcceptCallback = function(data) self:Accept(data) end,
-		gamepadDeclineCallback = function(data) self:Decline(data) end,
-		data =
+function LostTreasure_Notification:NewNotification(notificationData)
+	if self.mining:IsActive() and not self.mining:IsItemStored(notificationData) then
+		local message =
 		{
-			[NOTIFICATION_ICON_PATH] = notificationIconPath,
-			[NOTIFICATION_X] = x,
-			[NOTIFICATION_Y] = y,
-			[NOTIFICATION_ZONE] = zone,
-			[NOTIFICATION_MAP_ID] = mapId,
-			[NOTIFICATION_ITEM_ID] = itemId,
-			[NOTIFICATION_ITEM_NAME] = itemName,
-			[NOTIFICATION_TREASURE_MAP] = lastOpenedTreasureMap,
-			[NOTIFICATION_ADDON_VERSION] = addOnVersion,
+			dataType = NOTIFICATIONS_REQUEST_DATA,
+			secsSinceRequest = ZO_NormalizeSecondsSince(0),
+			note = GetString(SI_LOST_TREASURE_NOTIFICATION_NOTE),
+			message = GetString(SI_LOST_TREASURE_NOTIFICATION_MESSAGE),
+			heading = self.addOnDisplayName,
+			texture = notificationData.icon,
+			shortDisplayText = self.addOnDisplayName,
+			controlsOwnSounds = false,
+			keyboardAcceptCallback = function(data) self:Accept(data) end,
+			keyboardDeclineCallback = function(data) self:Decline(data) end,
+			gamepadAcceptCallback = function(data) self:Accept(data) end,
+			gamepadDeclineCallback = function(data) self:Decline(data) end,
+			data = notificationData
 		}
-	}
-	self:AddNotification(message)
+		self:AddNotification(message)
+
+		-- Save item data to prevent reporting an item multiple times
+		self.mining:StoreItem(notificationData)
+	end
 end

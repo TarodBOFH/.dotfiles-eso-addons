@@ -88,7 +88,7 @@ local strings = {
 	HR_MENU_ICONS_VISIBILITY_ANIM_TT = "Reproduce iconos animados. Nota: activar o desactivar esta opción no afecta los FPS.",
 
 	HR_MENU_ICONS_README1 = "El icono personalizado debe tener la extensión .dds (formato de la aplicación DirectDraw). Tamaño preferible es 32x32 px.",
-	HR_MENU_ICONS_README2 = "Si deseas que otros jugadores puedan ver tu icono personalizado, entonces deberás apoyar al autor del addon |cFFFF00@andy.s|r con oro (donaciones con dinero real también son bienvenidas).\nIcono estático: 1M oro, icono animado: 2-3M oro dependiendo del número de fotogramas. Puedes contactar al autor por medio de Discord (|cFFFF00andy.s#2135|r) o en la página de esoui.com.",
+	HR_MENU_ICONS_README2 = "Si deseas que otros jugadores puedan ver tu icono personalizado, entonces deberás apoyar al autor del addon |cFFFF00@andy.s|r con oro (donaciones con dinero real también son bienvenidas).\nIcono estático: |cFFFF002M oro|r, icono animado: |cFFFF004M oro|r. Puedes contactar al autor por medio de Discord (|cFFFF00andy.s#2135|r) o en la página de esoui.com.",
 	HR_MENU_ICONS_README3 = "Puedes previsualizar tu icono y nombre más abajo y enviar el código LUA generado junto con el archivo de tu icono a |cFFFF00andy.s#2135|r via Discord (puede que tengas que agregarme primero).",
 
 	HR_MENU_STYLE = "Estilo",

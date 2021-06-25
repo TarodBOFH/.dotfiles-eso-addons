@@ -104,7 +104,7 @@ function M.BuildIconsMenu()
 	local options = {
 		{
 			type = "submenu",
-			name = string.format("|cFFFACD%s|r", GetString(HR_MENU_ICONS_README)),
+			name = string.format("|cFF8800%s|r", GetString(HR_MENU_ICONS_README)),
 			controls = readme,
 		},
 		{

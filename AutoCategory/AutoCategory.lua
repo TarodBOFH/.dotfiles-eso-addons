@@ -61,11 +61,17 @@ end
 function AutoCategory.CompileRule(rule)
   if rule == nil then return end
   
-    local compiledfunc,err = zo_loadstring("return("..rule.rule..")")
+	local logger = LibDebugLogger("AutoCategory")
+	logger:SetEnabled(true)
+	local rulestr = "return("..rule.rule..")"
+	local compiledfunc,err = zo_loadstring(rulestr)
     if not compiledfunc then
-      rule.damaged = true
+		rule.damaged = true
+		logger:Error("Failure to compile rule "..rulestr..". ERROR: "..err)
+		logger:SetEnabled(false)
       return err
     end
+	logger:SetEnabled(false)
     AC.compiledRules[rule.name] = compiledfunc
     return ""
 end
@@ -82,24 +88,29 @@ function AutoCategory.RecompileRules(ruleset)
     end
     if ruleset == nil then return end
     
+	local logger = LibDebugLogger("AutoCategory")
+	logger:SetEnabled(true)
     local compiled = AutoCategory.compiledRules
     for j = 1, #ruleset do
         if ruleset[j] then 
             local r = ruleset[j]
             local n = r.name
-            if r.compiled then
-                compiled[n] = r.compiled
+			if r.compiled then
+			    compiled[n] = r.compiled
             else
-                if not r.rule then
-                    r.damaged = nil
+				if not r.rule then
+				    r.damaged = nil
                 end
-                compiled[n],err = zo_loadstring(SF.str("return(",r.rule,")"))
+				local rulestr = "return(" .. r.rule .. ")"
+                compiled[n],err = zo_loadstring(rulestr)
                 if not compiled[n] then
                     r.damaged = true 
+					logger:Error("Failure to compile rule "..rulestr..". ERROR: "..err)
                 end
             end
         end
     end
+	logger:SetEnabled(false)
 end
 
 -- ----------------------------- Sorting comparators ------------------
@@ -260,14 +271,6 @@ function AutoCategory.ResetToDefaults()
     end
     ZO_DeepTableCopy(AutoCategory.defaultAcctSettings.appearance, AutoCategory.acctSaved.appearance)
     
-    --[[ currently no char-level rules
-    if AutoCategory.charSaved.rules then 
-        ZO_ClearTable(AutoCategory.charSaved.rules)
-    else
-        AutoCategory.charSaved.rules = {}
-    end
-	ZO_ShallowTableCopy(AutoCategory.defaultSettings.rules, AutoCategory.charSaved.rules)
-	--]]
     if AutoCategory.charSaved.bags then 
         ZO_ClearTable(AutoCategory.charSaved.bags)
     else
@@ -572,8 +575,10 @@ EVENT_MANAGER:RegisterForEvent(AutoCategory.name, EVENT_ADD_ON_LOADED, AutoCateg
 --== Interface ==-- 
 function AutoCategory.RefreshCurrentList()
 	local function RefreshList(inventoryType) 
-		PLAYER_INVENTORY:UpdateList(inventoryType)
+		local UPDATE_IF_NOT_HIDDEN = false
+		PLAYER_INVENTORY:UpdateList(inventoryType, UPDATE_IF_NOT_HIDDEN)
 	end
+	
 	if not ZO_PlayerInventory:IsHidden() then
 		RefreshList(INVENTORY_BACKPACK)
 		RefreshList(INVENTORY_QUEST_ITEM)
@@ -592,18 +597,35 @@ function AutoCategory.RefreshCurrentList()
 	end
 end
 
-function AC_ItemRowHeader_OnMouseEnter(header)  
+function AutoCategory.RefreshAllLists()
+    PLAYER_INVENTORY:UpdateList(INVENTORY_BACKPACK)
+    PLAYER_INVENTORY:UpdateList(INVENTORY_QUEST_ITEM)
+    PLAYER_INVENTORY:UpdateList(INVENTORY_CRAFT_BAG)
+    PLAYER_INVENTORY:UpdateList(INVENTORY_GUILD_BANK)
+    PLAYER_INVENTORY:UpdateList(INVENTORY_HOUSE_BANK)
+    PLAYER_INVENTORY:UpdateList(INVENTORY_BANK)
+    
+    SMITHING.deconstructionPanel.inventory:PerformFullRefresh()
+    SMITHING.improvementPanel.inventory:PerformFullRefresh()
+end
+
+function AC_ItemRowHeader_OnMouseEnter(header)
 	local cateName = header.slot.dataEntry.bestItemTypeName
 	local bagTypeId = header.slot.dataEntry.bagTypeId
-	
+
 	local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName) 
 	local markerBG = header:GetNamedChild("CollapseMarkerBG")
-	markerBG:SetHidden(false)
-	if collapsed then
-		markerBG:SetTexture("EsoUI/Art/Buttons/plus_over.dds")
-	else
-		markerBG:SetTexture("EsoUI/Art/Buttons/minus_over.dds")
-	end
+
+    if AutoCategory.acctSaved.general["SHOW_CATEGORY_COLLAPSE_ICON"] then
+        markerBG:SetHidden(false)
+        if collapsed then
+            markerBG:SetTexture("EsoUI/Art/Buttons/plus_over.dds")
+        else
+            markerBG:SetTexture("EsoUI/Art/Buttons/minus_over.dds")
+        end
+    else
+        markerBG:SetHidden(true)
+    end
 end
 
 function AC_ItemRowHeader_OnMouseExit(header)  
@@ -612,6 +634,8 @@ function AC_ItemRowHeader_OnMouseExit(header)
 end
 
 function AC_ItemRowHeader_OnMouseClicked(header)
+    if (AutoCategory.acctSaved.general["SHOW_CATEGORY_COLLAPSE_ICON"] == false) then return end
+
 	local cateName = header.slot.dataEntry.bestItemTypeName
 	local bagTypeId = header.slot.dataEntry.bagTypeId
 	

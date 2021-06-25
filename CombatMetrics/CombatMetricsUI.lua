@@ -11,16 +11,16 @@ local currentCLPage
 local selections, lastSelections
 local savedFights
 local SVHandler
-local barKeyOffset = 1
 local enlargedGraph = false
 local maxXYPlots = 5
 local maxBarPlots = 8
-local skillpage = 0
 local uncollapsedBuffs = {
 
 }
 
 local LOG_LEVEL_VERBOSE, LOG_LEVEL_DEBUG, LOG_LEVEL_INFO, LOG_LEVEL_WARNING, LOG_LEVEL_ERROR = CMX.GetDebugLevels()
+
+if GetAPIVersion() < 100034 then CHAMPION_DISCIPLINE_TYPE_COMBAT, CHAMPION_DISCIPLINE_TYPE_CONDITIONING, CHAMPION_DISCIPLINE_TYPE_WORLD = 0, 1, 2 end
 
 local CMX = CMX
 if CMX == nil then CMX = {} end
@@ -60,7 +60,6 @@ local function searchtable(t, field, value)
 
 	return false, nil
 end
-
 
 local function storeOrigLayout(self)
 
@@ -390,22 +389,18 @@ local function updateSelectorButtons(selectorButtons)
 
 	local show = db.ForceNotification or ((isGerman or isMe) and isEUServer and isNotificationAllowed and isVeteranRaid and isWithinAllowedTime)
 
-	if false then
-
-		df("Result: %s, De: %s, EU: %s, G: %s, R: %s, T: %s, Set: %s (%s, %d / %d)",
-			tostring(show),
-			tostring(isGerman),
-			tostring(isEUServer),
-			tostring(isNotInGuild),
-			tostring(isVeteranRaid),
-			tostring(isWithinAllowedTime),
-			tostring(isNotificationAllowed),
-			tostring(db.NotificationAllowed),
-			db.currentNotificationVersion,
-			db.NotificationRead
-		)
-
-	end
+	--[[ df("Result: %s, De: %s, EU: %s, G: %s, R: %s, T: %s, Set: %s (%s, %d / %d)",
+		tostring(show),
+		tostring(isGerman),
+		tostring(isEUServer),
+		tostring(isNotInGuild),
+		tostring(isVeteranRaid),
+		tostring(isWithinAllowedTime),
+		tostring(isNotificationAllowed),
+		tostring(db.NotificationAllowed),
+		db.currentNotificationVersion,
+		db.NotificationRead
+	)--]]
 
 	selectorButtons:GetNamedChild("NotificationButton"):SetHidden(not show)
 
@@ -431,7 +426,9 @@ local function initSelectorButtons(selectorButtons)
 	end
 end
 
-function CMX.InitializeCPRows(panel)
+local LegacyStrings = CMX.CPLegacyStrings[GetCVar("language.2")] or CMX.CPLegacyStrings["en"]
+
+function CMX.InitializeCPRowsLegacy(panel)
 
 	for i = 1, 9 do
 
@@ -453,7 +450,9 @@ function CMX.InitializeCPRows(panel)
 
 		local title = signcontrol:GetNamedChild("Title")
 
-		title:SetText(zo_strformat(SI_CHAMPION_CONSTELLATION_NAME_FORMAT, GetChampionDisciplineName(discipline)))
+		local name = LegacyStrings and LegacyStrings[discipline] and LegacyStrings[discipline].name or "???"
+
+		title:SetText(name)
 
 		local width = title:GetTextWidth() + 4
 		local height = title:GetHeight()
@@ -468,11 +467,9 @@ function CMX.InitializeCPRows(panel)
 
 			local label = row:GetNamedChild("Name")
 
-			label:SetText(zo_strformat(SI_CHAMPION_CONSTELLATION_NAME_FORMAT, GetChampionSkillName(discipline, i)))
+			local name = LegacyStrings and LegacyStrings[discipline] and LegacyStrings[discipline][i] or "???"
 
-			row.discipline = discipline
-			row.skillId = i
-			row.points = 0
+			label:SetText(name)
 
 			local passive = signcontrol:GetNamedChild("Passive"..i)
 
@@ -481,6 +478,87 @@ function CMX.InitializeCPRows(panel)
 			passive.points = 0
 
 		end
+	end
+end
+
+local labelcolors = {
+
+	[CHAMPION_DISCIPLINE_TYPE_COMBAT] = GetString(SI_COMBAT_METRICS_MAGICKA_COLOR),
+	[CHAMPION_DISCIPLINE_TYPE_CONDITIONING] = GetString(SI_COMBAT_METRICS_HEALTH_COLOR),
+	[CHAMPION_DISCIPLINE_TYPE_WORLD] = GetString(SI_COMBAT_METRICS_STAMINA_COLOR),
+
+}
+
+local starcolors = {
+
+	[CHAMPION_DISCIPLINE_TYPE_COMBAT] = ZO_ColorDef:New(0.8, 0.8, 1),
+	[CHAMPION_DISCIPLINE_TYPE_CONDITIONING] = ZO_ColorDef:New(1, 0.80, 0.8),
+	[CHAMPION_DISCIPLINE_TYPE_WORLD] = ZO_ColorDef:New(0.8, 1, 0.7),
+
+}
+
+function CMX.InitializeCPRows(panel)
+
+	if GetAPIVersion() < 100034 then return end
+
+	for disciplineId = 1,3 do
+
+		local constellationControl = panel:GetNamedChild("Constellation"..disciplineId)
+
+		local disciplineType = GetChampionDisciplineType(disciplineId)
+
+		local color = labelcolors[disciplineType]
+
+		local title = constellationControl:GetNamedChild("Title")
+		title:SetText(zo_strformat(SI_CHAMPION_CONSTELLATION_NAME_FORMAT, GetChampionDisciplineName(disciplineId)))
+
+		local nameBase = constellationControl:GetName() .. "StarItem"
+		local anchor = title
+
+		for i = 1, 18 do
+
+			local starItem = CreateControlFromVirtual(nameBase, constellationControl, "CombatMetrics_StarItem", i)
+
+			if i == 1 then
+
+				starItem:SetAnchor(TOPLEFT, anchor, BOTTOMLEFT, 0, 4)
+
+			elseif i == 10 then
+
+				starItem:SetAnchor(TOPRIGHT, constellationControl, TOPRIGHT, 0, 24)
+
+			else
+
+				starItem:SetAnchor(TOPLEFT, anchor, BOTTOMLEFT, 0, 2)
+
+			end
+
+			anchor = starItem
+
+			local coords = {0.75, 1, 0.5, 0.75}
+
+			if i > 4 then
+
+				coords = {0.25, 0.5, 0.25, 0.5}
+				starItem:GetNamedChild("Ring"):SetHidden(true)
+				starItem:SetHidden(true)
+
+			else
+
+				starItem:GetNamedChild("Star"):SetHidden(true)
+				starItem:GetNamedChild("Name"):SetHidden(true)
+				starItem:GetNamedChild("Value"):SetHidden(true)
+
+			end
+
+			local starIcon = starItem:GetNamedChild("Star")
+
+			starIcon:SetTextureCoords(unpack(coords))
+			starIcon:SetColor(starcolors[disciplineType]:UnpackRGB())
+
+		end
+
+		CMX.SetLabelColor(constellationControl, color)
 	end
 end
 
@@ -1399,7 +1477,7 @@ do
 			{label = GetString(SI_COMBAT_METRICS_FEEDBACK_GITHUB), callback = GotoGithub},
 			{label = GetString(SI_COMBAT_METRICS_FEEDBACK_DISCORD), callback = GotoDiscord},
 		}
-		
+
 		local donationSubItems = {
 			{label = ZO_CachedStrFormat(stringFormatEU, GetString(SI_COMBAT_METRICS_DONATE_GOLD)), callback = DonateGold, disabled = not isEUServer},
 			{label = ZO_CachedStrFormat(stringFormatEU, GetString(SI_COMBAT_METRICS_DONATE_CROWNS)), callback = DonateCrowns, disabled = not isEUServer},
@@ -1873,29 +1951,48 @@ local powerTypeLabels = {
 	[POWERTYPE_HEALTH] = "_HEALTH",
 }
 
-local attackStatsKeys = { 			-- {label, format, convert}
+
+local statKeysLegacy = {
+
+[LIBCOMBAT_STAT_MAXMAGICKA] 		= "maxmagicka",
+[LIBCOMBAT_STAT_SPELLPOWER] 		= "spellpower",
+[LIBCOMBAT_STAT_SPELLCRIT] 			= "spellcrit",
+[LIBCOMBAT_STAT_SPELLCRITBONUS] 	= "spellcritbonus",
+[LIBCOMBAT_STAT_SPELLPENETRATION]	= "spellpen",
+[LIBCOMBAT_STAT_MAXSTAMINA] 		= "maxstamina",
+[LIBCOMBAT_STAT_WEAPONPOWER] 		= "weaponpower",
+[LIBCOMBAT_STAT_WEAPONCRIT] 		= "weaponcrit",
+[LIBCOMBAT_STAT_WEAPONCRITBONUS]	= "weaponcritbonus",
+[LIBCOMBAT_STAT_WEAPONPENETRATION] 	= "weaponpen",
+[LIBCOMBAT_STAT_MAXHEALTH] 			= "maxhealth",
+[LIBCOMBAT_STAT_PHYSICALRESISTANCE] = "physres",
+[LIBCOMBAT_STAT_SPELLRESISTANCE] 	= "spellres",
+[LIBCOMBAT_STAT_CRITICALRESISTANCE] = "critres",
+}
+
+local statFormat = { 			-- {label, format, convert}
 
 	[POWERTYPE_MAGICKA] = {
-		[1] = {"maxmagicka", "%d"},
-		[2] = {"spellpower", "%d"},
-		[3] = {"spellcrit", "%.1f%%", true},
-		[4] = {"spellcritbonus", "%.1f%%"},
-		[5] = {"spellpen", "%d"},
+		[1] = {LIBCOMBAT_STAT_MAXMAGICKA, "%d"},
+		[2] = {LIBCOMBAT_STAT_SPELLPOWER, "%d"},
+		[3] = {LIBCOMBAT_STAT_SPELLCRIT, "%.1f%%", true},
+		[4] = {LIBCOMBAT_STAT_SPELLCRITBONUS, "%.1f%%"},
+		[5] = {LIBCOMBAT_STAT_SPELLPENETRATION, "%d"},
 	},
 
 	[POWERTYPE_STAMINA] = {
-		[1] = {"maxstamina", "%d"},
-		[2] = {"weaponpower", "%d"},
-		[3] = {"weaponcrit", "%.1f%%", true},
-		[4] = {"weaponcritbonus", "%.1f%%"},
-		[5] = {"weaponpen", "%d"},
+		[1] = {LIBCOMBAT_STAT_MAXSTAMINA, "%d"},
+		[2] = {LIBCOMBAT_STAT_WEAPONPOWER, "%d"},
+		[3] = {LIBCOMBAT_STAT_WEAPONCRIT, "%.1f%%", true},
+		[4] = {LIBCOMBAT_STAT_WEAPONCRITBONUS, "%.1f%%"},
+		[5] = {LIBCOMBAT_STAT_WEAPONPENETRATION, "%d"},
 	},
 
 	[POWERTYPE_HEALTH] = {
-		[1] = {"maxhealth", "%d"},
-		[2] = {"physres", "%d"},
-		[3] = {"spellres", "%d"},
-		[4] = {"critres", "%d", "%.1f%%"},
+		[1] = {LIBCOMBAT_STAT_MAXHEALTH, "%d"},
+		[2] = {LIBCOMBAT_STAT_PHYSICALRESISTANCE, "%d"},
+		[3] = {LIBCOMBAT_STAT_SPELLRESISTANCE, "%d"},
+		[4] = {LIBCOMBAT_STAT_CRITICALRESISTANCE, "%d", "%.1f%%"},
 	},
 
 }
@@ -1910,13 +2007,14 @@ local function updateFightStatsPanelRight(panel)
 	local category = db.FightReport.category
 	category = category == "healingIn" and "healingOut" or category
 
-	local calculated  = data.calculated or {}
+	local calculated = data.calculated or {}
+	local calcVersion = calculated.calcVersion or 1
 
-	local calcstats = calculated.stats or {}
-	local stats = data.stats or {}
+	local stats = calculated.stats or {}
+	local fightStats = data.stats or {}
 
-	local isdamage = category == "damageOut" or category == "damageIn"
-	local avgvalues = (powerType == POWERTYPE_HEALTH and calcstats.dmginavg) or (isdamage and calcstats.dmgavg) or calcstats.healavg or {}
+	local avgkey = (category == "damageOut" or category == "damageIn") and "dmgavg" or "healavg"
+	local avgvalues = (powerType == POWERTYPE_HEALTH and stats.dmginavg) or stats[avgkey] or {}
 	local totalvalue = powerType == POWERTYPE_HEALTH and calculated.damageInTotal or calculated[category.."Total"]
 	local countvalue = calculated[CountStrings[category].."Total"]
 
@@ -1941,7 +2039,7 @@ local function updateFightStatsPanelRight(panel)
 	local stringKey = "SI_COMBAT_METRICS_STATS" .. powerTypeLabels[powerType]
 
 	local statWindowControl = panel:GetNamedChild("AttackStats")
-	local keys = attackStatsKeys[powerType]
+	local keys = statFormat[powerType]
 
 	for i = 1, 4 do
 
@@ -1949,15 +2047,19 @@ local function updateFightStatsPanelRight(panel)
 		local rowcontrol = statWindowControl:GetNamedChild("Row"..i)
 		local dataKey, displayformat, convert = unpack(keys[i] or {})
 
+		local statData = stats[dataKey]
+
+		if calcVersion < 2 then dataKey = statKeysLegacy[dataKey] end
+
 		if text ~= nil and text ~= "" and dataKey ~= nil then
 
-			local maxvalue = stats["max"..dataKey] or 0
+			local maxvalue = statData and statData.max or fightStats["max"..dataKey] or 0
 
 			if convert == true then maxvalue = GetCriticalStrikeChance(maxvalue) end
 			if dataKey == POWERTYPE_HEALTH and i == 4 then maxvalue = maxvalue / 68 end 	-- untested, but good agreement from multiple sources
 			if displayformat then maxvalue = string.format(displayformat, maxvalue) end
 
-			local avgvalue = avgvalues["avg"..dataKey] or calcstats["avg"..dataKey]
+			local avgvalue = statData and statData[avgkey] or avgvalues["avg"..dataKey] or stats["avg"..dataKey]
 
 			if avgvalue == nil then
 
@@ -1971,6 +2073,26 @@ local function updateFightStatsPanelRight(panel)
 				if convert then avgvalue = GetCriticalStrikeChance(avgvalue) end
 				if displayformat then avgvalue = string.format(displayformat, avgvalue) end
 
+			end
+
+			if i == 4 then	-- Add a hint for backstabber
+
+				rowcontrol.tooltip = nil
+
+				local CP = data.CP
+
+				if powerType ~= POWERTYPE_HEALTH and CP and CP.version ~= nil and CP.version >= 2 then
+
+					local backstabber = CP[1] and CP[1].stars and CP[1].stars[31] -- Backstabber CP
+
+					if backstabber and backstabber[1] >= 10 and backstabber[2] == LIBCOMBAT_CPTYPE_SLOTTED then
+
+						text = ZO_CachedStrFormat("<<1>>*:", GetString(stringKey, i))
+
+						rowcontrol.tooltip = {GetString(SI_COMBAT_METRICS_BACKSTABBER_TT)}
+
+					end
+				end
 			end
 
 			rowcontrol:GetNamedChild("Label"):SetText(text)
@@ -1993,12 +2115,13 @@ local function updateFightStatsPanelRight(panel)
 	if category == "damageOut" and (powerType == POWERTYPE_MAGICKA or powerType == POWERTYPE_STAMINA) then
 
 		local resistvalues = powerType == POWERTYPE_MAGICKA and resdata.spellResistance or powerType == POWERTYPE_STAMINA and resdata.physicalResistance or {}
-		local dataKey = keys[5][1]
+		local statId = keys[5][1]
+		local statData = stats[statId]
 
 		local sum = 0
 		local effectiveSum = 0
 		local totaldamage = 0
-		local maxvalue = stats["max"..dataKey] or 0
+		local maxvalue = statData and statData.max or fightStats["max"..statId] or 0
 		local overpen = 0
 		local maxpen = db.unitresistance
 
@@ -2038,7 +2161,7 @@ local function updateFightStatsPanelRight(panel)
 
 		end
 
-		local averagePenetration = string.format("%d", math.max(zo_round(effectiveSum / totaldamage), avgvalues["avg"..dataKey] or 0))
+		local averagePenetration = string.format("%d", math.max(zo_round(effectiveSum / totaldamage), avgvalues["avg"..statId] or 0))
 		local overPenetrationRatio = string.format("%.1f%%", 100 * overpen / totaldamage)
 
 		local newline = string.format("%s: %d", GetString(SI_COMBAT_METRICS_AVERAGE), zo_round(sum / totaldamage))
@@ -2048,13 +2171,13 @@ local function updateFightStatsPanelRight(panel)
 		row5:SetHidden(false)
 		row6:SetHidden(false)
 
-		local text5 = GetString(stringKey, 5)
+		local text5 = ZO_CachedStrFormat("<<1>>:", GetString(stringKey, 5))
 
 		row5:GetNamedChild("Label"):SetText(text5)
 		row5:GetNamedChild("Value"):SetText(averagePenetration)
 		row5:GetNamedChild("Value2"):SetText(maxvalue)
 
-		local text6 = GetString(stringKey, 6)
+		local text6 = ZO_CachedStrFormat("<<1>>:", GetString(stringKey, 6))
 
 		row6:GetNamedChild("Label"):SetText(text6)
 		row6:GetNamedChild("Value"):SetText(overPenetrationRatio)
@@ -3750,9 +3873,9 @@ end
 
 local powerTypeKeyTable = {
 
-	[POWERTYPE_HEALTH] = "maxmaxhealth",
-	[POWERTYPE_MAGICKA] = "maxmaxmagicka",
-	[POWERTYPE_STAMINA] = "maxmaxstamina",
+	[POWERTYPE_HEALTH] = LIBCOMBAT_STAT_MAXHEALTH,
+	[POWERTYPE_MAGICKA] = LIBCOMBAT_STAT_MAXMAGICKA,
+	[POWERTYPE_STAMINA] = LIBCOMBAT_STAT_MAXSTAMINA,
 
 }
 
@@ -3819,7 +3942,7 @@ local function ResourceAbsolute(powerType)
 
 	local key = powerTypeKeyTable[powerType]
 
-	local maxValue = powerType == POWERTYPE_ULTIMATE and 500 or fightData.stats[key]
+	local maxValue = powerType == POWERTYPE_ULTIMATE and 500 or fightData.calculated.stats[key].max
 
 	for i, xyData in ipairs(XYData) do
 
@@ -3886,7 +4009,7 @@ local function PerformancePlot(dataType)
 		if lineData[1] == event and lineData[key] then
 
 			local deltatime = lineData[2]/1000 - combatstart
-		
+
 			local isSkill = dataType ~= 7 or (lineData[3]%10) > 2
 
 			if deltatime > x and isSkill then
@@ -5190,9 +5313,11 @@ function CMX.SkillTooltip_OnMouseEnter(control)
 	local delay = rowControl.delay
 	local font = string.format("%s|%s|%s", GetString(SI_COMBAT_METRICS_STD_FONT), 16, "soft-shadow-thin")
 
+	local format = rowControl.ignored and "ID: %d (Off GCD)" or "ID: %d"
+
 	SkillTooltip:SetAbilityId(id)
 	SkillTooltip:AddVerticalPadding(15)
-	SkillTooltip:AddLine(string.format("ID: %d", id), font, .7, .7, .8 , TOP, MODIFY_TEXT_TYPE_NONE, TEXT_ALIGN_CENTER)
+	SkillTooltip:AddLine(string.format(format, id), font, .7, .7, .8 , TOP, MODIFY_TEXT_TYPE_NONE, TEXT_ALIGN_CENTER)
 	if delay then SkillTooltip:AddLine(string.format("Average delay: %d ms", delay), font, .7, .7, .8 , TOP, MODIFY_TEXT_TYPE_NONE, TEXT_ALIGN_CENTER) end
 end
 
@@ -5202,17 +5327,37 @@ function CMX.SkillTooltip_OnMouseExit(control)
 
 end
 
-function CMX.CPTooltip_OnMouseEnter(control)
+function CMX.CPTooltip_OnMouseEnterLegacy(control)
 
-	InitializeTooltip(SkillTooltip, control, TOPLEFT, 0, 5, BOTTOMLEFT)
+	if control.skillId == nil then return end
 
-	SkillTooltip:SetChampionSkillAbility(control.discipline, control.skillId, control.points)
+	InitializeTooltip(InformationTooltip, control, TOPLEFT, 0, 5, BOTTOMLEFT)
+
+	local string = LegacyStrings[control.discipline][control.skillId]
+	
+	AddTooltipLine(control, InformationTooltip, string)
+
+end
+
+function CMX.CPTooltip_OnMouseEnter(starControl)
+
+	if starControl.starId == nil then return end
+
+	InitializeTooltip(ChampionSkillTooltip, starControl, TOPLEFT, 0, 5, BOTTOMLEFT)
+
+	ChampionSkillTooltip:SetChampionSkill(starControl.starId, starControl.points, nil, starControl.slotted)
+
+end
+
+function CMX.CPTooltip_OnMouseExitLegacy(control)
+
+	ClearTooltip(InformationTooltip)
 
 end
 
 function CMX.CPTooltip_OnMouseExit(control)
 
-	ClearTooltip(SkillTooltip)
+	ClearTooltip(ChampionSkillTooltip)
 
 end
 
@@ -5269,6 +5414,12 @@ local armorcolors = {
 	[ARMORTYPE_LIGHT] = {0.3, 0.3, 1, 1},
 }
 
+local SkillBarItems = {"LightAttack", "HeavyAttack", "Ability1", "Ability2", "Ability3", "Ability4", "Ability5", "Ultimate"}
+
+local DisabledColor = ZO_ColorDef:New("FF999999")
+local WerewolfColor = ZO_ColorDef:New("FFf3c86e")
+local WhiteColor = ZO_ColorDef:New("FFFFFFFF")
+
 local function updateLeftInfoPanel(panel)
 
 	if fightData == nil then return end
@@ -5286,24 +5437,48 @@ local function updateLeftInfoPanel(panel)
 	local skilldata = data.skills
 	local barStatData = data.barStats
 
-	local barkeys = {}
-
-	for bar, data in CMX.spairs(skillBars or {}) do
-
-		table.insert(barkeys, bar)
-
-	end
-
 	local category = db.FightReport.category
 
-	for i = 0, 1 do
+	for subPanelIndex = 1, 2 do
 
-		local row = panel:GetNamedChild("AbilityBlock" .. i+1)
+		local subPanel = panel:GetNamedChild("AbilityBlock" .. subPanelIndex)
 
-		local barkey = barkeys and barkeys[i + barKeyOffset] or i
+		if subPanelIndex == 2 then	-- show extra option for werewolf bar
 
-		local bardata = skillBars and skillBars[barkey] or nil
-		local barStats = barStatData and barStatData[barkey] or nil
+			local hasWerewolfData = skillBars[HOTBAR_CATEGORY_WEREWOLF+1] ~= nil
+
+			local titleControl = subPanel:GetNamedChild("Title")
+			local werewolfButton = subPanel:GetNamedChild("Werewolf")
+
+			werewolfButton:SetHidden(not hasWerewolfData)
+
+			local titleString
+			local titleColor = WhiteColor
+
+			if hasWerewolfData then
+
+				local color = DisabledColor
+
+				if db.FightReport.showWereWolf then
+
+					color = WerewolfColor
+					subPanelIndex = HOTBAR_CATEGORY_WEREWOLF + 1
+					titleString = GetString(SI_HOTBARCATEGORY8)
+					titleColor = WerewolfColor
+
+				end
+
+				werewolfButton:GetNamedChild("Texture"):SetColor(color:UnpackRGB())
+				werewolfButton:GetNamedChild("Bg"):SetEdgeColor(color:UnpackRGB())
+
+			end
+
+			titleControl:SetText(titleString or zo_strformat("<<1>> 2", GetString(SI_COMBAT_METRICS_BAR)))
+			titleControl:SetColor(titleColor:UnpackRGB())
+		end
+
+		local bardata = skillBars and skillBars[subPanelIndex] or nil
+		local barStats = barStatData and barStatData[subPanelIndex] or nil
 
 		local dpsratio, timeratio
 
@@ -5317,22 +5492,22 @@ local function updateLeftInfoPanel(panel)
 
 		end
 
-		local statControl = row:GetNamedChild("Stats")
+		local statControl = subPanel:GetNamedChild("Stats")
 		local ratioControl = statControl:GetNamedChild("Value1")
 		local timeControl = statControl:GetNamedChild("Value2")
 
 		ratioControl:SetText(string.format("%.1f%%", (timeratio or 0) * 100))
 		timeControl:SetText(string.format("%.1f%%", (dpsratio or 0) * 100))
 
-		for j = 5, row:GetNumChildren() - 2 do
+		for line, controlName in ipairs(SkillBarItems) do
 
-			local control = row:GetChild(j)
+			local control = subPanel:GetNamedChild(controlName)
 
 			local icon = control:GetNamedChild("Icon"):GetNamedChild("Texture")
 
 			local name = control:GetNamedChild("Label")
 
-			local abilityId = bardata and bardata[j-4] or nil
+			local abilityId = bardata and bardata[line] or nil
 
 			control.id = abilityId
 
@@ -5344,11 +5519,13 @@ local function updateLeftInfoPanel(panel)
 
 			name:SetText(abilityName)
 
-			local reducedslot = (barkey - 1) * 10 + j - 4
+			local reducedslot = (subPanelIndex-1) * 10 + line
 
 			local slotdata = skilldata and skilldata[reducedslot] or nil
 
 			local strings = {"-", "-", "-", "-"}
+
+			local color = WhiteColor
 
 			if slotdata and slotdata.count and slotdata.count > 0 then
 
@@ -5358,16 +5535,29 @@ local function updateLeftInfoPanel(panel)
 				strings[2] = weave and string.format("%.2f", weave/1000) or "-"
 
 				local errors = slotdata.weavingErrors
-				strings[3] = errors and string.format("%d", errors) or "-"
+				strings[3] = weave and errors and string.format("%d", errors) or "-"
 
 				local diff = slotdata.diffTimeAvg or slotdata.difftimesAvg
 				strings[4] = diff and string.format("%.2f", diff/1000) or "-"
 
 				control.delay = slotdata.delayAvg
 
+				if slotdata.ignored then color = DisabledColor end
+
+				control.ignored = slotdata.ignored
+
 			end
 
-			for k = 1, 4 do control:GetNamedChild("Value" .. k):SetText(strings[k]) end
+			name:SetColor(color:UnpackRGB())
+
+			for k = 1, 4 do
+
+				local label = control:GetNamedChild("Value" .. k)
+
+				label:SetText(strings[k])
+				label:SetColor(color:UnpackRGB())
+
+			end
 		end
 	end
 
@@ -5398,15 +5588,29 @@ local function updateLeftInfoPanel(panel)
 	statrow2:GetNamedChild("Label2"):SetText(string.format("%s  %s", GetString(SI_COMBAT_METRICS_TOTALSKILLS), value4string))
 end
 
+function CMX.SkillbarButtonMouseOver(control, isOver)
+
+	local bg = control:GetNamedChild("Bg")
+
+	local alpha = isOver and 1 or 0
+
+	bg:SetCenterColor(0.2, 0.2, 0.2, alpha)
+
+end
+
+function CMX.SkillbarToggleWerewolf(control)
+
+	db.FightReport.showWereWolf = not db.FightReport.showWereWolf
+
+	updateLeftInfoPanel(control:GetParent():GetParent())
+
+end
+
 local passiveRequirements = {10, 30, 75, 120}
 
-local function updateRightInfoPanel(panel)
-
-	if fightData == nil then return end
+local function updateRightInfoPanelLegacy(panel)
 
 	local CPData = fightData.CP
-
-	if CPData == nil then return end
 
 	for i = 1, 9 do
 
@@ -5447,6 +5651,137 @@ local function updateRightInfoPanel(panel)
 	end
 end
 
+local function starOrder(t, a, b)
+
+	local ishigher = false
+
+	local typeA = t[a][2]
+	local typeB = t[b][2]
+
+	if typeA > typeB or (typeA == typeB and a < b) then ishigher = true end
+
+	return ishigher
+
+end
+
+local disciplineColors = {
+	[CHAMPION_DISCIPLINE_TYPE_COMBAT] = GetString(SI_COMBAT_METRICS_MAGICKA_COLOR),
+	[CHAMPION_DISCIPLINE_TYPE_CONDITIONING] = GetString(SI_COMBAT_METRICS_HEALTH_COLOR),
+	[CHAMPION_DISCIPLINE_TYPE_WORLD] = GetString(SI_COMBAT_METRICS_STAMINA_COLOR),
+}
+
+local function updateRightInfoPanel(panel)
+
+	if fightData == nil then return end
+
+	local CPData = fightData.CP
+
+	if CPData == nil then return end
+
+	local legacyPanel = panel:GetParent():GetNamedChild("RightOld")
+
+	if GetAPIVersion() < 100034 or (CPData.version or 0) < 2 then
+
+		panel:SetHidden(true)
+		legacyPanel:SetHidden(false)
+
+		updateRightInfoPanelLegacy(legacyPanel)
+
+		return
+	end
+
+	panel:SetHidden(false)
+	legacyPanel:SetHidden(true)
+
+	for disciplineId, discipline in pairs(CPData) do
+
+		if type(discipline) == "table" then
+
+			local constellationControl = panel:GetNamedChild("Constellation"..disciplineId)
+
+			local itemNo = 0
+			
+			local title = constellationControl:GetNamedChild("Title")
+			local disciplineName = zo_strformat(SI_CHAMPION_CONSTELLATION_NAME_FORMAT, GetChampionDisciplineName(disciplineId))
+
+			title:SetText(ZO_CachedStrFormat("<<1>> (<<2>>)", disciplineName, discipline.total))
+
+			for starId, starData in CMX.spairs(discipline.stars, starOrder) do
+
+				local starControl
+
+				itemNo = itemNo + 1
+
+				local points, state = unpack(starData)
+
+				starControl = constellationControl:GetNamedChild("StarItem" .. itemNo)
+
+				if itemNo > 18 then
+
+					break
+
+				elseif state == 2 then -- slotted
+
+					starControl:GetNamedChild("Star"):SetHidden(false)
+					starControl:GetNamedChild("Ring"):SetTexture("/esoui/art/champion/actionbar/champion_bar_slot_frame.dds")
+
+					local name = starControl:GetNamedChild("Name")
+					local value = starControl:GetNamedChild("Value")
+
+					name:SetHidden(false)
+					value:SetHidden(false)
+
+					name:SetText(zo_strformat(SI_CHAMPION_CONSTELLATION_NAME_FORMAT, GetChampionSkillName(starId)))
+					value:SetText(points)
+
+					starControl.slotted = true
+					starControl.starId = starId
+					starControl.points = points
+
+				else
+					if itemNo <= 4 then
+
+						for i = itemNo, 4 do
+							
+							starControl = constellationControl:GetNamedChild("StarItem" .. i)
+
+							starControl:GetNamedChild("Star"):SetHidden(true)
+							starControl:GetNamedChild("Name"):SetHidden(true)
+							starControl:GetNamedChild("Value"):SetHidden(true)
+							starControl:GetNamedChild("Ring"):SetTexture("/esoui/art/champion/actionbar/champion_bar_slot_frame_disabled.dds")					
+
+							starControl.slotted = nil
+							starControl.starId = nil
+							starControl.points = nil
+						end
+
+						itemNo = 5
+
+						starControl = constellationControl:GetNamedChild("StarItem" .. itemNo)
+
+					end
+
+					starControl:SetHidden(false)
+
+					starControl:GetNamedChild("Name"):SetText(zo_strformat(SI_CHAMPION_CONSTELLATION_NAME_FORMAT, GetChampionSkillName(starId)))
+					starControl:GetNamedChild("Value"):SetText(points)					
+
+					starControl.slotted = false
+					starControl.starId = starId
+					starControl.points = points
+
+				end
+			end
+
+			for i = math.max(itemNo + 1, 5), 18 do
+
+				constellationControl:GetNamedChild("StarItem" .. i):SetHidden(true)
+
+			end
+		end
+	end
+end
+
 local subIdToQuality = {}
 
 local function GetEnchantQuality(itemLink)	-- From Enchanted Quality (Rhyono, votan)
@@ -5458,7 +5793,7 @@ local function GetEnchantQuality(itemLink)	-- From Enchanted Quality (Rhyono, vo
 
 	if enchantSub == 0 and not IsItemLinkCrafted(itemLink) then
 
-		local hasSet = GetItemLinkSetInfo(itemLink, false)		
+		local hasSet = GetItemLinkSetInfo(itemLink, false)
 		if hasSet then enchantSub = tonumber(itemIdSub) end -- For non-crafted sets, the "built-in" enchantment has the same quality as the item itself
 
 	end
@@ -5919,8 +6254,8 @@ local function GetSelectionDamage(data, selection)	-- Gets highest Single Target
 
 			units = units + 1
 			damage = damage + totalUnitDamage
-			starttime = math.min(starttime or unit.dpsstart or 0, unit.dpsstart or 0)
-			endtime = math.max(endtime or unit.dpsend or 0, unit.dpsend or 0)
+			starttime = unit.dpsstart and math.min(starttime or unit.dpsstart, unit.dpsstart) or starttime
+			endtime = unit.dpsend and math.max(endtime or unit.dpsend, unit.dpsend) or endtime
 
 			if totalUnitDamage > bossDamage then
 
@@ -5932,7 +6267,7 @@ local function GetSelectionDamage(data, selection)	-- Gets highest Single Target
 		end
 	end
 
-	local damageTime = (endtime - starttime)/1000
+	local damageTime = starttime and endtime and (endtime - starttime)/1000 or 0
 	damageTime = damageTime > 0 and damageTime or data.dpstime
 
 	return units, damage, bossName, damageTime

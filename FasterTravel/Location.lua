@@ -45,9 +45,7 @@ local function IsCyrodiil(loc)
 	return loc.zone == "cyrodiil"
 end
 
-local l = Location
+Location.GetClosestLocation = GetClosestLocation
+Location.IsCyrodil = IsCyrodiil
 
-l.GetClosestLocation = GetClosestLocation
-l.IsCyrodil = IsCyrodiil
-
-FasterTravel.Location = l 
+FasterTravel.Location = Location 

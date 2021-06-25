@@ -115,13 +115,21 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE = "Show Message When Toggle",
     SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE_TOOLTIP = "Will show a message in chat when toggling this add-on.",
     SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT = "Show Category Items Count",
-    SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP = "Add a number to show how many items in the category after the category's name", 
+    SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP = "Add a number to show how many items in the category after the category's name",
+    SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_COLLAPSE_ICON = "Show Category Collapse Icon",
+    SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_COLLAPSE_ICON_TOOLTIP = "Shows an icon to collapse/expand the categories.",
     SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS = "Save Category Collapse Status",
     SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS_TOOLTIP = "Will keep the categories collapsed/expanded as they are after quit/log out.",
 
     SI_AC_MENU_SUBMENU_IMPORT_EXPORT = "|c0066FF[Import & Export]|r",
     SI_AC_MENU_HEADER_ACCOUNT_WIDE_SETTING = "Account Wide Setting",
 
+    SI_AC_MENU_SUBMENU_GAMEPAD_SETTING = "|c0066FF[Gamepad Settings]|r",
+    SI_AC_MENU_GMS_DESCRIPTION_TIP = "Only works in gamepad mode",
+	SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD = "Enable inventory support",
+	SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD_TOOLTIP = "Categories and rules will be applied to gamepad inventory.",
+    SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES = "Enable extended Supplies category",
+    SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES_TOOLTIP = "Supplies category will contain all items from inventory. Default Materials, Furnishings and Slottable items categories will be hidden.",
 
     SI_AC_DEFAULT_TAG_GEARS= "Gears",
     SI_AC_DEFAULT_TAG_GENERAL_ITEMS= "General Items",

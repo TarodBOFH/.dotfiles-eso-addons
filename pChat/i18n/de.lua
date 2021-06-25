@@ -40,6 +40,8 @@ SafeAddString(PCHAT_enableWhisperTabT							,"Flüster Nachrichten werden zu ein
 
 
 -- New Need Translations
+SafeAddString(PCHAT_ADDON_INFO                                  , "pChat überarbeitet alle möglichen Aspekte deines Chats. Du kannst Farben, Größe, Benachrichtigungen usw. anpassen, dich per Sound benachrichtigen lassen, und vieles mehr.\nDas Addon ChatMentions ist mittlerweile in pChat integriert.\nMit dem Befehl /msg im Chat kannst du die UI zum Definieren von Kürzeln öffnen, mit denen du deine Langtexte (Gilden Willkommens-Grüße z.B.) in den Chat senden kannst.", 1)
+SafeAddString(PCHAT_ADDON_INFO_2                                , "Benutze den Chat Befehl \'/pchatdeleteoldsv\' um alte, nicht-Server abhängige Einstellungen zu löschen (Dateigröße verringern).", 1)
 
 SafeAddString(PCHAT_OPTIONSH											, "Chat Optionen", 1)
 SafeAddString(PCHAT_MESSAGEOPTIONSH										, "Nachrichten Optionen", 1)
@@ -441,6 +443,7 @@ SafeAddString(PCHAT_COPYXMLAPPLY                                    , "Filter an
 SafeAddString(PCHAT_SWITCHTONEXTTABBINDING						, "Zur nächsten Registerkarte", 1)
 SafeAddString(PCHAT_TOGGLECHATBINDING								, "Toggle Chat-Fenster", 1)
 SafeAddString(PCHAT_WHISPMYTARGETBINDING							, "Flüsternachricht an Zielperson", 1)
+SafeAddString(PCHAT_COPYWHOLECHATBINDING                        ,   "Kopiere den Chat (Dialog)", 1)
 
 SafeAddString(PCHAT_SAVMSGERRALREADYEXISTS						, "Kann die Nachricht nicht speichern, da sie schon existiert!", 1)
 SafeAddString(PCHAT_AUTOMSG_NAME_DEFAULT_TEXT			, "Beispiel: ts3", 1)
@@ -473,24 +476,35 @@ SafeAddString(PCHAT_CHATHANDLER_IGNORE_REMOVED              , "Ignorierte Spiele
 SafeAddString(PCHAT_CHATHANDLER_GROUP_MEMBER_LEFT           , "Gruppen Mitglied verlassen", 1)
 SafeAddString(PCHAT_CHATHANDLER_GROUP_TYPE_CHANGED          , "Gruppen Typ geändert", 1)
 
+SafeAddString(PCHAT_SETTINGS_EDITBOX_HOOKS 					, "Chat Text Eingabefeld", 1)
+SafeAddString(PCHAT_SETTINGS_EDITBOX_HOOK_CTRL_BACKSPACE 	, "STRG + <-: Wort löschen", 1)
+SafeAddString(PCHAT_SETTINGS_EDITBOX_HOOK_CTRL_BACKSPACETT 	, "Wenn die STRG + Zurück (<- Taste, auch BACKSPACE genannt) gedrückt wird, so wird das ganze Wort links vor dem Cursor gelöscht.", 1)
 
-	-- Coorbin20200708
-	-- Chat Mentions settings strings
-SafeAddString(PCHAT_MENTIONSH, "Erwähnungen", 1)
-SafeAddString(PCHAT_MENTIONS_TEXT_COLOR_CHECKBOX_NAME, "Verändere Schriftfarbe bei einer Erwähnung: Name",1)
-SafeAddString(PCHAT_MENTIONS_TEXT_COLOR_CHECKBOX_TOOLTIP, "Soll die Chat Schriftfarbe verändert werden, wenn dein Name genannt wird, oder nicht?",1)
-SafeAddString(PCHAT_MENTIONS_TEXT_COLOR_PICKER_NAME, "Farbe bei Erwähnung: Name",1)
-SafeAddString(PCHAT_MENTIONS_ADD_EXCL_ICON_NAME, "Fühe Ausrufezeichen hinzu",1)
-SafeAddString(PCHAT_MENTIONS_ADD_EXCL_ICON_TOOLTIP, "Soll dem Chat Text ein Ausrufezeichen Symbol am Anfang zugefügt werden, wenn dein Name erwähnt wird?",1)
-SafeAddString(PCHAT_MENTIONS_ALLCAPS_NAME, "Alles in GROßBUCHSTABEN: Name",1)
-SafeAddString(PCHAT_MENTIONS_ALLCAPS_TOOLTIP, "Soll der Name im Chat Text in Großbuchstaben dargestellt werden, wenn dein Name erwähnt wird?",1)
-SafeAddString(PCHAT_MENTIONS_EXTRA_NAMES_NAME, "Andere Namen um dich zu benachrichtigen (1 Zeile je Name)",1)
-SafeAddString(PCHAT_MENTIONS_EXTRA_NAMES_TOOLTIP, "Eine Liste mit 1 Namen je Zeile bei welchen du auch informiert wirst. Drücke die ENTER Taste um eine neue Zeile zu beginnen. Wenn du ein \'!\' vor den Namen schreibst, wirst du nur informiert, wenn der Name ein eigenes Wort ist. Zum Beispiel: Wenn du \'!de\' einträgst wirst du bei \'de nada\' informiert aber nicht bei \'Delikatessen\'. Wenn du nur \'de\' einträgst wirst du auch bei \'Delikatessen\' informiert.",1)
-SafeAddString(PCHAT_MENTIONS_SELFSEND_NAME, "Auch bei deinen gesendeten Nachrichten?",1)
-SafeAddString(PCHAT_MENTIONS_SELFSEND_TOOLTIP, "Sollen die eingestellten Formatierungen auch auf Nachrichten angewendet werden, welche du versendest?",1)
-SafeAddString(PCHAT_MENTIONS_DING_NAME, "Ding Geräusch?",1)
-SafeAddString(PCHAT_MENTIONS_DING_TOOLTIP, "Spiele ein Ding Geräusch ab wenn dein Name erwähnt wird.",1)
-SafeAddString(PCHAT_MENTIONS_APPLYNAME_NAME, "Alle Charakter Namen berücksichtigen",1)
-SafeAddString(PCHAT_MENTIONS_APPLYNAME_TOOLTIP, "Formatierungen auf alle Bestandteile deines Namens anwenden (durch Leerzeichen getrennt). Deaktiviere diese Option, wenn du einen gewöhnlichen Namen wie z.B. \'Me\' in deinem Namen verwendest",1)
-SafeAddString(PCHAT_MENTIONS_WHOLEWORD_NAME, "Charakter Namen nur als Gesamtes Wort",1)
-SafeAddString(PCHAT_MENTIONS_WHOLEWORD_TOOLTIP, "Sollen die Charakter Namen nur als Gesamtes Wort erkannt werden? Wenn du einen sehr kurzen Namen innerhalb deines mit Leerzeichen getrennten Charakter Namen verwendest, willst du diese Option ggf. anschalten.",1)
+SafeAddString(PCHAT_SETTINGS_BACKUP 				        , "Backup", 1)
+SafeAddString(PCHAT_SETTINGS_BACKUP_REMINDER_LAST_REMINDER  , "Letzte Erinnerung: %s", 1)
+SafeAddString(PCHAT_SETTINGS_BACKUP_REMINDER 		        , "Backup Erinnerung", 1)
+SafeAddString(PCHAT_SETTINGS_BACKUP_REMINDER_TT 	        , "Zeige eine Erinnerung, dass du deine Einstellungen sichern sollst, jede Woche 1x an. Die Erinnerung wird auch angezeigt, wenn ein Wechsel der APIVersion festgestellt wird (durch einen Patch z.B.).\n\nDu solltest generell nach einem Spiel Patch, aber VOR dem Einloggen in das Spiel, ein Backup deines SavedVariables Verzeichnisses durchführen!", 1)
+SafeAddString(PCHAT_SETTINGS_BACKUP_REMINDER_DIALOG_TEXT	, "Bitte |cFF0000!logge dich aus!|r und sichere deine pChat SavedVariables!\nDer folgende Link auf www.esoui.com erklärt dir\nwie du dies tun kannst:\n\nhttps://www.esoui.com/forums/showthread.php?t=9235\n\nBestätige diesen Dialog und der nächste Dialog\nkann dir diese Webseite direkt öffnen\n(falls du noch lernen musst, wie man seine\nSavedVariables sichern kann).", 1)
+SafeAddString(PCHAT_SETTINGS_WARNING_REMINDER_LOGOUT_BEFORE	, "Denk daran dich zuerst AUSZULOGGEN!", 1)
+
+
+-- Coorbin20200708
+-- Chat Mentions settings strings
+SafeAddString(PCHAT_MENTIONSH ,  "Erwähnungen (Mentions)")
+SafeAddString(PCHAT_MENTIONS_TEXT_COLOR_CHECKBOX_NAME ,  "Text Farbe anpassen, wenn Name erwähnt wird?")
+SafeAddString(PCHAT_MENTIONS_TEXT_COLOR_CHECKBOX_TOOLTIP ,  "Soll die Text Farbe verändert werden, wenn dein Account Name (oder auch Charakter Name, sofern weiter unten in den Einstellungen aktiviert) erwähnt wird")
+SafeAddString(PCHAT_MENTIONS_TEXT_COLOR_PICKER_NAME ,  "Farbe des Namens, wenn du erwähnt wirst")
+SafeAddString(PCHAT_MENTIONS_ADD_EXCL_ICON_NAME ,  "Ausrufezeichen hinzufügen?")
+SafeAddString(PCHAT_MENTIONS_ADD_EXCL_ICON_TOOLTIP ,  "Soll ein ! (Ausrufzeichen) Symbol am Anfang des Namens hinzugefügt werden, wenn dein Name erwähnt wird?")
+SafeAddString(PCHAT_MENTIONS_ALLCAPS_NAME ,  "Den NAMEN GROß schreiben?")
+SafeAddString(PCHAT_MENTIONS_ALLCAPS_TOOLTIP ,  "Soll dein Name in großbuchstaben dargestellt werden, wenn er erwähnt wird?")
+SafeAddString(PCHAT_MENTIONS_EXTRA_NAMES_NAME ,  "Extra Namen, welche als Erwähnung gelten (je Zeile: 1 Name)")
+SafeAddString(PCHAT_MENTIONS_EXTRA_NAMES_TOOLTIP ,  "Eine Liste in welcher je Zeile ein weiterer Name eingetragen werden kann, welcher zu einer Erwähnunh führen wird. Drücke die ENTER Taste, um eine neue Zeile zu beginnen. Wenn du ein \'!\' (Ausrufezeichen) vor den Namen setzt, so wird dieser Name nur erwähnt, wenn dieser ein eigenständiges Wort (mt Leerzeichen davor und dahinter) darstellt!\n\nBeispiel: \'!de\' Du wirst bei \'de nada\' informiert, nicht jedoch bei \'Delikatessen\'. Wenn du nur z.B. \'de\' hinzufügst, werden alle Wörte mit den Buchstaben \'de\' zu einer Benachrichtigung führen (z.B. Hunde, Delikatessen, Deutschland, ...).")
+SafeAddString(PCHAT_MENTIONS_SELFSEND_NAME ,  "Auch für eigen-versendete Nachrichten?")
+SafeAddString(PCHAT_MENTIONS_SELFSEND_TOOLTIP ,  "Sollen die Benachrichtigungen auch für Nachrichten, welche du selbst versendest, aktiviert werden?")
+SafeAddString(PCHAT_MENTIONS_DING_NAME ,  "\'Ding\' Klang?")
+SafeAddString(PCHAT_MENTIONS_DING_TOOLTIP ,  "Soll ein Ding Klang ertönen, wenn eine Erwähnung vorliegt?")
+SafeAddString(PCHAT_MENTIONS_APPLYNAME_NAME ,  "Charakter Namen auch berücksichtigen?")
+SafeAddString(PCHAT_MENTIONS_APPLYNAME_TOOLTIP ,  "Soll nicht nicht der Account Name, sondern auch der Charakter Name, berücksichtigt werden?\nAchtung: Dies wird für jeden Bestandteil deines Charakter Namens (also jeden durch Leerzeichen getrennten Teil) angewandt! z.B. wird bei  \'Baertram der Bärenfreund\' dann benachrichtigt, wenn jemand \'Baertram\', \'der\' oder \'Bärenfreund\' schreibt.\nDeaktiviere diese Option, wenn du einen sehr gewöhnlichen Namensbestandteil wie z.B. \'der\' in deinem Charakternamen verwendest.")
+SafeAddString(PCHAT_MENTIONS_WHOLEWORD_NAME ,  "Namen nur als ganze Wörter prüfen?")
+SafeAddString(PCHAT_MENTIONS_WHOLEWORD_TOOLTIP ,  "Charakter Namen werden nur als ganze Wörter geprüft, und nicht jeder Charakternamen Bestandteil (durch Leerzeichen getrennt) einzeln. Wenn du einen kurzen Charakternamen Bestandteil verendest, z.B. \'der\' in \'Baertram der Bärenfreund\', dann sollte diese Option dir helfen .")

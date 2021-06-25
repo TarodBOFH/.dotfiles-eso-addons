@@ -1,9 +1,14 @@
 local Location = FasterTravel.Location
 local Utils = FasterTravel.Utils
+local Options = FasterTravel.Options
 
 local ALLIANCE_ALL = -2147483646
 local ALLIANCE_SHARED = -2147483647
 local ALLIANCE_WORLD = -2147483648
+
+local LocationDirection = Options.LocationDirection
+local LocationOrder = Options.LocationOrder
+local AllWSOrder = Options.AllWSOrder
 
 local _factionZoneOrderLookup = {
 	[ALLIANCE_ALDMERI_DOMINION] = {
@@ -26,6 +31,7 @@ local _factionZoneOrderLookup = {
 		"elsweyr", "southernelsweyr", "tideholm", 
 		"westernskyrim", "blackreach", 
 		"u28_blackreach", "reach", 
+		"blackwood",
 	},
 	[ALLIANCE_WORLD] = { "tamriel", "mundus", }
 }
@@ -98,8 +104,9 @@ local _locationsList = {
 	{["subzone"] = "westernskyrim",		["zone"] = "skyrim",			["mapIndex"] = 38,	["zoneIndex"] = 743,			["name"] = "Western Skyrim",				["key"] = "skyrim/westernskyrim",				["tile"] = "art/maps/skyrim/westernskyrim_base_0.dds",		},
 	{["subzone"] = "blackreach",		["zone"] = "skyrim",			["mapIndex"] = 39,	["zoneIndex"] = 744,			["name"] = "Blackreach: Greymoor Caverns",	["key"] = "skyrim/blackreach",					["tile"] = "art/maps/skyrim/blackreach_base_0.dds",			},
 --	{["subzone"] = "blackreach",		["zone"] = "skyrim",			["mapIndex"] = 40,	["zoneIndex"] = 745,			["name"] = "Blackreach",					["key"] = "skyrim/blackreach",					["tile"] = "art/maps/skyrim/blackreach_base_0.dds",			},
-	{["subzone"] = "u28_blackreach",	["zone"] = "reach",				["mapIndex"] = 41,	["zoneIndex"] = 784,			["name"] = "Blackreach: Arkthzand Cavern",	["key"] = "reach/u28_blackreach",				["tile"] = "art/maps/reach/U28_blackreach_base_0.dds",		},
-	{["subzone"] = "reach",				["zone"] = "reach",				["mapIndex"] = 42,	["zoneIndex"] = 783,			["name"] = "The Reach",						["key"] = "reach/reach",						["tile"] = "art/maps/reach/reach_base_0.dds",				},
+	{["subzone"] = "u28_blackreach",	["zone"] = "reach",				["mapIndex"] = 41,	["zoneIndex"] = 783,			["name"] = "Blackreach: Arkthzand Cavern",	["key"] = "reach/u28_blackreach",				["tile"] = "art/maps/reach/U28_blackreach_base_0.dds",		},
+	{["subzone"] = "reach",				["zone"] = "reach",				["mapIndex"] = 42,	["zoneIndex"] = 784,			["name"] = "The Reach",						["key"] = "reach/reach",						["tile"] = "art/maps/reach/reach_base_0.dds",				},
+	{["subzone"] = "blackwood",			["zone"] = "blackwood",			["mapIndex"] = 43,	["zoneIndex"] = 834,			["name"] = "Blackwood",						["key"] = "reach/reach",						["tile"] = "art/maps/blackwood/blackwood_base_0.dds",		},
 	{ -- manually added
 		["zoneIndex"] = 99,
 		["name"] = "Eyevea",
@@ -113,26 +120,27 @@ local _locationsList = {
 	}
 }
 
+-- add localized zone names
+for i, v in ipairs(_locationsList) do
+	v.name = Utils.FormatStringCurrentLanguage(GetZoneNameByIndex(v.zoneIndex))
+end
+
 local ZONE_INDEX_CYRODIIL = 37
-
-local LocationOrder = {
-	ZONE_NAME = 0,
-	ZONE_LEVEL = 2,
-}
-
-local LocationDirection = {
-	ASCENDING = 0,
-	DESCENDING = 1
-}
-
-local AllWSOrder = {
-	NAME = 1,
-	TRADERS = 2
-}
 
 local _locations
 local _locationsLookup
 local _zoneFactionLookup
+
+local _zoneIdReverseLookup = {}
+for zoneIndex=0, GetNumZones() do
+    local zoneId = GetZoneId(zoneIndex)
+	local zoneName = Utils.FormatStringCurrentLanguage(GetZoneNameById(zoneId))
+	_zoneIdReverseLookup[zoneName] = zoneId
+end
+	
+local function GetZoneIdByName(name)
+	return _zoneIdReverseLookup[name]
+end
 
 local function GetMapZone(path)
 	path = path or GetMapTileTexture()
@@ -330,17 +338,6 @@ local _locationSortOrder = {
 		end)
 		return list
 	end,
---[[
-	[LocationOrder.FACTION_NAME] = function(direction,currentFaction) 
-		local lookup = GetLookup()
-		local tbl = GetFactionOrderedList(currentFaction, lookup, { 
-			zoneSortFunc = function(x,y) 
-				return GetDirectionValue(direction,x,y)
-			end
-		})
-		return tbl
-	end, 
-]]--
 	[LocationOrder.ZONE_LEVEL] = function(direction,currentFaction)
 		local lookup = GetLookup()
 		local tbl = GetFactionOrderedList(currentFaction, lookup, {
@@ -374,38 +371,6 @@ local function UpdateLocationOrder(locations,order,...)
 	end
 end
 
--- dropdown labels
-local s1, s2, s3, s4, s5, s6
-s1, s2 = string.match(GetString(SI_GAMEPAD_BANK_SORT_ORDER_UP_TEXT), "(.+)/(.+)")
-s3, s4 = string.match(GetString(SI_GAMEPAD_BANK_SORT_ORDER_DOWN_TEXT), "(.+)/(.+)")
-s5 = GetString(SI_CHAT_CHANNEL_NAME_ZONE)
-s6 = GetString(SI_FRIENDS_LIST_PANEL_TOOLTIP_LEVEL)
-
-local function DropdownLabel(id, x, y)
-	return { id = id, text = string.format("%s %s", x, y) }
-end
-
-local _sortOrders = {
-	DropdownLabel(LocationOrder.ZONE_NAME + LocationDirection.ASCENDING,   s5, s2),
-	DropdownLabel(LocationOrder.ZONE_NAME + LocationDirection.DESCENDING,  s5, s4),
-	DropdownLabel(LocationOrder.ZONE_LEVEL + LocationDirection.ASCENDING,  s6, s1),
-	DropdownLabel(LocationOrder.ZONE_LEVEL + LocationDirection.DESCENDING, s6, s3),
-}
-
-local _sortAllWSOrders = {
-	{ id = AllWSOrder.NAME, text = GetString(SI_INVENTORY_SORT_TYPE_NAME) },
-	{ id = AllWSOrder.TRADERS, text = GetString(FASTER_TRAVEL_TRADERS)}
-}
-
--- accessor functions
-local function GetSortOrders()
-	return _sortOrders
-end 
-
-local function GetSortAllWSOrders()
-	return _sortAllWSOrders
-end 
-
 local function GetZoneFactionIcon(loc)
 	local faction = GetZoneFaction(loc)
 	return _factionAllianceIcons[faction]
@@ -413,6 +378,7 @@ end
 
 local Data = {}
 Data.ZONE_INDEX_CYRODIIL = ZONE_INDEX_CYRODIIL
+Data.GetZoneIdByName = GetZoneIdByName
 Data.GetMapZoneKey = GetMapZoneKey
 Data.GetList = GetList
 Data.GetLookup = GetLookup
@@ -423,13 +389,8 @@ Data.GetZoneFaction = GetZoneFaction
 Data.GetFactionOrderedList = GetFactionOrderedList
 Data.IsFactionWorldOrShared = IsFactionWorldOrShared
 Data.LocationOrder = LocationOrder
-Data.LocationDirection = LocationDirection
-Data.AllWSOrder = AllWSOrder
 Data.UpdateLocationOrder = UpdateLocationOrder
-Data.GetSortOrders = GetSortOrders
-Data.GetSortAllWSOrders = GetSortAllWSOrders
 Data.GetZoneFactionIcon = GetZoneFactionIcon
-
 FasterTravel.Location.Data = Data
 	
 	

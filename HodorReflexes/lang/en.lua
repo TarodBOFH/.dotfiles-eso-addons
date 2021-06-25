@@ -85,24 +85,30 @@ local strings = {
 	HR_MENU_ICONS_VISIBILITY_ANIM = "Animated Icons",
 	HR_MENU_ICONS_VISIBILITY_ANIM_TT = "Play animated icons. Note: disabling this feature won't increase your FPS.",
 
-	HR_MENU_ICONS_README1 = "A custom icon must have the .dds extension (DirectDraw Surface file format). Preferable size is 32x32 px.",
-	HR_MENU_ICONS_README2 = "If you want other players to see your icon, then you need to support the addon's author |cFFFF00@andy.s|r with gold (real money donations are also welcome).\nStatic icon: 1M gold, animated icon: 2-3M gold depending on the number of frames. You can contact the author via Discord (|cFFFF00andy.s#2135|r) or esoui.com site.",
-	HR_MENU_ICONS_README3 = "You can preview your name and icon below and send the generated LUA code alongside the icon file to |cFFFF00andy.s#2135|r via Discord (you may need to add me to friends first).",
+	HR_MENU_ICONS_README1 = "To preview a custom icon below, it must have the .dds extension (DirectDraw Surface file format). Preferable size is 32x32 px.",
+	HR_MENU_ICONS_README2 = "If you want other players to see your icon, then you need to support the addon's author |cFFFF00@andy.s|r with gold (real money donations are also welcome).\nStatic icon: |cFFFF002M gold|r, animated icon: |cFFFF004M gold|r. You can contact the author via Discord (|cFFFF00andy.s#2135|r) or esoui.com site.",
+	HR_MENU_ICONS_README3 = "You can preview your name and icon below and send the generated LUA code alongside the icon file to |cFFFF00andy.s#2135|r via Discord (send me a friend request first).",
 
 	HR_MENU_STYLE = "Style",
 	HR_MENU_STYLE_PINS = "Show map pings",
 	HR_MENU_STYLE_PINS_TT = "Show players' pings on the world map and compass.",
 	HR_MENU_STYLE_DPS = "Damage list",
-	HR_MENU_STYLE_DPS_FONT = "Numbers font:",
+	HR_MENU_STYLE_DPS_FONT = "Numbers font",
 	HR_MENU_STYLE_DPS_FONT_DEFAULT = "Default",
 	HR_MENU_STYLE_DPS_FONT_GAMEPAD = "Gamepad",
-	HR_MENU_STYLE_DPS_BOSS_COLOR = "Boss damage color:",
-	HR_MENU_STYLE_DPS_TOTAL_COLOR = "Total damage color:",
-	HR_MENU_STYLE_DPS_HEADER_OPACITY = "Header opacity:",
-	HR_MENU_STYLE_DPS_EVEN_OPACITY = "Even row opacity:",
-	HR_MENU_STYLE_DPS_ODD_OPACITY = "Odd row opacity:",
-	HR_MENU_STYLE_DPS_HIGHLIGHT = "Highlight color:",
+	HR_MENU_STYLE_DPS_BOSS_COLOR = "Boss damage color",
+	HR_MENU_STYLE_DPS_TOTAL_COLOR = "Total damage color",
+	HR_MENU_STYLE_DPS_HEADER_OPACITY = "Header opacity",
+	HR_MENU_STYLE_DPS_EVEN_OPACITY = "Even row opacity",
+	HR_MENU_STYLE_DPS_ODD_OPACITY = "Odd row opacity",
+	HR_MENU_STYLE_DPS_HIGHLIGHT = "Highlight color",
 	HR_MENU_STYLE_DPS_HIGHLIGHT_TT = "Highlight your name in the damage list with the selected color. If you don't want to highlight your name, then set Opacity to 0. Only you see the highlighted name.",
+	HR_MENU_STYLE_HORN_COLOR = "War Horn duration color",
+	HR_MENU_STYLE_FORCE_COLOR = "Major Force duration color",
+	HR_MENU_STYLE_COLOS_COLOR = "Colossus duration color",
+
+	HR_MENU_ANIMATIONS = "Animated messages",
+	HR_MENU_ANIMATIONS_TT = "Animate colossus and horn countdowns to make them more noticeable.",
 
 	HR_MENU_VOTE = "Vote",
 	HR_MENU_VOTE_DISABLED = "This module requires Hodor Reflexes to be enabled!",
@@ -179,7 +185,7 @@ local strings = {
 	-------------------------
 
 	HR_MOCK1 = "Imagine dying with all these addons enabled.",
-    HR_MOCK2 = "Try to equip Mighty Chudan, Plague Doctor and Beekeeper's Gear.",
+    HR_MOCK2 = "Try equipping Mighty Chudan, Plague Doctor and Beekeeper's Gear.",
     HR_MOCK3 = "Are you going to blame the servers again?",
 	HR_MOCK4 = "A bad instance, obviously.",
 	HR_MOCK5 = "Maybe tanking or healing would be a better role for you.",
@@ -191,10 +197,13 @@ local strings = {
 	HR_MOCK11 = "If you want to do something useful, then check Crown Store.",
 	HR_MOCK12 = "The game's performance is bad, but yours is worse.",
 	HR_MOCK13 = "You are doing good at being bad.",
-	HR_MOCK14 = "Try to install more addons to carry you.",
+	HR_MOCK14 = "Try installing more addons to carry you.",
 	HR_MOCK15 = "Your APM is too low for this fight.",
 	HR_MOCK16 = "Don't worry, eventually we'll add this trial's achievements to Crown Store.",
 	HR_MOCK17 = "Insanity is doing the same thing over and over again and expecting different results.",
+	HR_MOCK18 = "In PvE content you are supposed to kill mobs before they kill you.",
+	HR_MOCK19 = "Have you ever considered changing your name to Kenny?",
+	HR_MOCK20 = "I've fought mudcrabs more fearsome than you.",
 	HR_MOCK_AA1 = "Imaging dying in a six years old content.",
 	HR_MOCK_EU1 = "Why do you even play on the EU server?",
 	HR_MOCK_NORMAL1 = "This is not even the veteran mode...",
@@ -206,6 +215,15 @@ local strings = {
 
 	HR_EXIT_INSTANCE = "Leave Instance",
 	HR_EXIT_INSTANCE_CONFIRM = "Do you want to leave the current instance?",
+	
+	-------------------------
+	-- Updated window
+	-------------------------
+
+	HR_UPDATED_TEXT = "Hodor Reflexes has been successfully updated, or maybe not? Unfortunately, when updating via Minion, there is a moderate chance for some files to vanish. Usually they are just icons, usually... So here is a little test of five images from different addon folders. If you don't see all of them, then you should close the game and reinstall the addon. Otherwise, just ignore this message, it won't appear again.",
+	HR_UPDATED_DISMISS = "I see five icons!",
+
+	HR_MISSING_ICON = "Couldn't load your Hodor Reflexes icon. Reinstall the addon or download it manually from esoui.com and restart the game.",
 
 }
 

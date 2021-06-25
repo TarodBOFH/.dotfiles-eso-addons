@@ -1,5 +1,5 @@
 
-local u = FasterTravel.Utils or {}
+local Utils = FasterTravel.Utils or {}
 
 local function stringIsEmpty(str)
 	return str == nil or str == ""
@@ -85,25 +85,29 @@ local function where(iter,predicate)
 end
 
 local function map(iter,func)
-	local t = type(iter)
-	if t == "table" then
-		local tbl = {}
-		for i,v in ipairs(iter) do
-			tbl[i]=func(v)
-		end
-		return tbl
-	elseif t == "function" then
-		local cur
-		return function()
-			cur = iter()
-			if cur == nil then return nil end
-			return func(cur)
+	if iter ~= nil then
+		local t = type(iter)
+		if t == "table" then
+			local tbl = {}
+			for i,v in ipairs(iter) do
+				tbl[i]=func(v)
+			end
+			return tbl
+		elseif t == "function" then
+			local cur
+			return function()
+				cur = iter()
+				if cur == nil then return nil end
+				return func(cur)
+			end
 		end
 	end
+	return ""
 end
 
 local function concatToString(...)
-	return table.concat(map({...},function(a)
+	local args = {...}
+	return table.concat(map(args,function(a)
 		return tostring(a)
 	end))
 end
@@ -119,7 +123,7 @@ end
 local _lang
 
 local function FormatStringLanguage(lang,str)
-	if stringIsEmpty(str) == true then return str end
+	if stringIsEmpty(str) then return str end
 	lang = string.lower(lang)
 	if lang == "en" then 
 		return str
@@ -128,12 +132,16 @@ local function FormatStringLanguage(lang,str)
 	end 
 end 
 
-local function FormatStringCurrentLanguage(str)
+local function CurrentLanguage()
 	if _lang == nil then 
 		_lang = GetCVar("language.2")
 		_lang = string.lower(_lang)
 	end 
-	return FormatStringLanguage(_lang,str)
+	return _lang
+end
+
+local function FormatStringCurrentLanguage(str)
+	return FormatStringLanguage(CurrentLanguage(),str)
 end
 
 local function pairsByKeys(a_table, comparing_function)
@@ -188,29 +196,55 @@ local function bold(arg)
 	return string.format("|c%s%s|r", "ffaa00", arg or "(nil)")
 end
 
+local function Highlight(wayshrine_name)
+	local prefix = ""
+	if string.find(wayshrine_name, '|c') then
+		prefix = string.sub(wayshrine_name, 1, 12)
+		wayshrine_name = string.sub(wayshrine_name, 13, -1)
+	end
+	return string.format("%s|cf0f000%s|r", prefix, wayshrine_name)
+end
+
 local function chat(level, fmt, ...)
-	if level <= FasterTravel.verbosity then
-		df(fmt, FasterTravel.prefix, ...)
+	if FasterTravel and FasterTravel.settings and
+	   FasterTravel.settings.verbosity and level <= FasterTravel.settings.verbosity then
+		local t = {}
+		local args = {...}
+		for i, v in ipairs(args) do
+			table.insert(t, v and tostring(v) or "nil")
+		end
+		if #t > 0 then
+			df(FasterTravel.prefix .. fmt, unpack(t))
+		else
+			d(FasterTravel.prefix .. fmt)
+		end
 	end
 end
 
-u.copy = copy
-u.shuffle = shuffle
-u.stringIsEmpty = stringIsEmpty
-u.stringStartsWith = stringStartsWith
-u.stringTrim = stringTrim
-u.toTable = toTable
-u.map = map
-u.where = where 
-u.extend = extend
-u.FormatStringLanguage = FormatStringLanguage
-u.FormatStringCurrentLanguage = FormatStringCurrentLanguage
-u.concatToString = concatToString
-u.reverseTable = reverseTable
-u.pairsByKeys = pairsByKeys
-u.BareName = BareName
-u.ShortName = ShortName
-u.SortByBareName = SortByBareName
-u.bold = bold
-u.chat = chat
-FasterTravel.Utils = u
+local function UniqueDialogName(dialogName)
+	return string.format("%s_%s", FasterTravel.addon.name, dialogName) 
+end
+
+
+Utils.copy = copy
+Utils.shuffle = shuffle
+Utils.stringIsEmpty = stringIsEmpty
+Utils.stringStartsWith = stringStartsWith
+Utils.stringTrim = stringTrim
+Utils.toTable = toTable
+Utils.map = map
+Utils.where = where 
+Utils.extend = extend
+Utils.CurrentLanguage = CurrentLanguage
+Utils.FormatStringLanguage = FormatStringLanguage
+Utils.FormatStringCurrentLanguage = FormatStringCurrentLanguage
+Utils.concatToString = concatToString
+Utils.reverseTable = reverseTable
+Utils.pairsByKeys = pairsByKeys
+Utils.BareName = BareName
+Utils.ShortName = ShortName
+Utils.SortByBareName = SortByBareName
+Utils.bold = bold
+Utils.chat = chat
+Utils.UniqueDialogName = UniqueDialogName
+FasterTravel.Utils = Utils

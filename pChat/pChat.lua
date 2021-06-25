@@ -35,18 +35,22 @@
 --Tested with only libs + pChat active.
 --=======================================================================================================================================
 
+--Working on:
+--#11 Copy dialog problems
+
+
 --=======================================================================================================================================
--- Changelog version: 10.0.0.5 (last version 10.0.1.0)
+-- Changelog version: 10.0.2.0 (last version 10.0.1.4)
 --=======================================================================================================================================
 --Fixed:
 --
 
 --Changed:
---API version
---LibMainMenu v9, LibCustomMenu v694
+--SavedVariables are now server dependent. "Non server dependent" SV will be copied to the first new logged in server "once". After that they will be removed!
 
 --Added:
---Chat mentions by Coorbin
+--Thanks to Dolgubon: New setting to enable the chat editbox backspace hook. If enbaled you are able to press the CTRL key + backspace to delete the whole
+--word left of the cursor
 
 --Added on request:
 --=======================================================================================================================================
@@ -59,6 +63,9 @@ pChat = pChat or {}
 --======================================================================================================================
 local CONSTANTS = pChat.CONSTANTS
 local ADDON_NAME    = CONSTANTS.ADDON_NAME
+local addonNamePrefix = "[" .. ADDON_NAME .. "] "
+
+local EM = EVENT_MANAGER
 
 --======================================================================================================================
 --pChat Variables--
@@ -92,7 +99,7 @@ local function LoadLibraries()
         logger = LibDebugLogger(ADDON_NAME)
         logger:Debug("AddOn loaded")
         logger.verbose = logger:Create("Verbose")
-        logger.verbose:SetEnabled(true)
+        logger.verbose:SetEnabled(false)
         pChat.logger = logger
     end
     --LibChatMessage
@@ -103,6 +110,19 @@ local function LoadLibraries()
 end
 --Early try to load libs (done again in EVENT_ADD_ON_LOADED)
 LoadLibraries()
+
+local function migrationInfoOutput(strVar, toChatToo, asAlertToo)
+    toChatToo = toChatToo or false
+    asAlertToo = asAlertToo or false
+    logger:Info(strVar)
+    if not logger or toChatToo == true then
+        d(addonNamePrefix .. strVar)
+    end
+    if asAlertToo == true then
+        ZO_Alert(UI_ALERT_CATEGORY_ALERT, SOUNDS.AVA_GATE_OPENED, addonNamePrefix .. strVar)
+    end
+end
+pChat.migrationInfoOutput = migrationInfoOutput
 
 --======================================================================================================================
 -- pChat functions
@@ -306,10 +326,52 @@ local function DoPostEventPlayerActivatedChecks()
     end
 end
 
+--Any tasks open after a SavedVariables migration was done?
+local function checkSavedVariablesMigrationTasks()
+    local worldName = GetWorldName()
+    logger:Debug("SV Migration - Event_Player_Activated -> checkSavedVariablesMigrationTasks")
+    --Were SavedVariables migrated from non-server dependent ones?
+    --And do we need a reloadui here?
+    if pChat.migrationReloadUI ~= nil then
+        if pChat.migrationReloadUI == 1 then
+            pChat.migrationReloadUI = nil
+            db.migrationJustFinished = nil
+            logger:Debug("SV Migration - Migration done! RELOADUI1 RELOADUI1 RELOADUI1 RELOADUI1 RELOADUI1")
+            ReloadUI()
+
+        elseif pChat.migrationReloadUI == 2 then
+            pChat.migrationReloadUI = nil
+            db.migrationJustFinished = nil
+            logger:Debug("SV Migration - Nothing migrated! RELOADUI1 RELOADUI1 RELOADUI1 RELOADUI1 RELOADUI1")
+            ReloadUI()
+
+        elseif pChat.migrationReloadUI == 3 then
+            pChat.migrationReloadUI = nil
+            db.migrationJustFinished = true
+            logger:Debug("SV Migration - Migration finished! RELOADUI2 RELOADUI2 RELOADUI2 RELOADUI2 RELOADUI2 RELOADUI2 RELOADUI2 RELOADUI2 RELOADUI2")
+            ReloadUI()
+        end
+    else
+        if db.migratedSVToServer == true and db.migrationJustFinished == true then
+            db.migrationJustFinished = nil
+
+            --Migration finished - Output info
+            logger:Debug("SV Migration - Wrote SV file to disk for server: \'" ..tostring(worldName) .."\'")
+            migrationInfoOutput("Successfully migrated the SavedVariables to the server \'" ..tostring(worldName) .. "\'", true, true)
+            migrationInfoOutput(">Non-server dependent SavedVariables for your account \'"..GetDisplayName().."\' can be deleted via the slash command \'/pchatdeleteoldsv\'!", true, false)
+            migrationInfoOutput(">Attention: If you want to copy the SVs to another server login to that other server first BEFORE deleting the non-server dependent SavedVariables, because they will be taken as the base to copy!", true, false)
+        end
+    end
+end
+
 -- Registers the formatMessage function.
 -- Unregisters itself from the player activation event with the event manager.
 local function OnPlayerActivated()
     logger:Debug("EVENT_PLAYER_ACTIVATED - Start")
+    --Were SavedVariables migrated from non-server dependent ones?
+    --And do we need a reloadui here?
+    checkSavedVariablesMigrationTasks()
+
     --Addon was loaded via EVENT_ADD_ON_LOADED and we are not already doing some EVENT_PLAYER_ACTIVATED tasks
     if pChatData.isAddonLoaded and not eventPlayerActivatedCheckRunning then
         pChatData.sceneFirst = false
@@ -375,7 +437,10 @@ local function OnPlayerActivated()
 
             pChatData.isAddonInitialized = true
 
-            EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, EVENT_PLAYER_ACTIVATED)
+            EM:UnregisterForEvent(ADDON_NAME, EVENT_PLAYER_ACTIVATED)
+
+            --Show the backup reminder?
+            pChat.ShowBackupReminder()
 
             logger:Debug("EVENT_PLAYER_ACTIVATED - End: Addon was initialized")
         end
@@ -422,6 +487,21 @@ local function LoadHooks()
         pChat_RemoveIMNotification()
     end)
 
+    --Code by Dolgubon, 2020-12-25 -- Delete whole word by using CTRL + backspace
+    ZO_PreHookHandler(ZO_ChatWindowTextEntryEditBox, "OnBackspace", function(self)
+        if not db.chatEditBoxOnBackspaceHook or not IsControlKeyDown() then return end
+        local text = self:GetText()
+        local position = self:GetCursorPosition()
+        local beforeCursor = string.sub(text, 1, position)
+        local space= #beforeCursor - (string.find(string.reverse(beforeCursor), "[% %(\"%']") or #beforeCursor)
+        local newText = string.sub(text, 0, space+1)..string.sub(text, #beforeCursor+1)
+        if space == 0 then
+            newText = ""..string.sub(text, #beforeCursor+1)
+        end
+        self:SetText(newText)
+        self:SetCursorPosition(space+1)
+    end)
+
 end
 
 --Load the string IDs for keybindings e.g.
@@ -450,11 +530,42 @@ end
 local function LoadSlashCommands()
     -- Register Slash commands
     SLASH_COMMANDS["/msg"] = pChat_ShowAutoMsg
-    -- Coorbin20200708
-    SLASH_COMMANDS["/cmadd"] = pChat.cm_add
-	SLASH_COMMANDS["/cmdel"] = pChat.cm_del
-	SLASH_COMMANDS["/cmlist"] = pChat.cm_print_list
-	SLASH_COMMANDS["/cmwatch"] = pChat.cm_watch_toggle
+
+    -- Coorbin20200708 Chat mentions
+    local cm = pChat.ChatMentions
+    SLASH_COMMANDS["/cmadd"] = cm.cm_add
+    SLASH_COMMANDS["/cmdel"] = cm.cm_del
+    SLASH_COMMANDS["/cmlist"] = cm.cm_print_list
+    SLASH_COMMANDS["/cmwatch"] = cm.cm_watch_toggle
+
+    local function pChatDeleteOldNonServerDependentSVForAccount(argu)
+        local ADDON_SV_NAME     = CONSTANTS["ADDON_SV_NAME"]
+ 	    local ADDON_SV_VERSION  = CONSTANTS["ADDON_SV_VERSION"]
+
+        local displayName = GetDisplayName()
+        migrationInfoOutput("Looking for old non-server dependent SavedVariables of account \'".. displayName .."\'....", true, false)
+        local dbOld = ZO_SavedVars:NewAccountWide(ADDON_SV_NAME, ADDON_SV_VERSION, nil, nil, nil, nil)
+--pChat._dbOld = dbOld
+        --Do the old SV exist with recently new pChat data?
+        if dbOld ~= nil and dbOld.colours ~= nil then
+            local dbOldNonServerDependent = _G[ADDON_SV_NAME]["Default"][displayName]["$AccountWide"]
+            --pChat._dbOldNonServerDependent = dbOldNonServerDependent
+            if dbOldNonServerDependent ~= nil then
+                _G[ADDON_SV_NAME]["Default"][displayName]["$AccountWide"] = nil
+                dbOldNonServerDependent = nil
+                migrationInfoOutput("Successfully deleted the old, non-server dependent SavedVariables of account \'"..displayName.."\'.", true, true)
+                logger:Info()
+                migrationInfoOutput(">A reloadUI saves the changes to disk in 3 seconds...", true, true)
+                zo_callLater(function()
+                    ReloadUI("ingame")
+                    logger:Debug("SV Delete - Old non-server data deleted! RELOADUI1_old RELOADUI1a RELOADUI1_old RELOADUI1_old RELOADUI1_old")
+                end, 3000)
+        end
+        else
+            migrationInfoOutput("No non-server dependent SavedVariables found for account \'"..displayName.."\'!", true, true)
+        end
+    end
+    SLASH_COMMANDS["/pchatdeleteoldsv"] = pChatDeleteOldNonServerDependentSVForAccount
 end
 
 -- Please note that some things are delayed in OnPlayerActivated() because Chat isn't ready when this function triggers
@@ -488,6 +599,9 @@ local function OnAddonLoaded(_, addonName)
         --Load the SV and LAM panel
         db = pChat.InitializeSettings()
 
+        --Load the dialogs
+        pChat.LoadDialogs()
+
         -- set up channel names
         UpdateCharCorrespondanceTableChannelNames()
 
@@ -502,8 +616,9 @@ local function OnAddonLoaded(_, addonName)
 
         -- Coorbin20200708
         -- Initialize Chat Mentions
-        pChat.cm_initChatMentionsEngine()
-        pChat.cm_loadRegexes()
+        local cm = pChat.ChatMentions
+        cm.cm_initChatMentionsEngine()
+        cm.cm_loadRegexes()
 
         -- Initialize Chat Config features
         pChat.InitializeChatConfig()

@@ -297,7 +297,7 @@ function ASModel.StoreStyle(style)
     end
 
     -- get outfit
-    local ofid = OFMGR:GetEquippedOutfitIndex()
+    local ofid = OFMGR:GetEquippedOutfitIndex(GAMEPLAY_ACTOR_CATEGORY_PLAYER)
     if ofid then
         style.OutfitId = ofid;
     else
@@ -352,7 +352,7 @@ function ASModel.LoadStyle(style)
     if style.OutfitId == ASModel.NO_OUTFIT_ID then
         UnequipOutfit()
     else
-        OFMGR:EquipOutfit(style.OutfitId)
+        OFMGR:EquipOutfit(GAMEPLAY_ACTOR_CATEGORY_PLAYER, style.OutfitId)
     end
 
     -- set title

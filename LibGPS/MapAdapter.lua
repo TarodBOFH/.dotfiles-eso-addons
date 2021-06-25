@@ -24,10 +24,9 @@ function MapAdapter:Initialize()
     self:HookSetMapToFunction("SetMapToQuestZone")
     self:HookSetMapToFunction("SetMapToMapListIndex")
     self:HookSetMapToFunction("SetMapToAutoMapNavigationTargetPosition")
-    if SetMapToDigSitePosition then -- added with Greymoore update. Not available in Harrowstorm
-        self:HookSetMapToFunction("SetMapToDigSitePosition")
-    end
+    self:HookSetMapToFunction("SetMapToDigSitePosition")
     self:HookSetMapToFunction("SetMapToPlayerLocation")
+    self:HookSetMapToFunction("SetMapToMapId")
     self:HookSetMapToFunction("ProcessMapClick", true, true) -- Returning is done via clicking already
     self:HookSetMapToFunction("SetMapFloor", true)
 end
@@ -62,7 +61,8 @@ local function FakeZO_WorldMap_IsMapChangingAllowed() return true end
 local function FakeSetMapToMapListIndex() return SET_MAP_RESULT_MAP_CHANGED end
 local FakeCALLBACK_MANAGER = { FireCallbacks = function() end }
 
-function MapAdapter:SetPlayerChoseCurrentMap() -- TODO: investigate if there is a better way now
+-- TODO: investigate if there is a better way now
+function MapAdapter:SetPlayerChoseCurrentMap()
     -- replace the original functions
     local oldIsChangingAllowed = ZO_WorldMap_IsMapChangingAllowed
     ZO_WorldMap_IsMapChangingAllowed = FakeZO_WorldMap_IsMapChangingAllowed
@@ -105,11 +105,15 @@ function MapAdapter:GetPlayerPosition()
 end
 
 function MapAdapter:GetPlayerWorldPosition()
-    return GetUnitWorldPosition("player")
+    return GetUnitRawWorldPosition("player")
 end
 
 function MapAdapter:GetCurrentMapIndex()
     return GetCurrentMapIndex()
+end
+
+function MapAdapter:GetCurrentMapId()
+    return GetCurrentMapId()
 end
 
 function MapAdapter:GetCurrentZoneId()
@@ -144,10 +148,6 @@ function MapAdapter:MapZoomOut()
     return MapZoomOut()
 end
 
-function MapAdapter:SetMapToPlayerLocationWithoutMeasuring()
-    return self.original.SetMapToPlayerLocation()
-end
-
 function MapAdapter:SetMapToMapListIndexWithoutMeasuring(mapIndex)
     return self.original.SetMapToMapListIndex(mapIndex)
 end
@@ -156,6 +156,6 @@ function MapAdapter:ProcessMapClickWithoutMeasuring(x, y)
     return self.original.ProcessMapClick(x, y)
 end
 
-function MapAdapter:SetMapFloorWithoutMeasuring(currentMapFloor)
-    return self.original.ProcessMapClick(currentMapFloor)
+function MapAdapter:SetMapToMapIdWithoutMeasuring(mapId)
+    return self.original.SetMapToMapId(mapId)
 end

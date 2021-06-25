@@ -121,8 +121,7 @@ function APOnBar()
     KillCounter_Kills:SetText(string.format(
                                   "K/D[%d/%d : %.1f] KB[%d] KBS[%d] Streak[%d] AP[%d]", -- To keep AP here AP(%d)
                                   counter, deathCounter,
-                                  KC_Fn.round(KDratio, 2), kbCounter, kbStreak,
-                                  streak, rankPointsGained)) -- rankPointsGained
+                                  KC_Fn.round(KDratio, 2), kbCounter, kbStreak, streak, rankPointsGained)) -- rankPointsGained
     KillCounter_Kills.anchorX = .5
 end
 
@@ -131,8 +130,7 @@ function APOffBar()
     KillCounter_Kills:SetText(string.format(
                                   "K/D[%d/%d : %.1f] KB[%d] KBS[%d] Streak[%d]", -- To keep AP here AP(%d)
                                   counter, deathCounter,
-                                  KC_Fn.round(KDratio, 2), kbCounter, kbStreak,
-                                  streak)) -- rankPointsGained
+                                  KC_Fn.round(KDratio, 2), kbCounter, kbStreak, streak)) -- rankPointsGained
     KillCounter_Kills.anchorPoint = .5
 end
 

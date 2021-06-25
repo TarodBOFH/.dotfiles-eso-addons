@@ -1,8 +1,31 @@
--- GreymindQuickSlotBar_tag (201107:15h:13) --{{{
+-- GreymindQuickSlotBar_tag (210605:17h:35) --{{{
 --  Feature Author: ivanwfr
 --}}}
 --[[ CHANGELOG
 -- TODO: when API changed, do not forget to update version in GreymindQuickSlotBar.txt
+v2.6.4   210605 {{{
+- [color="yellow"]Checked with Update 30 Blackwood (7.0.5): (API 100035)[/color]
+- [color="magenta"]Issue from Marazota: [color="orange"]LockThisPreset[/color] option set to NOT remove items on preset switch[/color]
+}}}
+v2.6.3.4 210509 {{{
+- [color="yellow"]Checked with Update 29 Flames of Ambition (6.3.0): (API 100034)[/color]
+- [color="magenta"]Issue from Marazota: [color="orange"]LockThisPreset[/color] option set to NOT remove items on preset switch[/color]
+}}}
+v2.6.3.3 210424 {{{
+- [color="yellow"]Checked with Update 29 Flames of Ambition (6.3.0): (API 100034)[/color]
+- [color="magenta"]Issue from Marazota: Hide buttons when champion dialog is showing[/color]
+}}}
+v2.6.3.2 210314 {{{
+- [color="yellow"]Checked with Update 29 Flames of Ambition (6.3.0): (API 100034)[/color]
+- [color="magenta"]Issue from Neverlands: quick slot swapping snap back on collectibles[/color]
+}}}
+v2.6.3.1 210313 {{{
+- [color="yellow"]Checked with Update 29 Flames of Ambition (6.3.0): (API 100034)[/color]
+- [color="magenta"]Issue from TheMikrobe: "Next <-o-> Previous wrap" was broken[/color]
+}}}
+v2.6.3   210312 {{{
+- [color="yellow"]Checked with Update 29 Flames of Ambition 100034 (6.3.0): (API 100034)[/color]
+}}}
 v2.6.2   201107 {{{
 - [color="yellow"]Checked with Update 28 Markarth (6.2.0): PTS (API 100033)[/color]
 - [color="orange"]Button Background Opacity slider[/color]
@@ -355,7 +378,7 @@ local QSB = {
 
     Name                                = "GreymindQuickSlotBar",
     Panel                               = nil,
-    Version                             = "v2.6.2", -- 201107 previous: 201018 201010 200824 200823 200717 200703 200614 200530 200527 200413 200304 200229 191125 191118 191102 191027 191006 190928 190918 190909 190907 190904 190824 190822 190821 190819 190817 190816 190815 190814 190813 190628 190522 190405 190304 190226 190207 190205 190126 190111 181113 181027 181023 181022 180815 180722 180522 180312 180310 180302 180226 180214 180213 171230 171219 171128 171028 170917 170902 170829 170822 170818 170815 170714 170722 170720 170717 170715 170709 170524 170206 161128 161007 160824 160823 160803 160601 160310 160219 160218 151108 150905 150514 150406 150403 150330 150314 150311 15021800
+    Version                             = "v2.6.4", -- 210605 previous: 210509 210505 210424 210314 210313 210312 201107 201018 201010 200824 200823 200717 200703 200614 200530 200527 200413 200304 200229 191125 191118 191102 191027 191006 190928 190918 190909 190907 190904 190824 190822 190821 190819 190817 190816 190815 190814 190813 190628 190522 190405 190304 190226 190207 190205 190126 190111 181113 181027 181023 181022 180815 180722 180522 180312 180310 180302 180226 180214 180213 171230 171219 171128 171028 170917 170902 170829 170822 170818 170815 170714 170722 170720 170717 170715 170709 170524 170206 161128 161007 160824 160823 160803 160601 160310 160219 160218 151108 150905 150514 150406 150403 150330 150314 150311 15021800
     SettingsVersion                     = 1,
 
     -- CHOICES
@@ -1104,7 +1127,30 @@ if(log_this) then D_EQUIP(ITEM_5_EQUIP_CHANGED, bNum, itemId, itemType, itemLeve
         -- ITEM COUNT AND SLOT {{{
         local bagIndex   = getItem_slot_from_link(itemLink)
         local _,   count = GetItemInfo(BAG_BACKPACK, bagIndex)
-        if(        count > 0 and IsValidItemForSlot(BAG_BACKPACK, bagIndex, slotIndex)) then
+        if(QSB.Settings.LockThisPreset) then
+            CallSecureProtected("SelectSlotItem"   ,BAG_BACKPACK, bagIndex, slotIndex)
+
+            if(    count <= 0 or not IsValidItemForSlot(BAG_BACKPACK, bagIndex, slotIndex)) then
+
+                -- ZO ALERT .. REFILL FOR A LOCKED PRESET {{{
+                local warnMsg = "You need a refill"
+
+                ZO_Alert(UI_ALERT_CATEGORY_ERROR
+                , QSB.Settings.SoundAlert
+                , "You're out of '"..itemName.."' in your inventory, "..warnMsg
+                )
+
+                --}}}
+                -- CHAT ALERT {{{
+                c(                      COLOR_2..QSB.Name..":\r\n"
+                ..COLOR_3.."You're out of|r "..tostring(itemLink)
+                ..COLOR_3.." in your inventory,|r "
+                ..COLOR_4.. warnMsg
+                )
+
+                --}}}
+            end
+        elseif(    count > 0 and IsValidItemForSlot(BAG_BACKPACK, bagIndex, slotIndex)) then
             CallSecureProtected("SelectSlotItem"   ,BAG_BACKPACK, bagIndex, slotIndex)
 
             --}}}
@@ -1125,7 +1171,7 @@ if(log_this) then D_EQUIP(ITEM_5_EQUIP_CHANGED, bNum, itemId, itemType, itemLeve
                     QSB.Settings.SlotItemTable[bNum].itemLink  = nil
             end
 
-            -- ZO ALERT
+            -- ZO ALERT .. SLOT CLEARED IN A NOT LOCKED PRESET {{{
             local warnMsg
             =      QSB.Settings.LockThisPreset
             and     "can't quickslot"
@@ -1136,13 +1182,15 @@ if(log_this) then D_EQUIP(ITEM_5_EQUIP_CHANGED, bNum, itemId, itemType, itemLeve
             , "You're out of '"..itemName.."' in your inventory, "..warnMsg
             )
 
-            -- CHAT ALERT
+            --}}}
+            -- CHAT ALERT {{{
             c(                      COLOR_2..QSB.Name..":\r\n"
             ..COLOR_3.."You're out of|r "..tostring(itemLink)
             ..COLOR_3.." in your inventory,|r "
             ..COLOR_4.. warnMsg
             )
 
+            --}}}
         --}}}
         -- ITEM_2_EQUIP_ERROR_SLOT {{{
         else
@@ -1523,6 +1571,7 @@ function getItem_tooltip(bNum)
             tt = tt
             .."\n"
             .."\n"..COLOR_3.."---------------------- ITEM -----------------------"
+            .."\n- GetSlotItemCount("..slotIndex..")"..s..")"       ..COLOR_2.. " ["..tostring(        GetSlotItemCount( slotIndex )).."]|r"
             .."\n- getItem_itID_from_slot("   ..s..")"              ..COLOR_2.. " ["..tostring(  getItem_itID_from_slot( bagIndex  )).."]|r"
             .."\n- GetItemId("                ..s..")"              ..COLOR_2.. " ["..tostring(  GetItemId(BAG_BACKPACK, bagIndex  )).."]|r"
             .."\n- GetItemName("              ..s..")"              ..COLOR_4..":\n"..tostring(GetItemName(BAG_BACKPACK, bagIndex  )).. "|r"
@@ -1993,7 +2042,7 @@ if(log_this) then c("background_color=[ R="..r.." G="..g.." B="..b.." ]") end
     else
         GreymindQuickSlotBarUI.data = {
             tooltipText
-            =  QSB.Name.." "..QSB.Version.." Markarth\n"
+            =  QSB.Name.." "..QSB.Version.." Flames of Ambition\n"
             ..(QSB.AccountWideSettings.SaveAccountWide and COLOR_3.."Account-wide Settings"
             or                                             COLOR_6..GetUnitName("player").."|r Character Settings"
             )
@@ -2337,6 +2386,17 @@ end
             background:SetAlpha(alpha)
 
             --}}}
+
+            if(QSB.Settings.LockThisPreset) then
+                button     : SetHidden(false)
+                overground : SetHidden(false)
+            end
+            if( emptySlot ) then
+                button     : SetAlpha(0)
+                baseground : SetAlpha(0)
+                background : SetAlpha(0)
+                overground : SetAlpha(1)
+            end
         end
     end
 
@@ -2455,22 +2515,21 @@ function ShowOrHide()
     local          crafting =     ZO_CraftingUtils_IsCraftingWindowOpen()
     local           digging =     ANTIQUITY_DIGGING_ACTIONS_FRAGMENT:IsShowing()
     local           scrying =     IsScryingInProgress()
+    local           setting =     SYSTEMS:IsShowing("champion") or not ZO_Skills:IsHidden()
 
     -- SHOULD TRANSITION TO SHOWING OR HIDING
     local          show_msg = ""
     local          hide_msg = ""
     if         qsb_panel_showing        then show_msg = "VIS-"..vis.." .. GQSB-MENU SHOWING"
     elseif not QSB.Settings.LockUI      then show_msg = "NOT LOCKED ON SCREEN"
-    elseif     BlockBarVisibility       then hide_msg = "BLOCKED IS ON"
-    elseif     ForceBarVisibility       then show_msg = "FORCED IS ON"
 
-    elseif     crafting                 then hide_msg = "WHILE CRAFTING"
-    elseif      digging                 then hide_msg = "WHILE DIGGING"
-    elseif      scrying                 then hide_msg = "WHILE SCRYING"
-    elseif not ZO_Skills:IsHidden()     then hide_msg = "WHILE SKILL TUNING"
-
+    -- USER DEFAULT
     elseif     vis == VIS_NEVER         then hide_msg = "VIS-"..vis
     elseif     vis == VIS_ALWAYS        then show_msg = "VIS-"..vis
+
+    -- USER FORCED
+    elseif     BlockBarVisibility       then hide_msg = "BLOCKED IS ON"
+    elseif     ForceBarVisibility       then show_msg = "FORCED IS ON"
 
     elseif     vis == VIS_BLINK_CHANGES then
         if     inventory_showing        then show_msg = "VIS-"..vis.." .. INVENTORY SHOWING"
@@ -2497,6 +2556,13 @@ function ShowOrHide()
         elseif quickslot_showing        then show_msg = "VIS-"..vis.." .. QSB-WHEEL SHOWING"
         else                                 hide_msg = "VIS-"..vis.." .. RETICLE ON SCREEN"
         end
+
+    end
+    -- NEVER SHOW
+    if         crafting                 then hide_msg = "WHILE CRAFTING"; show_msg = ""
+    elseif      digging                 then hide_msg = "WHILE DIGGING" ; show_msg = ""
+    elseif      scrying                 then hide_msg = "WHILE SCRYING" ; show_msg = ""
+    elseif      setting                 then hide_msg = "SETUP SHOWING" ; show_msg = ""
     end
 
     -- BUTTONS SHOWING OR HIDING
@@ -3315,17 +3381,14 @@ end
 --}}}
 -- IsEmptySlot {{{
 function IsEmptySlot(slotIndex)
-D("IsEmptySlot("..tostring(slotIndex)..")")
+D_ITEM("IsEmptySlot(" ..tostring( slotIndex )..")")
 
-       slotItemCount = GetSlotItemCount(slotIndex)
---D_ITEM("...slotItemCount=["..tostring( slotItemCount    ).."]")
+    local slotName = GetSlotName( slotIndex )
+    local is_empty = (slotIndex == nil) or (slotName == "")
 
-    if(slotItemCount == nil) then   -- 150329 -- (ticket from ESOUI) -- GreymindQuickSlotBar.lua:1272: operator < is not supported for nil < number
-        return false
-    else
-        return (GetSlotTexture( slotIndex ) == "") or (slotItemCount < 1)
-    end
-
+    local color = (is_empty and COLOR_R) or COLOR_G
+D_ITEM("...slotName=["..tostring( slotName  ).."] "..color.."...return "..tostring(is_empty))
+    return is_empty
 end
 --}}}
 -- string_split {{{
@@ -3937,7 +4000,7 @@ D("BuildSettingsMenu()")
     control = {
         type        = "slider",
         reference   = "QSB_SlotItem_ButtonBackgroundOpacity",
-        name        = "Button Background Opacity"..COLOR_3.." (new since v2.6.2)|r",
+        name        = "Button Background Opacity",
         tooltip     = "From plain invisible to full opacity",
         min         = 0,
         max         = 100,
@@ -4565,8 +4628,28 @@ if(DEBUG_EQUIP) then c(COLOR_5.."ITEM UPDATED: [ID "..bagIndex.."] [Level "..tos
         end
         --}}}
 
-        SelectNextAuto("INVENTORY UPDATED")
+        -- may have a refill for depleted items
+        SelectPreset( QSB.Settings.PresetName )
+        loadPresetSlots()
+
+        local slotIndex = GetCurrentQuickslot()
+        if IsEmptySlot(slotIndex) then
+            SelectNextAuto("INVENTORY UPDATED")
+        end
+
         Refresh("INVENTORY UPDATED")
+
+    end)
+    --}}}
+    -- Refresh .. ACTION_LAYER_POPPED --{{{
+    -- hide or show when some game dialog changed
+    EVENT_MANAGER:RegisterForEvent("GQSB.ACTION_LAYER_POPPED"
+    , EVENT_ACTION_LAYER_POPPED
+    , function(...) -- (...)
+        local layer = select(2,...)
+        D_EVENT("ACTION_LAYER_POPPED layer=["..tostring(layer).."]")
+
+        Refresh("ACTION_LAYER_POPPED", ZO_MENU_SHOW_HIDE_DELAY)
 
     end)
     --}}}
@@ -5130,6 +5213,9 @@ function OnSlashCommand(arg)
         -- /gqsb lua SHARED_FURNITURE.placeableFurniture[1][1][8].slotData
         -- /gqsb lua SHARED_FURNITURE.retrievableFurniture
 
+        ------------ https://esoapi.uesp.net/100034/data/i/s/s/IsShowing.html
+        -- /gqsb lua SYSTEMS:IsShowing("champion")
+
         ------------ TABLE
         -- /gqsb lua ACTION_BAR_ASSIGNMENT_MANAGER
         -- /gqsb lua ACTIVITY_TRACKER
@@ -5175,7 +5261,7 @@ function OnSlashCommand(arg)
     if presetName ~= "" then
         SelectPreset( presetName )
         loadPresetSlots()
-        Refresh("OnClicked_handle "..handleName)
+        Refresh("OnClicked_handle "..presetName)
 
         ui_may_have_changed = true
     end
@@ -5306,10 +5392,8 @@ end
 function d_signature()
 
     d("\r\n"
-    .."!! GQSB"..COLOR_C.." "..QSB.Version.." (201107)\n"
-    .."!!"..COLOR_6.."- Checked with Update 28 Markarth (6.2.0) API 100033\n"
-    .."!!"..COLOR_6.."- Button Background Opacity slider\n"
-    .."!!"..COLOR_6.."- UI Handles hidden by default\n"
+    .."!! GQSB"..COLOR_C.." "..QSB.Version.." (210605)\n"
+    .."!!"..COLOR_7.."- Checked with Update 30 Blackwood (7.0.5) API 100035\n"
     .."→ "..COLOR_8..QSB_SLASH_COMMAND.." -h for help|r\n"
     )
 
@@ -5322,6 +5406,9 @@ EVENT_MANAGER:RegisterForEvent(GreymindQuickSlotBar.Name, EVENT_ADD_ON_LOADED, I
 -- LINKS
 --[[--{{{
 :new C:/LOCAL/GAMES/TESO/ADDONS/2_Greymind_Quick_Slot_Bar/P.txt
+:e   C:/LOCAL/GAMES/TESO/ADDONS/2_Greymind_Quick_Slot_Bar/ARCHIVES/BAK/GreymindQuickSlotBar_210425.lua
+:e   C:/LOCAL/GAMES/TESO/ADDONS/2_Greymind_Quick_Slot_Bar/ARCHIVES/BAK/GreymindQuickSlotBar_210509.lua
 
+:!start explorer "https://esoapi.uesp.net/100035"
 --]]--}}}
 

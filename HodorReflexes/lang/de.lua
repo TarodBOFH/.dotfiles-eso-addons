@@ -84,7 +84,7 @@ local strings = {
 	HR_MENU_ICONS_VISIBILITY_ANIM_TT = "Spiele animierte Symbole ab. Achtung: die Deaktivierung dieser Funktion wird deine FPS nicht erhöhen.",
 
 	HR_MENU_ICONS_README1 = "Benutzerdefinierte Symbole müssen die Endung .dds (DirectDraw Surface file format) haben. Die Bevorzugte Größe ist 32x32 px.",
-	HR_MENU_ICONS_README2 = "Wenn du möchtest das andere Spieler dein Symbol sehen können, musst du den Autor dieses Addons |cFFFF00@andy.s|r mit Gold unterstützen (Spenden mit echtem Geld sind ebenfalls willkommen).\nStatisches Symbol: 1M Gold, animiertes Symbol: 2-3M Gold abhängig von der Anzahl der Bilder. Du erreichst den Autor über Discord (|cFFFF00andy.s#2135|r) oder der esoui.com Internetseite.",
+	HR_MENU_ICONS_README2 = "Wenn du möchtest das andere Spieler dein Symbol sehen können, musst du den Autor dieses Addons |cFFFF00@andy.s|r mit Gold unterstützen (Spenden mit echtem Geld sind ebenfalls willkommen).\nStatisches Symbol: |cFFFF002M Gold|r, animiertes Symbol: |cFFFF004M Gold|r. Du erreichst den Autor über Discord (|cFFFF00andy.s#2135|r) oder der esoui.com Internetseite.",
 	HR_MENU_ICONS_README3 = "You can preview your name and icon below and send the generated LUA code alongside the icon file to |cFFFF00andy.s#2135|r via Discord (you may need to add me to friends first).",
 
 	HR_MENU_STYLE = "Style",

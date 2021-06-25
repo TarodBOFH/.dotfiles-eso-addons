@@ -264,14 +264,11 @@ local function GetKeepTooltip()
     return _keepTooltip
 end
 
-local w = WorldMap
+WorldMap.PanToPoint = PanToPoint
+WorldMap.GetKeepTooltip = GetKeepTooltip
+WorldMap.GetPinTypeIconPath = GetPinTypeIconPath
+WorldMap.GetQuestIconPath = GetQuestIconPath
+WorldMap.ConvertQuestPinType = ConvertQuestPinType
+WorldMap.GetPinTexture = GetPinTexture
 
-w.PanToPoint = PanToPoint
-w.GetKeepTooltip = GetKeepTooltip
-
-w.GetPinTypeIconPath = GetPinTypeIconPath
-w.GetQuestIconPath = GetQuestIconPath
-w.ConvertQuestPinType = ConvertQuestPinType
-w.GetPinTexture = GetPinTexture
-
-FasterTravel.WorldMap = w
+FasterTravel.WorldMap = WorldMap

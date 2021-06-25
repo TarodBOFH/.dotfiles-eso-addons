@@ -86,7 +86,7 @@ local strings = {
 	HR_MENU_ICONS_VISIBILITY_ANIM_TT = "アニメーションアイコンを有効にします。 注: 無効化してもFPSは上昇しません。",
 
 	HR_MENU_ICONS_README1 = "カスタムアイコンには、拡張子.dds（DirectDraw Surfaceファイル形式）が必要です。推奨サイズは32x32ピクセルです。",
-	HR_MENU_ICONS_README2 = "他のプレイヤーにあなたのアイコンを表示したい場合は、アドオンの作者|cFFFF00@andy.s|rをゴールドで支援する必要があります（現金での寄付も歓迎です）。\n静止画アイコン: 1M ゴールド、 アニメーションアイコン: フレーム数に応じて2-3M ゴールド。  Discord(|cFFFF00andy.s#2135|r)またはesoui.comサイトから作者に連絡できます。",
+	HR_MENU_ICONS_README2 = "他のプレイヤーにあなたのアイコンを表示したい場合は、アドオンの作者|cFFFF00@andy.s|rをゴールドで支援する必要があります（現金での寄付も歓迎です）。\n静止画アイコン: 2M ゴールド、 アニメーションアイコン: フレーム数に応じて4M ゴールド。  Discord(|cFFFF00andy.s#2135|r)またはesoui.comサイトから作者に連絡できます。",
 	HR_MENU_ICONS_README3 = "You can preview your name and icon below and send the generated LUA code alongside the icon file to |cFFFF00andy.s#2135|r via Discord (you may need to add me to friends first).",
 
 	HR_MENU_STYLE = "スタイル",

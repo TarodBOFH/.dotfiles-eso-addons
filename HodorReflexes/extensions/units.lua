@@ -97,18 +97,20 @@ function units.Register()
 	groupSizeOnline = 0
 	for i = 1, GetGroupSize() do
 		local tag = GetGroupUnitTagByIndex(i)
-		local unit = {
-			tag = tag,
-			id = 0,
-			name = GetUnitName(tag),
-			displayName = GetUnitDisplayName(tag),
-			classId = GetUnitClassId(tag),
-			isOnline = IsUnitOnline(tag),
-			isPlayer = AreUnitsEqual(tag, 'player'),
-		}
-		if unit.isOnline then groupSizeOnline = groupSizeOnline + 1 end
-		if unit.isPlayer then unitList['player'] = unit end
-		unitList[tag] = unit
+		if IsUnitPlayer(tag) then
+			local unit = {
+				tag = tag,
+				id = 0,
+				name = GetUnitName(tag),
+				displayName = GetUnitDisplayName(tag),
+				classId = GetUnitClassId(tag),
+				isOnline = IsUnitOnline(tag),
+				isPlayer = AreUnitsEqual(tag, 'player'),
+			}
+			if unit.isOnline then groupSizeOnline = groupSizeOnline + 1 end
+			if unit.isPlayer then unitList['player'] = unit end
+			unitList[tag] = unit
+		end
 	end
 
 	EM:RegisterForEvent(EVENT_GROUP_EFFECT,  EVENT_EFFECT_CHANGED, function(_, _, _, _, tag, _, _, _, _, _, _, _, _, _, id) units.AddUnit(id, tag) end)

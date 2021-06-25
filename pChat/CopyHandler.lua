@@ -323,36 +323,40 @@ end
 
 local function SetupChatCopyOptionsDialog(control)
     ZO_Dialogs_RegisterCustomDialog("PCHAT_CHAT_COPY_DIALOG",
-    {
-        customControl = control,
-        title =
-        {
-            text = PCHAT_COPYXMLTITLE,
-        },
-        setup = function(self)
-            pChat.ChatCopyOptions:Initialize(control)
-        end,
-        buttons =
-        {
-            --[[
-            --Using the button here will always close the dialog :-(
             {
+                customControl = control,
+                title =
+                {
+                    text = PCHAT_COPYXMLTITLE,
+                },
+                setup = function(self)
+                    pChat.ChatCopyOptions:Initialize(control)
+                end,
+                buttons =
+                {
+                    --[[
+                    --Using the button here will always close the dialog :-(
+                    {
 
-                control =   GetControl(control, "ApplyFilter"),
-                text =      PCHAT_COPYXMLAPPLY,
-                keybind =   "DIALOG_PRIMARY",
-                callback =  function(dialog)
-                                pChat_ChatCopyOptions_OnCommitClicked(control)
-                            end,
-            },
-            ]]
-            {
-                control =   GetControl(control, "Close"),
-                text =      SI_DIALOG_EXIT,
-                keybind =   "DIALOG_NEGATIVE",
-            },
-        }
-    })
+                        control =   GetControl(control, "ApplyFilter"),
+                        text =      PCHAT_COPYXMLAPPLY,
+                        keybind =   "DIALOG_PRIMARY",
+                        callback =  function(dialog)
+                                        pChat_ChatCopyOptions_OnCommitClicked(control)
+                                    end,
+                    },
+                    ]]
+                    {
+                        control =   GetControl(control, "Close"),
+                        text =      SI_DIALOG_EXIT,
+                        keybind =   "DIALOG_NEGATIVE",
+                    },
+                },
+                --[[
+                finishedCallback = function()
+                end,
+                ]]
+            })
 end
 
 function ChatCopyOptions:UpdateEditAndButtons()
@@ -364,20 +368,23 @@ function ChatCopyOptions:UpdateEditAndButtons()
 
     -- editbox is 20000 chars max
     local maxChars      = 20000
-    local label = GetControl(control, "Label")
-    local notePrev = GetControl(control, "NotePrev")
-    local noteNext = GetControl(control, "NoteNext")
-    local noteEdit = GetControl(control, "NoteEdit")
+    local label     = GetControl(control, "Label")
+    local notePrev  = GetControl(control, "NotePrev")
+    local noteNext  = GetControl(control, "NoteNext")
+    local noteEdit  = GetControl(control, "NoteEdit")
 
     if string.len(message) < maxChars then
         label:SetText(GetString(PCHAT_COPYXMLLABEL))
         noteEdit:SetText(message)
         noteNext:SetHidden(true)
         notePrev:SetHidden(true)
-        control:SetHidden(false)
+        --DO not use or the scenes with HUDUI and hud will stay switched after closing the dialog
+        --control:SetHidden(false)
 
         noteEdit:SetEditEnabled(false)
         noteEdit:SelectAll()
+
+
     else
         label:SetText(GetString(PCHAT_COPYXMLTOOLONG))
         pChatData.messageTableId = 1
@@ -388,7 +395,8 @@ function ChatCopyOptions:UpdateEditAndButtons()
         noteEdit:SetEditEnabled(false)
         noteEdit:SelectAll()
 
-        control:SetHidden(false)
+        --DO not use or the scenes with HUDUI and hud will stay switched after closing the dialog
+        --control:SetHidden(false)
 
         noteNext:SetHidden(false)
         notePrev:SetHidden(true)
@@ -403,8 +411,8 @@ function ChatCopyOptions:Initialize(control)
         self.filterSection = control:GetNamedChild("FilterSection")
         self.guildSection = control:GetNamedChild("GuildSection")
 
-        local function Reset(control)
-            control:SetHidden(true)
+        local function Reset(p_control)
+            p_control:SetHidden(true)
         end
 
         local function FilterFactory(pool)
@@ -422,6 +430,7 @@ function ChatCopyOptions:Initialize(control)
         self.guildNameLabels = {}
         self:InitializeFilterButtons(control)
         self:InitializeGuildFilters(control)
+        self.filteredChannels = {}
         self.initialized = true
     end
 
@@ -432,9 +441,9 @@ function ChatCopyOptions:Initialize(control)
     if not message or message == "" then return end
     --Get the selected chatChannel (via ShowDiscussion)
     local chatChannel = self.chatChannel
-    --ShowDiscussion was called?
-    local applyFilterEnabled = (chatChannel==nil) or false
-
+    --ShowDiscussion (a specific chat channel only) was called?
+    local isShowDiscussion = chatChannel ~= nil
+--d("[pChat]ChatCopyOptions:Initialize - chatChannel: " ..tostring(chatChannel))
     --Uncheck all checkboxes and enable them again
     self:ResetFilterCheckBoxes()
 
@@ -445,8 +454,28 @@ function ChatCopyOptions:Initialize(control)
     if pChat.tabIndices and #pChat.tabIndices > 0 then
         local chatContainer = CHAT_SYSTEM.primaryContainer
         if chatContainer then
-            for chatTabIndex, _ in ipairs(pChat.tabIndices) do
-                self:SetCurrentChannelSelections(chatContainer, chatTabIndex, chatChannel, applyFilterEnabled)
+            if isShowDiscussion == true then
+                local pChatData = pChat.pChatData
+                local activeTab = pChatData.activeTab
+                self:SetCurrentChannelSelections(chatContainer, activeTab, chatChannel, isShowDiscussion)
+            else
+                for chatTabIndex, _ in ipairs(pChat.tabIndices) do
+                    self:SetCurrentChannelSelections(chatContainer, chatTabIndex, chatChannel, isShowDiscussion)
+                end
+            end
+        end
+        --Update the button checked state and enabled state to true for the filtered ones.
+        --All non-filtered were disabled via self:ResetFilterCheckBoxes()
+        for button, isFilterEnabled in pairs(self.filteredChannels) do
+            if isFilterEnabled == true then
+                --Update their checked state
+                button:SetEnabled(isFilterEnabled)
+                button:SetMouseEnabled(isFilterEnabled)
+                local label = GetControl(button, "Label")
+                if label then
+                    label:SetMouseEnabled(isFilterEnabled)
+                end
+                ZO_CheckButton_SetCheckState(button, isFilterEnabled)
             end
         end
     end
@@ -456,9 +485,9 @@ function ChatCopyOptions:Initialize(control)
     --Do not allow more filters if we only show one chatChannel
     local applyFilter = GetControl(control, "ApplyFilter")
     applyFilter:SetText(GetString(PCHAT_COPYXMLAPPLY))
-    applyFilter:SetEnabled(applyFilterEnabled)
-    applyFilter:SetMouseEnabled(applyFilterEnabled)
-    applyFilter:SetHidden(not applyFilterEnabled)
+    applyFilter:SetEnabled(not isShowDiscussion)
+    applyFilter:SetMouseEnabled(not isShowDiscussion)
+    applyFilter:SetHidden(isShowDiscussion)
 
     --Update the edit box and the buttons + labels
     self:UpdateEditAndButtons()
@@ -602,14 +631,19 @@ function ChatCopyOptions:UpdateGuildNames()
 end
 
 function ChatCopyOptions:ResetFilterCheckBoxes()
-d("[pChat]ResetFilterCheckBoxes")
+--d("[pChat]ResetFilterCheckBoxes")
     if not self.filterButtons then return end
     for _, button in ipairs(self.filterButtons) do
         ZO_CheckButton_SetCheckState(button, false)
-        button:SetEnabled(true)
-        button:SetMouseEnabled(true)
+        button:SetEnabled(false)
+        button:SetMouseEnabled(false)
         button:SetHidden(false)
+        local label = GetControl(button, "Label")
+        if label then
+            label:SetMouseEnabled(false)
+        end
     end
+    self.filteredChannels = {}
 end
 
 function ChatCopyOptions:SetCurrentChannelSelections(container, chatTabIndex, chatChannel, isShowDiscussion)
@@ -620,15 +654,14 @@ function ChatCopyOptions:SetCurrentChannelSelections(container, chatTabIndex, ch
     --Attention: button.channels are the chatCategories not the chatChannels!
     --> As multiple chat tabs are checked: Keep the already checked checkboxes enabled!
     -- If a chatChannel is given as 3rd parameter, only use this one but check all channels assigned to the buttons instead of only the first
-d("pChat SetCurrentChannelSelections-chatTabIndex: " ..tostring(chatTabIndex) ..", chatChannel: " ..tostring(chatChannel) .. ", isShowDiscussion: " ..tostring(isShowDiscussion))
+--d("pChat SetCurrentChannelSelections-chatTabIndex: " ..tostring(chatTabIndex) ..", chatChannel: " ..tostring(chatChannel) .. ", isShowDiscussion: " ..tostring(isShowDiscussion))
     for _, button in ipairs(self.filterButtons) do
+--d(">button: " ..tostring(button:GetName()))
         if not ZO_CheckButton_IsChecked(button) then
             if chatChannel == nil then
                 local chatChannelIsEnabeldAtChatTab = IsChatContainerTabCategoryEnabled(container.id, chatTabIndex, button.channels[1]) or false
-                ZO_CheckButton_SetCheckState(button, chatChannelIsEnabeldAtChatTab)
-                if isShowDiscussion == true then
-                    button:SetHidden(not chatChannelIsEnabeldAtChatTab)
-                end
+--d(">chatTabIndex: " ..tostring(chatTabIndex) .. ", chatChannel1AtTab: " ..tostring(button.channels[1]) .."->" ..tostring(chatChannelIsEnabeldAtChatTab))
+                self.filteredChannels[button] = self.filteredChannels[button] or chatChannelIsEnabeldAtChatTab
             else
                 local chatCategoryToCheck = GetChannelCategoryFromChannel(chatChannel)
                 if not chatCategoryToCheck then return end
@@ -636,13 +669,10 @@ d("pChat SetCurrentChannelSelections-chatTabIndex: " ..tostring(chatTabIndex) ..
                     local chatChannelCategoryIsEnabledAtChatTab = false
                     if chatCategoryToCheck == chatCategoryAtCheckbox then
                         chatChannelCategoryIsEnabledAtChatTab = IsChatContainerTabCategoryEnabled(container.id, chatTabIndex, chatCategoryToCheck) or false
+--d(">category equals cboxCategory ->" ..tostring(chatChannelCategoryIsEnabledAtChatTab))
                     end
 --d(">category: toCompare/WithCheckBox: " ..tostring(chatCategoryToCheck) .. "/" ..tostring(chatCategoryAtCheckbox) .."->" ..tostring(chatChannelCategoryIsEnabledAtChatTab))
-                    --Update their checked state
-                    ZO_CheckButton_SetCheckState(button, chatChannelCategoryIsEnabledAtChatTab)
-                    if isShowDiscussion == true then
-                        button:SetHidden(not chatChannelCategoryIsEnabledAtChatTab)
-                    end
+                    self.filteredChannels[button] = self.filteredChannels[button] or chatChannelCategoryIsEnabledAtChatTab
                 end
             end
         end
@@ -705,6 +735,8 @@ function  pChat_ChatCopyOptions_OnCommitClicked()
 end
 
 function pChat_ChatCopyOptions_OnHide()
+--d("pChat_ChatCopyOptions_OnHide")
+    ZO_Dialogs_ReleaseDialog("PCHAT_CHAT_COPY_DIALOG")
     pChat.ChatCopyOptions:Hide()
 end
 
@@ -721,6 +753,11 @@ end
 ]]
 ----------------------------------------------------------------------------------------------
 
+--Keybidning function
+function pChat_CopyWholeChat()
+    CopyWholeChat(false)
+end
+
 -- Create the controls and the dialog
 -- & transfer the message to the dialog (for the setup function)
 -- then show the dialog
@@ -730,6 +767,7 @@ function pChat_ShowCopyDialog(messageText, chatChannel)
     if pChatChatCopyOptions ~= nil and pChatChatCopyOptions.Show then
         pChatChatCopyOptions.message = messageText
         pChatChatCopyOptions.chatChannel = chatChannel
+        --Show the dialog now
         pChatChatCopyOptions:Show()
     end
 end
@@ -784,9 +822,12 @@ function pChat.InitializeCopyHandler(control)
     local db = pChat.db
 
     --Initialize the chat copy options dialog
+    -->Will be done via the XML's OnInitialized at TLC "pChatCopyOptionsDialog" as the dialog is shown
+    --[[
     if pChatCopyOptionsDialog then
         pChat_ChatCopyOptions_OnInitialized(pChatCopyOptionsDialog)
     end
+    ]]
 
     -- Show contextualMenu when clicking on a pChatLink
     local function ShowContextMenuOnHandlers(numLine, chanNumber)

@@ -50,6 +50,7 @@ local _zoneNodeLookup = {
         { poiIndex = 17, nodeIndex = 190, name = "Dungeon: Crypt of Hearts I" },
         { poiIndex = 18, nodeIndex = 9,   name = "Oldgate Wayshrine", traders_cnt = 1, },
         { poiIndex = 19, nodeIndex = 10,  name = "Crestshade Wayshrine" },
+        { poiIndex = 20, nodeIndex = 11,  name = "Tamrith Camp Wayshrine", },       
         { poiIndex = 22, nodeIndex = 12,  name = "Boralis Wayshrine" },
         { poiIndex = 23, nodeIndex = 13,  name = "Staging Grounds Wayshrine" },
         { poiIndex = 24, nodeIndex = 82,  name = "Northpoint Wayshrine" },
@@ -104,6 +105,7 @@ local _zoneNodeLookup = {
         { poiIndex = 61, nodeIndex = 319, name = "Quondam Indorilia" },
         { poiIndex = 62, nodeIndex = 309, name = "Velothi Reverie" },
         { poiIndex = 63, nodeIndex = 287, name = "Flaming Nix Deluxe Garret" },
+        { poiIndex = 64, nodeIndex = 454, name = "Dungeon: The Cauldron" },
 
     },
     [ 11] = { -- Malabal Tor
@@ -162,8 +164,8 @@ local _zoneNodeLookup = {
 
     },
     [ 16] = { -- The Rift
-        { poiIndex = 14, nodeIndex = 109, name = "Riften Wayshrine", traders_cnt = 5, },
-        { poiIndex = 15, nodeIndex = 110, name = "Skald's Retreat Wayshrine" },
+        { poiIndex = 14, nodeIndex = 109, name = "Riften Wayshrine" },
+        { poiIndex = 15, nodeIndex = 110, name = "Skald's Retreat Wayshrine", traders_cnt = 5, },
         { poiIndex = 16, nodeIndex = 111, name = "Trolhetta Wayshrine" },
         { poiIndex = 17, nodeIndex = 112, name = "Trolhetta Summit Wayshrine" },
         { poiIndex = 23, nodeIndex = 113, name = "Honrich Tower Wayshrine" },
@@ -393,6 +395,8 @@ local _zoneNodeLookup = {
         { poiIndex = 23, nodeIndex = 343, name = "Linchal Grand Manor" },
         { poiIndex = 24, nodeIndex = 362, name = "The Erstwhile Sanctuary" },
         { poiIndex = 25, nodeIndex = 390, name = "Dungeon: Depths of Malatar" },
+        { poiIndex = 26, nodeIndex = 437, name = "Dungeon: Black Drake Villa" },
+        { poiIndex = 27, nodeIndex = 466, name = "Varlaisvea Ayleid Ruins" },
 
     },
     [467] = { -- Vvardenfell
@@ -416,6 +420,7 @@ local _zoneNodeLookup = {
         { poiIndex = 68, nodeIndex = 336, name = "Tel Galen" },
         { poiIndex = 72, nodeIndex = 282, name = "Valley of the Wind Wayshrine" },
         { poiIndex = 85, nodeIndex = 328, name = "Vivec Temple Wayshrine" },
+        { poiIndex = 91, nodeIndex = 465, name = "Kushalit Sanctuary" },
 
     },
     [500] = { -- Craglorn
@@ -559,6 +564,26 @@ local _zoneNodeLookup = {
         { poiIndex = 10, nodeIndex = 448, name = "Nighthollow Wayshrine" },
 
     },
+    [834] = { -- Blackwood
+        { poiIndex = 23, nodeIndex = 462, name = "Bloodrun Wayshrine", },
+        { poiIndex = 38, nodeIndex = 468, name = "Trial: Rockgrove", },
+        { poiIndex = 43, nodeIndex = 458, name = "Leyawiin Wayshrine", traders_cnt = 6, },
+        { poiIndex = 44, nodeIndex = 459, name = "Gideon Wayshrine", },
+        { poiIndex = 45, nodeIndex = 460, name = "Borderwatch Wayshrine", },
+        { poiIndex = 46, nodeIndex = 461, name = "Fort Redmane Wayshrine", },
+        { poiIndex = 47, nodeIndex = 463, name = "Blueblood Wayshrine", },
+        { poiIndex = 48, nodeIndex = 464, name = "Stonewastes Wayshrine", },
+        { poiIndex = 49, nodeIndex = 467, name = "Leyawiin Outskirts Wayshrine", },
+        { poiIndex = 53, nodeIndex = 471, name = "Pilgrim's Rest", },
+        { poiIndex = 54, nodeIndex = 472, name = "Water's Edge", },
+        { poiIndex = 55, nodeIndex = 473, name = "Pantherfang Chapel", },
+        { poiIndex = 56, nodeIndex = 481, name = "Doomvault Vulpinaz Wayshrine", },
+        { poiIndex = 57, nodeIndex = 482, name = "Blackwood Crossroads Wayshrine", },
+        { poiIndex = 58, nodeIndex = 483, name = "Hutan-Tzel Wayshrine", },
+        { poiIndex = 59, nodeIndex = 484, name = "Vunalk Wayshrine", }, 
+
+    },
+
     [-2147483648]  = { },
 
 }
@@ -597,9 +622,7 @@ local function GetNodeInfo(nodeIndex)
     return known,name,normalizedX, normalizedY, textureName ,textureName,poiType,isShown
 end
 
-local d = Data
+Data.GetNodesByZoneIndex = GetNodesByZoneIndex
+Data.GetNodeInfo = GetNodeInfo
 
-d.GetNodesByZoneIndex = GetNodesByZoneIndex
-d.GetNodeInfo = GetNodeInfo
-
-FasterTravel.Wayshrine.Data = d
+FasterTravel.Wayshrine.Data = Data
